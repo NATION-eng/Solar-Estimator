@@ -51,5 +51,78 @@
       "estimatedPriceNaira": 1076400
     },
     "createdAt": "2026-01-14T12:48:57.281Z"
+  },
+  {
+    "propertyType": "home",
+    "contact": {
+      "name": "Demo User",
+      "phone": "0000000000",
+      "location": "Demo Location"
+    },
+    "appliances": [
+      {
+        "name": "LED TV",
+        "watt": 150,
+        "quantity": 1
+      },
+      {
+        "name": "Refrigerator",
+        "watt": 200,
+        "quantity": 1
+      },
+      {
+        "name": "Lighting Point",
+        "watt": 15,
+        "quantity": 5
+      }
+    ],
+    "hours": 6,
+    "result": {
+      "totalLoadWatts": 425,
+      "dailyEnergyWh": 2550,
+      "recommendedInverterW": 553,
+      "batteryCapacityWh": 3188,
+      "estimatedPriceNaira": 2113700
+    },
+    "createdAt": "2026-01-26T10:17:55.735Z"
+  },
+  {
+    "propertyType": "office",
+    "contact": {
+      "name": "Demo User",
+      "phone": "0000000000",
+      "location": "Demo Location"
+    },
+    "appliances": [
+      {
+        "name": "Desktops",
+        "watt": 50,
+        "quantity": 4
+      },
+      {
+        "name": "Refrigerator",
+        "watt": 10,
+        "quantity": 1
+      },
+      {
+        "name": "Lighting Point",
+        "watt": 15,
+        "quantity": 6
+      },
+      {
+        "name": "AC",
+        "watt": 80,
+        "quantity": 2
+      }
+    ],
+    "hours": 10,
+    "result": {
+      "totalLoadWatts": 460,
+      "dailyEnergyWh": 4600,
+      "recommendedInverterW": 598,
+      "batteryCapacityWh": 5750,
+      "estimatedPriceNaira": 3349200
+    },
+    "createdAt": "2026-01-26T10:22:04.851Z"
   }
 ]

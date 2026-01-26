@@ -67,6 +67,7 @@ export default function AppResult({ data }: ResultProps) {
     // @ts-ignore
     const finalY = doc.lastAutoTable.finalY + 20;
     
+    // @ts-ignore
     doc.setFillColor(245, 250, 255);
     doc.setDrawColor(0, 240, 255);
     doc.rect(14, finalY, 182, 30, 'FD');
@@ -96,9 +97,8 @@ export default function AppResult({ data }: ResultProps) {
 
   return (
     <section className="animate-float" style={{ animationDuration: '8s' }}>
-      <div className="glass-panel" style={{ 
+      <div className="glass-panel p-responsive" style={{ 
         marginTop: '60px', 
-        padding: '40px', 
         borderRadius: 'var(--radius-lg)',
         border: '1px solid var(--color-primary-glow)'
       }}>
@@ -199,7 +199,9 @@ export default function AppResult({ data }: ResultProps) {
               fontSize: '2.5rem', 
               fontWeight: 800, 
               color: 'var(--color-accent)',
-              textShadow: '0 0 20px rgba(245, 158, 11, 0.3)'
+              textShadow: '0 0 20px rgba(245, 158, 11, 0.3)',
+              wordWrap: 'break-word',
+              lineHeight: 1.2
             }}>
               {formatCurrency(data.estimatedPriceNaira)}
             </div>

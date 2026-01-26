@@ -140,8 +140,7 @@ export default function Estimator() {
 
   return (
     <div className="container-wide" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div className="glass-panel" style={{ 
-        padding: '40px', 
+      <div className="glass-panel p-responsive" style={{ 
         borderRadius: 'var(--radius-lg)',
         borderTop: '1px solid rgba(255,255,255,0.1)' 
       }}>
@@ -155,7 +154,7 @@ export default function Estimator() {
         </div>
 
         {/* PROPERTY SELECTOR */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px', marginBottom: '40px' }}>
+        <div className="grid-property" style={{ marginBottom: '40px' }}>
           {types.map((t) => (
             <button
               key={t.id}
@@ -219,7 +218,7 @@ export default function Estimator() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {appliances.map((app, index) => (
-              <div key={index} style={{
+              <div key={index} className="appliance-row" style={{
                 display: "grid",
                 gridTemplateColumns: "2fr 1fr 1fr auto",
                 gap: "12px",
@@ -281,6 +280,7 @@ export default function Estimator() {
 
                 <button
                   onClick={() => removeAppliance(index)}
+                  className="remove-btn"
                   style={{
                     color: "var(--color-text-muted)",
                     background: "transparent",
@@ -304,7 +304,8 @@ export default function Estimator() {
                 padding: "12px",
                 width: "100%",
                 borderRadius: "var(--radius-sm)",
-                fontSize: "0.9rem"
+                fontSize: "0.9rem",
+                cursor: 'pointer'
               }}
             >
               + Add Another Appliance

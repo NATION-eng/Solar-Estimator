@@ -97,3 +97,104 @@
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
+
+/* ================= MEDIA QUERIES & RESPONSIVE HELPER CLASSES ================= */
+
+/* Small Mobile (<640px) */
+@media (max-width: 640px) {
+  :root {
+      --radius-lg: 16px; /* Smaller radius for mobile */
+  }
+
+  /* Padding adjustments */
+  .pad-section {
+      padding: 30px 20px !important;
+  }
+  
+  .container-wide {
+    padding: 0 16px;
+  }
+  
+  /* Typography adjustments */
+  h1.hero-title {
+      font-size: 2.5rem !important; /* Smaller hero title */
+      word-wrap: break-word; /* Prevent overflow */
+  }
+  
+  p.hero-subtitle {
+     font-size: 1rem !important;
+  }
+  
+  .btn-primary {
+      padding: 14px 24px !important;
+      font-size: 1rem !important;
+      width: 100%; /* Full width buttons on mobile */
+      justify-content: center;
+      display: flex;
+  }
+
+  /* Layout Resets */
+  .flex-responsive {
+      flex-direction: column;
+  }
+
+  .grid-responsive {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  /* Estimator Form Specifics */
+  .appliance-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px !important;
+  }
+  
+  .appliance-row input {
+      width: 100% !important;
+      text-align: left !important;
+  }
+  
+  .appliance-row .remove-btn {
+      align-self: flex-end;
+      background: rgba(255, 0, 0, 0.1) !important;
+      padding: 4px 12px !important;
+      border-radius: 4px;
+  }
+}
+
+/* Tablet (640px - 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .hero-title {
+      font-size: 3.5rem !important;
+  }
+  
+  .pad-section {
+      padding: 40px 30px !important;
+  }
+}
+
+/* Utility to force responsive padding on any element */
+.p-responsive {
+    padding: 60px 40px;
+}
+
+@media (max-width: 640px) {
+    .p-responsive {
+        padding: 30px 20px !important;
+    }
+}
+
+/* Utility for responsive property selector grid */
+.grid-property {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+@media (max-width: 480px) {
+    .grid-property {
+        grid-template-columns: 1fr 1fr; /* 2 columns on very small screens */
+    }
+}

@@ -1,7 +1,6 @@
 export default function Hero() {
   return (
-    <section className="glass-panel" style={{ 
-      padding: '60px 40px', 
+    <section className="glass-panel p-responsive" style={{ 
       borderRadius: 'var(--radius-lg)', 
       textAlign: 'center',
       position: 'relative',
@@ -43,7 +42,8 @@ export default function Hero() {
           fontSize: '4.5rem', 
           fontWeight: 700, 
           marginBottom: '24px',
-          letterSpacing: '-0.02em'
+          letterSpacing: '-0.02em',
+          lineHeight: '1.1'
         }}>
           <span className="text-gradient">Solar System</span>
           <br />

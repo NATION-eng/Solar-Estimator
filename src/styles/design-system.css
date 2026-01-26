@@ -1,0 +1,99 @@
+/* =========================================
+   MASTERVIEW DESIGN SYSTEM
+   Premium styling for Solar Estimator
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&family=Inter:wght@400;500&display=swap');
+
+:root {
+  /* --- PALETTE: MIDNIGHT GOLD --- */
+  --color-bg-deep: #020617; /* Deepest Navy */
+  --color-bg-card: rgba(15, 23, 42, 0.7);
+  --color-bg-glass: rgba(255, 215, 0, 0.03);
+  
+  --color-primary: #fbbf24; /* Amber/Gold */
+  --color-primary-glow: rgba(251, 191, 36, 0.5);
+  
+  --color-accent: #38bdf8; /* Sky Blue */
+  --color-accent-glow: rgba(56, 189, 248, 0.4);
+  
+  --color-success: #10b981; /* Emerald */
+  --color-text-main: #ffffff;
+  --color-text-muted: #94a3b8;
+  
+  /* --- TYPOGRAPHY --- */
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  
+  /* --- UI TOKENS --- */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  
+  --shadow-glow: 0 0 35px var(--color-primary-glow);
+  --shadow-card: 0 10px 40px rgba(0, 0, 0, 0.6);
+  
+  --border-glass: 1px solid rgba(251, 191, 36, 0.2);
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ================= UTILITIES ================= */
+
+.glass-panel {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: var(--border-glass);
+  box-shadow: var(--shadow-card);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.container-wide {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.grid-responsive {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes glow-pulse {
+  0% { box-shadow: 0 0 5px var(--color-primary-glow); }
+  50% { box-shadow: 0 0 20px var(--color-primary-glow); }
+  100% { box-shadow: 0 0 5px var(--color-primary-glow); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}

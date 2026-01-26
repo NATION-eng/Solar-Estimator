@@ -1,0 +1,55 @@
+[
+  {
+    "propertyType": "home",
+    "contact": {
+      "name": "Test User",
+      "phone": "08012345678",
+      "location": "Lagos"
+    },
+    "appliances": [
+      {
+        "name": "TV",
+        "watt": 120,
+        "quantity": 1
+      }
+    ],
+    "hours": 6,
+    "result": {
+      "totalLoadWatts": 120,
+      "dailyEnergyWh": 720,
+      "recommendedInverterW": 156,
+      "batteryCapacityWh": 900,
+      "estimatedPriceNaira": 564400
+    },
+    "createdAt": "2026-01-14T12:47:45.094Z"
+  },
+  {
+    "propertyType": "home",
+    "contact": {
+      "name": "Test User",
+      "phone": "08012345678",
+      "location": "Lagos"
+    },
+    "appliances": [
+      {
+        "name": "TV",
+        "watt": 100,
+        "quantity": 1
+      },
+      {
+        "name": "fridge",
+        "watt": 120,
+        "quantity": 1
+      }
+    ],
+    "hours": 6,
+    "result": {
+      "totalLoadWatts": 220,
+      "dailyEnergyWh": 1320,
+      "recommendedInverterW": 286,
+      "batteryCapacityWh": 1650,
+      "estimatedPriceNaira": 1076400
+    },
+    "createdAt": "2026-01-14T12:48:57.281Z"
+  }
+]

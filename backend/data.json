@@ -1,0 +1,235 @@
+{
+  "leads": [
+    {
+      "id": 1770029403746,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "port Harcourt ",
+      "property_type": "school",
+      "status": "estimated",
+      "created_at": "2026-02-02T10:50:03.116Z"
+    },
+    {
+      "id": 1770030522093,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Port Harcourt ",
+      "property_type": "home",
+      "status": "estimated",
+      "created_at": "2026-02-02T11:08:42.045Z"
+    },
+    {
+      "id": 1770030571400,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Port Harcourt ",
+      "property_type": "hospital",
+      "status": "estimated",
+      "created_at": "2026-02-02T11:09:30.914Z"
+    },
+    {
+      "id": 1770031345981,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Port Harcourt ",
+      "property_type": "office",
+      "status": "estimated",
+      "created_at": "2026-02-02T11:22:25.328Z"
+    },
+    {
+      "id": 1770031365068,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Port Harcourt ",
+      "property_type": "hospital",
+      "status": "estimated",
+      "created_at": "2026-02-02T11:22:44.182Z"
+    },
+    {
+      "id": 1770037038323,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Lagos",
+      "property_type": "office",
+      "status": "estimated",
+      "created_at": "2026-02-02T12:57:17.614Z"
+    },
+    {
+      "id": 1770037237521,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Port Harcourt ",
+      "property_type": "office",
+      "status": "estimated",
+      "created_at": "2026-02-02T13:00:36.596Z"
+    },
+    {
+      "id": 1770277668722,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Port harcourt ",
+      "property_type": "home",
+      "status": "estimated",
+      "created_at": "2026-02-05T07:47:48.543Z"
+    }
+  ],
+  "estimations": [
+    {
+      "id": 1770029403854,
+      "lead_id": 1770029403746,
+      "totalSteadyWatts": 425,
+      "maxSurgeWatts": 240,
+      "dailyEnergyWh": 2550,
+      "recommendedInverter": 510,
+      "panelQuantity": 2,
+      "panelWattage": 450,
+      "batteryCapacityWh": 3825,
+      "systemVoltage": 24,
+      "estimated_price": 2258250,
+      "lat": 4.7676576,
+      "lon": 7.0188527,
+      "created_at": "2026-02-02T10:50:03.118Z"
+    },
+    {
+      "id": 1770030522462,
+      "lead_id": 1770030522093,
+      "totalSteadyWatts": 385,
+      "maxSurgeWatts": 420,
+      "dailyEnergyWh": 2310,
+      "recommendedInverter": 462,
+      "panelQuantity": 2,
+      "panelWattage": 450,
+      "batteryCapacityWh": 3465,
+      "systemVoltage": 24,
+      "estimated_price": 2110650,
+      "lat": 4.7676576,
+      "lon": 7.0188527,
+      "created_at": "2026-02-02T11:08:42.047Z"
+    },
+    {
+      "id": 1770030571215,
+      "lead_id": 1770030571400,
+      "totalSteadyWatts": 1500,
+      "maxSurgeWatts": 1050,
+      "dailyEnergyWh": 9000,
+      "recommendedInverter": 1800,
+      "panelQuantity": 6,
+      "panelWattage": 450,
+      "batteryCapacityWh": 13500,
+      "systemVoltage": 24,
+      "estimated_price": 7305000,
+      "lat": 4.7676576,
+      "lon": 7.0188527,
+      "created_at": "2026-02-02T11:09:30.916Z"
+    },
+    {
+      "id": 1770031345950,
+      "lead_id": 1770031345981,
+      "totalSteadyWatts": 2575,
+      "maxSurgeWatts": 3850,
+      "dailyEnergyWh": 30900,
+      "recommendedInverter": 3850,
+      "panelQuantity": 21,
+      "panelWattage": 450,
+      "batteryCapacityWh": 46350,
+      "systemVoltage": 48,
+      "estimated_price": 23775000,
+      "lat": 4.7676576,
+      "lon": 7.0188527,
+      "created_at": "2026-02-02T11:22:25.330Z"
+    },
+    {
+      "id": 1770031364233,
+      "lead_id": 1770031365068,
+      "totalSteadyWatts": 1500,
+      "maxSurgeWatts": 1050,
+      "dailyEnergyWh": 18000,
+      "recommendedInverter": 1800,
+      "panelQuantity": 12,
+      "panelWattage": 450,
+      "batteryCapacityWh": 27000,
+      "systemVoltage": 24,
+      "estimated_price": 13650000,
+      "lat": 4.7676576,
+      "lon": 7.0188527,
+      "created_at": "2026-02-02T11:22:44.185Z"
+    },
+    {
+      "id": 1770037037666,
+      "lead_id": 1770037038323,
+      "totalSteadyWatts": 2575,
+      "maxSurgeWatts": 3850,
+      "dailyEnergyWh": 15450,
+      "recommendedInverter": 3850,
+      "panelQuantity": 9,
+      "panelWattage": 450,
+      "batteryCapacityWh": 23175,
+      "systemVoltage": 48,
+      "estimated_price": 12423750,
+      "lat": 6.4550575,
+      "lon": 3.3941795,
+      "created_at": "2026-02-02T12:57:17.617Z"
+    },
+    {
+      "id": 1770037236787,
+      "lead_id": 1770037237521,
+      "totalSteadyWatts": 2575,
+      "maxSurgeWatts": 3850,
+      "dailyEnergyWh": 15450,
+      "recommendedInverter": 3850,
+      "panelQuantity": 11,
+      "panelWattage": 450,
+      "batteryCapacityWh": 23175,
+      "systemVoltage": 48,
+      "estimated_price": 12963750,
+      "lat": 4.7676576,
+      "lon": 7.0188527,
+      "created_at": "2026-02-02T13:00:36.598Z"
+    },
+    {
+      "id": 1770277669389,
+      "lead_id": 1770277668722,
+      "totalSteadyWatts": 385,
+      "maxSurgeWatts": 550,
+      "dailyEnergyWh": 4235,
+      "recommendedInverter": 550,
+      "systemVoltage": 12,
+      "batteryAh": 552,
+      "chargeControllerAmps": 135,
+      "panelQuantity": 3,
+      "panelWattage": 450,
+      "batteryCapacityWh": 6617.1875,
+      "estimated_price": 4239000,
+      "lat": 4.7676576,
+      "lon": 7.0188527,
+      "created_at": "2026-02-05T07:47:48.546Z"
+    }
+  ],
+  "appliance_presets": [
+    {
+      "name": "LED TV",
+      "watt": 150,
+      "surgeFactor": 1.2
+    },
+    {
+      "name": "Refrigerator",
+      "watt": 200,
+      "surgeFactor": 3
+    },
+    {
+      "name": "Air Conditioner",
+      "watt": 1500,
+      "surgeFactor": 2.5
+    },
+    {
+      "name": "Water Pump",
+      "watt": 750,
+      "surgeFactor": 3.5
+    },
+    {
+      "name": "Washing Machine",
+      "watt": 500,
+      "surgeFactor": 2
+    }
+  ]
+}

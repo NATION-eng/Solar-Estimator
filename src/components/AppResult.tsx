@@ -8,6 +8,17 @@ type ResultProps = {
     recommendedInverterW: number;
     batteryCapacityWh: number;
     estimatedPriceNaira?: number;
+    maxSurgeWatts?: number;
+    panelQuantity?: number;
+    panelWattage?: number;
+    paybackYears?: number;
+    systemVoltage?: number;
+    batteryAh?: number;
+    chargeControllerAmps?: number;
+    location?: {
+      address: string;
+      psh: number;
+    };
   };
 };
 
@@ -21,78 +32,91 @@ export default function AppResult({ data }: ResultProps) {
   };
 
   const handleDownloadPDF = () => {
-    const doc = new jsPDF();
-    
-    // Header
-    doc.setFillColor(5, 5, 5); // Deep Black
-    doc.rect(0, 0, 210, 40, 'F');
-    
-    doc.setTextColor(0, 240, 255); // Cyan
-    doc.setFontSize(22);
-    doc.setFont('helvetica', 'bold');
-    doc.text("MasterviewCEL", 14, 20);
-    
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    // @ts-ignore
-    doc.text("Solar System Quotation", 14, 28);
-    
-    doc.setFontSize(10);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 160, 25);
+    try {
+      console.log("Starting exquisite PDF generation...");
+      
+      // Resilient constructor for jsPDF across various build environments
+      const jsPDFConstructor = (jsPDF as any).default || jsPDF;
+      const doc = new jsPDFConstructor();
+      
+      // Header overlay
+      doc.setFillColor(5, 5, 5); 
+      doc.rect(0, 0, 210, 40, 'F');
+      
+      doc.setTextColor(0, 240, 255); 
+      doc.setFontSize(22);
+      doc.setFont('helvetica', 'bold');
+      doc.text("MasterviewCEL", 14, 20);
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.text("Professional Solar Quotation", 14, 28);
+      
+      doc.setFontSize(10);
+      doc.text(`Reference Date: ${new Date().toLocaleDateString()}`, 160, 25);
 
-    // Summary Section
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.text("System Configuration", 14, 55);
+      // Section Title
+      doc.setTextColor(0, 0, 0);
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.text("Technical Configuration", 14, 55);
 
-    const tableData = [
-      ['Recommended Inverter', `${(data.recommendedInverterW / 1000).toFixed(1)} kVA Pure Sine Wave`],
-      ['Battery Bank', `${(data.batteryCapacityWh / 1000).toFixed(1)} kWh Lithium-ion`],
-      ['Total Load', `${data.totalLoadWatts.toLocaleString()} Watts`],
-      ['Daily Energy Need', `${(data.dailyEnergyWh / 1000).toFixed(1)} kWh/day`]
-    ];
+      const tableData = [
+        ['System Voltage', `${data.systemVoltage || '24'}V DC`],
+        ['Inverter Rating', `${((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA Pure Sine`],
+        ['Peak Surge Support', `${(data.maxSurgeWatts || 0).toLocaleString()} Watts`],
+        ['Battery Bank', `${data.batteryAh || '--'} Ah @ ${data.systemVoltage || '24'}V`],
+        ['Solar Array', `${data.panelQuantity || '--'} x 450W Monocrystalline`],
+        ['Daily Energy Yield', `${((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh/day`],
+        ['Charge Controller', `${data.chargeControllerAmps || '--'}A MPPT Sized`]
+      ];
 
-    autoTable(doc, {
-      startY: 60,
-      head: [['Component', 'Specification']],
-      body: tableData,
-      theme: 'grid',
-      headStyles: { fillColor: [5, 5, 5], textColor: [0, 240, 255] },
-      styles: { fontSize: 11, cellPadding: 6 }
-    });
+      // Robust autoTable call
+      const autoTableFunc = (autoTable as any).default || autoTable;
+      if (typeof autoTableFunc === 'function') {
+        autoTableFunc(doc, {
+          startY: 60,
+          head: [['Requirement', 'Engineering Specification']],
+          body: tableData,
+          theme: 'grid',
+          headStyles: { fillColor: [5, 5, 5], textColor: [0, 240, 255] },
+          styles: { fontSize: 10, cellPadding: 5 }
+        });
+      }
 
-    // Cost Section
-    // @ts-ignore
-    const finalY = doc.lastAutoTable.finalY + 20;
-    
-    // @ts-ignore
-    doc.setFillColor(245, 250, 255);
-    doc.setDrawColor(0, 240, 255);
-    doc.rect(14, finalY, 182, 30, 'FD');
-    
-    doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Estimated Total Cost", 20, finalY + 12);
-    
-    doc.setFontSize(18);
-    doc.setTextColor(0, 0, 0); // Black for contrast in PDF
-    doc.setFont('helvetica', 'bold');
-    
-    if (data.estimatedPriceNaira) {
-       doc.text(formatCurrency(data.estimatedPriceNaira), 20, finalY + 22);
-    } else {
-       doc.text("Contact for Price", 20, finalY + 22);
+      // Check final Y position
+      const lastTable = (doc as any).lastAutoTable;
+      const finalY = (lastTable && lastTable.finalY) ? lastTable.finalY : 150;
+      
+      // Pricing Highlight
+      doc.setFillColor(245, 250, 255);
+      doc.setDrawColor(0, 240, 255);
+      doc.rect(14, finalY + 10, 182, 30, 'FD');
+      
+      doc.setFontSize(11);
+      doc.setTextColor(100, 100, 100);
+      doc.text("Estimated System Investment (NGN)", 20, finalY + 20);
+      
+      doc.setFontSize(20);
+      doc.setTextColor(0, 0, 0); 
+      doc.setFont('helvetica', 'bold');
+      
+      const priceText = data.estimatedPriceNaira ? formatCurrency(data.estimatedPriceNaira) : "Consulting Required";
+      doc.text(priceText, 20, finalY + 32);
+
+      // Disclaimer & Footer
+      doc.setFontSize(8);
+      doc.setTextColor(120, 120, 120);
+      doc.text("Disclaimer: This is a high-fidelity estimate based on provided load profiles and geo-solar data. Final hardware selection may vary.", 14, 275);
+      doc.text("Visit: www.masterviewcel.com | © 2026 MasterviewCEL Energy Solutions", 14, 282);
+
+      doc.save('Solar_Quotation_Masterview.pdf');
+      console.log("PDF successfully generated and saved.");
+    } catch (err: any) {
+      console.error("PDF Component Failure:", err);
+      alert(`Export Error: ${err.message || "Contact Support"}`);
     }
-
-    // Footer
-    doc.setFontSize(9);
-    doc.setTextColor(150, 150, 150);
-    doc.text("Note: This is an automated estimate. Final price may vary based on site inspection.", 14, finalY + 45);
-    doc.text("© 2026 MasterviewCEL Energy Solutions", 14, 290);
-
-    doc.save('masterview-solar-quote.pdf');
   };
 
   return (
@@ -129,12 +153,12 @@ export default function AppResult({ data }: ResultProps) {
               letterSpacing: '0.1em',
               color: 'var(--color-primary)',
               marginBottom: '8px'
-            }}>Recommended Inverter</p>
-            <h3 style={{ fontSize: '1.8rem', fontWeight: 700 }}>
-              {(data.recommendedInverterW / 1000).toFixed(1)} kVA
+            }}>System Core</p>
+            <h3 className="result-card-title" style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+              {data.systemVoltage}V / {(data.recommendedInverterW / 1000).toFixed(1)} kVA
             </h3>
             <p style={{ fontSize: '0.9rem', opacity: 0.7, marginTop: '4px' }}>
-              Pure Sine Wave Hybrid
+              Pure Sine Wave Inverter
             </p>
           </div>
 
@@ -152,16 +176,16 @@ export default function AppResult({ data }: ResultProps) {
               letterSpacing: '0.1em',
               color: 'var(--color-success)',
               marginBottom: '8px'
-            }}>Battery Bank</p>
-            <h3 style={{ fontSize: '1.8rem', fontWeight: 700 }}>
-              {(data.batteryCapacityWh / 1000).toFixed(1)} kWh
+            }}>Storage Bank</p>
+            <h3 className="result-card-title" style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+              {data.batteryAh} Ah
             </h3>
             <p style={{ fontSize: '0.9rem', opacity: 0.7, marginTop: '4px' }}>
-              Lithium-ion (LiFePO4)
+              @ {data.systemVoltage}V (Lithium Recommended)
             </p>
           </div>
 
-          {/* Load Card */}
+          {/* Solar Card */}
            <div style={{ 
             background: 'rgba(245, 158, 11, 0.1)', 
             padding: '24px', 
@@ -175,36 +199,102 @@ export default function AppResult({ data }: ResultProps) {
               letterSpacing: '0.1em',
               color: 'var(--color-accent)',
               marginBottom: '8px'
-            }}>Total Load</p>
-            <h3 style={{ fontSize: '1.8rem', fontWeight: 700 }}>
-              {data.totalLoadWatts.toLocaleString()} W
+            }}>Energy Source</p>
+            <h3 className="result-card-title" style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+              {data.panelQuantity} Panels
             </h3>
              <p style={{ fontSize: '0.9rem', opacity: 0.7, marginTop: '4px' }}>
-              Peak Usage
+               {data.chargeControllerAmps}A MPPT Controller
             </p>
           </div>
         </div>
 
-        {/* Cost Estimate Section */}
-        {data.estimatedPriceNaira && (data.estimatedPriceNaira > 0) && (
-          <div style={{ 
-            textAlign: 'center', 
-            padding: '30px', 
-            background: 'var(--color-bg-deep)', 
-            borderRadius: 'var(--radius-md)',
-            marginBottom: '40px'
-          }}>
-            <p style={{ color: 'var(--color-text-muted)', marginBottom: '8px' }}>Estimated System Cost</p>
-            <div style={{ 
-              fontSize: '2.5rem', 
-              fontWeight: 800, 
-              color: 'var(--color-accent)',
-              textShadow: '0 0 20px rgba(245, 158, 11, 0.3)',
-              wordWrap: 'break-word',
-              lineHeight: 1.2
-            }}>
-              {formatCurrency(data.estimatedPriceNaira)}
+        {/* Technical Blueprint Section (Dope Add-on) */}
+        <div style={{ 
+          background: 'rgba(0,0,0,0.4)', 
+          padding: '24px', 
+          borderRadius: 'var(--radius-md)',
+          marginBottom: '40px',
+          border: '1px solid rgba(255,255,255,0.05)'
+        }}>
+          <h4 style={{ color: 'var(--color-primary)', fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '16px', letterSpacing: '0.1em' }}>Technical Specifications</h4>
+          <div className="grid-responsive-narrow" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Peak Surge Load</span>
+              <span style={{ fontWeight: 600 }}>{data.maxSurgeWatts?.toLocaleString()} W</span>
             </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Daily Energy Usage</span>
+              <span style={{ fontWeight: 600 }}>{(data.dailyEnergyWh / 1000).toFixed(1)} kWh</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Solar Yield (Local)</span>
+              <span style={{ fontWeight: 600 }}>{data.location?.psh.toFixed(2)} Hrs/Day</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Inverter Efficiency</span>
+              <span style={{ fontWeight: 600 }}>92% Pure Sine</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Cost & ROI */}
+        <div className="flex-responsive" style={{ 
+          display: 'flex',
+          gap: '20px',
+          marginBottom: '40px'
+        }}>
+            <div style={{ 
+              flex: 1.5,
+              textAlign: 'left', 
+              padding: '30px', 
+              background: 'var(--color-bg-deep)', 
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid rgba(255,150,0,0.2)'
+            }}>
+              <p style={{ color: 'var(--color-text-muted)', marginBottom: '8px' }}>Estimated System Cost</p>
+              <div style={{ 
+                fontSize: '2.2rem', 
+                fontWeight: 800, 
+                color: 'var(--color-accent)',
+                lineHeight: 1.2
+              }}>
+                {formatCurrency(data.estimatedPriceNaira || 0)}
+              </div>
+            </div>
+
+            <div style={{ 
+              flex: 1,
+              textAlign: 'center', 
+              padding: '30px', 
+              background: 'rgba(255,255,255,0.03)', 
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
+            }}>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '4px' }}>Estimated Payback</p>
+              <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>
+                {data.paybackYears ? `${data.paybackYears.toFixed(1)} Years` : 'N/A'}
+              </div>
+              <p style={{ fontSize: '0.7rem', opacity: 0.5 }}>vs Grid Tariff</p>
+            </div>
+        </div>
+
+        {data.location?.address && (
+          <div style={{ 
+            marginBottom: '40px', 
+            padding: '12px', 
+            background: 'rgba(0,0,0,0.3)', 
+            borderRadius: '10px',
+            fontSize: '0.85rem',
+            color: 'var(--color-text-muted)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+             <span>📍</span>
+             <span>Optimized for: <strong>{data.location.address}</strong></span>
           </div>
         )}
 

@@ -1,4 +1,4 @@
-export default function Hero() {
+export default function Hero({ onBegin }: { onBegin: () => void }) {
   return (
     <section className="glass-panel p-responsive" style={{ 
       borderRadius: 'var(--radius-lg)', 
@@ -65,18 +65,21 @@ export default function Hero() {
           your exact needs based on real-world efficiency standards.
         </p>
         
-        <button className="btn-primary" style={{
-          background: 'var(--color-primary)',
-          color: '#fff',
-          padding: '16px 48px',
-          fontSize: '1.1rem',
-          borderRadius: '100px',
-          boxShadow: 'var(--shadow-glow)',
-          fontWeight: 600,
-          transition: 'var(--transition-fast)'
-        }}
-        onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-        onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+        <button 
+          className="btn-primary" 
+          onClick={onBegin}
+          style={{
+            background: 'var(--color-primary)',
+            color: '#fff',
+            padding: '16px 48px',
+            fontSize: '1.1rem',
+            borderRadius: '100px',
+            boxShadow: 'var(--shadow-glow)',
+            fontWeight: 600,
+            transition: 'var(--transition-fast)'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
           Begin Assessment
         </button>

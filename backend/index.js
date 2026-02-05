@@ -1,69 +1,88 @@
 import express from "express";
 import cors from "cors";
-import fs from "fs";
-import calculator from "./calculator.js";
+import rateLimit from "express-rate-limit";
+import { db } from "./database.js";
+import { solarService } from "./services/solarService.js";
+import { energyModel } from "./services/energyModel.js";
 
 const app = express();
-const PORT = 5000;
+const PORT = 5050;
 
 /* ================= MIDDLEWARE ================= */
 app.use(cors());
 app.use(express.json());
 
-/* ================= UTILITY ================= */
-
-// Ensure leads.json exists
-const leadsFile = "./leads.json";
-if (!fs.existsSync(leadsFile)) {
-  fs.writeFileSync(leadsFile, JSON.stringify([]));
-}
+// Rate limiting to protect geocoding/weather API usage
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
 
 /* ================= ROUTES ================= */
 
-app.post("/estimate", (req, res) => {
+/**
+ * Main Estimation API
+ * Input: { propertyType, appliances, hours, contact, address }
+ */
+app.post("/estimate", async (req, res) => {
   try {
-    console.log("Received body:", req.body);
+    const { propertyType, appliances, hours, contact, address } = req.body;
 
-    const { propertyType, appliances, hours, contact } = req.body;
-
-    if (!propertyType || !appliances || appliances.length === 0 || !hours) {
-      return res.status(400).json({ error: "Invalid input data" });
+    if (!appliances || !hours || !address) {
+      return res.status(400).json({ error: "Missing required inputs (appliances, hours, address)" });
     }
 
-    // Convert all numeric fields to numbers
-    const numericAppliances = appliances.map((a) => ({
-      name: a.name,
-      watt: Number(a.watt),
-      quantity: Number(a.quantity),
-    }));
+    // 1. Geolocation & Solar Data
+    const location = await solarService.getCoordinates(address);
+    if (!location) {
+      return res.status(404).json({ error: "Could not find address" });
+    }
 
-    const numericHours = Number(hours);
+    const solarData = await solarService.getSolarYield(location.lat, location.lon);
 
-    const result = calculator({
-      appliances: numericAppliances,
-      hours: numericHours,
+    // 2. Technical Sizing
+    const result = energyModel.calculateSystem(appliances, Number(hours), solarData.peakSunHours);
+
+    // 3. Persist Lead & Estimation (CRM Logic)
+    const lead = db.insert('leads', {
+      name: contact?.name || "Anonymous",
+      phone: contact?.phone,
+      address: address, // Standardized address
+      property_type: propertyType,
+      status: 'estimated'
     });
 
-    // Save lead
-    const leads = JSON.parse(fs.readFileSync(leadsFile, "utf-8"));
-    leads.push({
-      propertyType,
-      contact,
-      appliances: numericAppliances,
-      hours: numericHours,
-      result,
-      createdAt: new Date().toISOString(),
+    const estimation = db.insert('estimations', {
+      lead_id: lead.id,
+      ...result.technical,
+      estimated_price: result.financial.estimatedPriceNaira,
+      lat: location.lat,
+      lon: location.lon
     });
-    fs.writeFileSync(leadsFile, JSON.stringify(leads, null, 2));
 
-    res.json(result);
+    // 4. Return Comprehensive Result
+    res.json({
+      id: estimation.id,
+      location: {
+        address: location.displayName,
+        psh: solarData.peakSunHours
+      },
+      ...result.technical,
+      ...result.financial,
+      recommendedInverterW: result.technical.recommendedInverter, // map back to frontend key
+    });
+
   } catch (error) {
     console.error("Estimation error:", error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "High-fidelity estimation failed. Check logs." });
   }
 });
 
 /* ================= START SERVER ================= */
-app.listen(PORT, () => {
-  console.log(`✅ Solar Estimator API running on http://localhost:${PORT}`);
+app.get("/health", (req, res) => res.json({ status: "ok", message: "Solar API is reaching the internet" }));
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Exquisite Solar API running on http://127.0.0.1:${PORT}`);
+  console.log(`🔗 Try visiting http://127.0.0.1:${PORT}/health in your browser`);
 });

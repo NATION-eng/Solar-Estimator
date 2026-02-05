@@ -42,80 +42,131 @@ const mockEstimate = (appliances: Appliance[], hours: number): EstimationResult 
 
 export default function Estimator() {
   const [property, setProperty] = useState("");
+  const [address, setAddress] = useState("");
   const [appliances, setAppliances] = useState<Appliance[]>([
     { name: "LED TV", watt: 150, quantity: 1 },
     { name: "Refrigerator", watt: 200, quantity: 1 },
     { name: "Lighting Point", watt: 15, quantity: 5 },
   ]);
   const [hours, setHours] = useState(6);
-  const [result, setResult] = useState<EstimationResult | null>(null);
+  const [result, setResult] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
 
   const types = [
-    { id: "home", label: "Residential", icon: "🏠" },
-    { id: "office", label: "Corporate", icon: "🏢" },
-    { id: "school", label: "Education", icon: "🏫" },
-    { id: "hospital", label: "Medical", icon: "🏥" },
+    { 
+      id: "home", 
+      label: "Residential", 
+      icon: "🏠", 
+      desc: "Homes & Apartments",
+      presets: [
+        { name: "LED TV (43\")", watt: 65, quantity: 1 },
+        { name: "Inverter Fridge", watt: 120, quantity: 1 },
+        { name: "Standing Fan", watt: 55, quantity: 2 },
+        { name: "LED Bulbs", watt: 9, quantity: 10 },
+      ]
+    },
+    { 
+      id: "office", 
+      label: "Corporate", 
+      icon: "🏢", 
+      desc: "Offices & Studios",
+      presets: [
+        { name: "Workstation/Laptop", watt: 85, quantity: 5 },
+        { name: "Inverter AC (1.5HP)", watt: 1100, quantity: 1 },
+        { name: "Office Printer", watt: 450, quantity: 1 },
+        { name: "Water Dispenser", watt: 600, quantity: 1 },
+      ]
+    },
+    { 
+      id: "school", 
+      label: "Education", 
+      icon: "🏫", 
+      desc: "Schools & Labs",
+      presets: [
+        { name: "Classroom Fan", watt: 75, quantity: 8 },
+        { name: "Smart Projector", watt: 250, quantity: 2 },
+        { name: "Desktop Computer", watt: 200, quantity: 10 },
+        { name: "PA System", watt: 400, quantity: 1 },
+      ]
+    },
+    { 
+      id: "hospital", 
+      label: "Medical", 
+      icon: "🏥", 
+      desc: "Clinics & Pharmacies",
+      presets: [
+        { name: "Vaccine Fridge", watt: 300, quantity: 1 },
+        { name: "Vital Monitor", watt: 150, quantity: 2 },
+        { name: "Surgical Light", watt: 100, quantity: 3 },
+        { name: "Oxygen Concentrator", watt: 600, quantity: 1 },
+      ]
+    },
   ];
 
   /* ================= HANDLERS ================= */
+
+  const handlePropertyChange = (typeId: string) => {
+    setProperty(typeId);
+    const selected = types.find(t => t.id === typeId);
+    if (selected) {
+      setAppliances(selected.presets);
+    }
+  };
 
   const runEstimate = async () => {
     if (!property) {
       alert("Please select a property type to proceed.");
       return;
     }
+    if (!address) {
+      alert("Please enter your installation address.");
+      return;
+    }
 
     setLoading(true);
     setResult(null);
 
-    // Simulate network delay for effect
-    await new Promise(r => setTimeout(r, 1500));
-
     try {
       const payload = {
         propertyType: property,
+        address: address,
         hours: Number(hours),
         appliances: appliances.map((a) => ({
           name: a.name,
           watt: Number(a.watt),
           quantity: Number(a.quantity),
+          isSurgeHeavy: a.name.toLowerCase().includes('fridge') || a.name.toLowerCase().includes('ac') || a.name.toLowerCase().includes('pump')
         })),
         contact: {
           name: "Demo User",
           phone: "0000000000",
-          location: "Demo Location",
         },
       };
 
-      // Try backend first
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
-
-      const response = await fetch("http://localhost:5000/estimate", {
+      const response = await fetch("http://127.0.0.1:5050/estimate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        signal: controller.signal
       });
-      clearTimeout(timeoutId);
 
-      if (!response.ok) throw new Error("Backend error");
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Backend error");
+      }
 
       const data = await response.json();
-      setResult({
-        totalLoadWatts: data.totalLoadWatts || 0,
-        dailyEnergyWh: data.dailyEnergyWh || 0,
-        recommendedInverterW: data.recommendedInverterW || 0,
-        batteryCapacityWh: data.batteryCapacityWh || 0,
-        estimatedPriceNaira: data.estimatedPriceNaira || 0,
-      });
+      setResult(data);
 
-    } catch (error) {
-      console.warn("Backend unavailable, switching to Demo Mode", error);
-      // Fallback to local calculation
-      const demoResult = mockEstimate(appliances, hours);
-      setResult(demoResult);
+    } catch (error: any) {
+      console.error("Estimation error:", error);
+      alert(`Estimation failed: ${error.message}`);
+      
+      // Fallback removed for "Exquisite" mode to ensure reality, 
+      // but let's keep a simple fallback if the user is just testing without a local server
+      if (error.message.includes('Failed to fetch')) {
+         const demoResult = mockEstimate(appliances, hours);
+         setResult(demoResult);
+      }
     } finally {
       setLoading(false);
     }
@@ -144,37 +195,87 @@ export default function Estimator() {
         borderRadius: 'var(--radius-lg)',
         borderTop: '1px solid rgba(255,255,255,0.1)' 
       }}>
+        {/* PROGRESS INDICATOR (Dope Feature) */}
+        <div style={{ marginBottom: '40px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.8rem', color: 'var(--color-primary)' }}>
+             <span style={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Assessment Progress</span>
+             <span>{property ? (address ? (appliances.length > 0 ? "100%" : "75%") : "50%") : "25%"}</span>
+          </div>
+          <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+             <div style={{ 
+               height: '100%', 
+               background: 'var(--color-primary)', 
+               width: property ? (address ? (appliances.length > 0 ? "100%" : "75%") : "50%") : "25%",
+               transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+               boxShadow: '0 0 10px var(--color-primary)'
+             }}></div>
+          </div>
+        </div>
+
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <h2 style={{ fontSize: "2rem", fontWeight: "700", marginBottom: "8px" }}>
             Configuration
           </h2>
           <p style={{ color: "var(--color-text-muted)" }}>
-            Select your property type and list your improved appliances.
+            Select your property type to load optimized energy presets.
           </p>
         </div>
 
         {/* PROPERTY SELECTOR */}
-        <div className="grid-property" style={{ marginBottom: '40px' }}>
+        <div className="grid-property" style={{ 
+          display: 'grid', 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
+          gap: '16px', 
+          marginBottom: '40px' 
+        }}>
           {types.map((t) => (
             <button
               key={t.id}
-              onClick={() => setProperty(t.id)}
+              onClick={() => handlePropertyChange(t.id)}
               style={{
-                background: property === t.id ? 'var(--color-primary)' : 'rgba(255,255,255,0.05)',
-                border: property === t.id ? 'none' : '1px solid rgba(255,255,255,0.1)',
+                background: property === t.id ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)',
+                border: property === t.id ? 'none' : '1px solid rgba(255,255,255,0.08)',
                 color: property === t.id ? '#fff' : 'var(--color-text-muted)',
-                padding: '20px',
+                padding: '24px 20px',
                 borderRadius: 'var(--radius-md)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                textAlign: 'center',
                 gap: '12px',
-                transition: 'all 0.2s ease',
-                cursor: 'pointer'
+                transition: 'all 0.3s ease',
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseOver={(e) => {
+                if (property !== t.id) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+              }}
+              onMouseOut={(e) => {
+                if (property !== t.id) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
               }}
             >
-              <span style={{ fontSize: '1.5rem' }}>{t.icon}</span>
-              <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>{t.label}</span>
+              <span style={{ fontSize: '2rem' }}>{t.icon}</span>
+              <div>
+                <span style={{ fontSize: '1rem', fontWeight: 700, display: 'block' }}>{t.label}</span>
+                <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>{t.desc}</span>
+              </div>
+              {property === t.id && (
+                <div style={{ 
+                  position: 'absolute', 
+                  bottom: '-4px', 
+                  right: '-4px', 
+                  background: '#fff', 
+                  color: 'var(--color-primary)', 
+                  width: '24px', 
+                  height: '24px', 
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.8rem'
+                }}>✓</div>
+              )}
             </button>
           ))}
         </div>
@@ -186,6 +287,27 @@ export default function Estimator() {
           transition: 'opacity 0.3s ease'
         }}>
           
+          <div style={{ marginBottom: '24px' }}>
+             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: 'var(--color-text-muted)' }}>
+               Installation Address
+             </label>
+             <input
+                type="text"
+                placeholder="Enter city or full address (e.g. Lagos, Nigeria)"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                style={{ 
+                  width: '100%', 
+                  background: 'rgba(255,255,255,0.05)', 
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: 'var(--radius-sm)',
+                  padding: '12px 16px',
+                  color: '#fff',
+                  fontSize: '1rem'
+                }}
+              />
+          </div>
+
           <div style={{ marginBottom: '32px' }}>
              <label style={{ display: 'block', marginBottom: '12px', fontWeight: 500 }}>
                Daily Usage Target (Hours)

@@ -1,14 +1,23 @@
+import { useRef } from "react";
 import Hero from "./components/Hero";
 import Estimator from "./components/Estimator";
-import "./styles/design-system.css"; // Ensure design system is loaded
+import "./styles/design-system.css"; 
 
 function App() {
+  const estimatorRef = useRef(null);
+
+  const scrollToEstimator = () => {
+    estimatorRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="app-wrapper">
       <main className="container-wide" style={{ paddingTop: '2rem', paddingBottom: '4rem' }}>
-        <Hero />
+        <Hero onBegin={scrollToEstimator} />
         <div style={{ height: '4rem' }}></div> {/* Spacer */}
-        <Estimator />
+        <div ref={estimatorRef}>
+          <Estimator />
+        </div>
       </main>
       
       <footer style={{ 

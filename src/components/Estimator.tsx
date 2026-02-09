@@ -7,6 +7,7 @@ import { useFormValidation } from "../hooks/useFormValidation";
 import { useEstimation } from "../hooks/useEstimation";
 import { useAppliances } from "../hooks/useAppliances";
 import type { PropertyType } from "../types";
+import styles from "./Estimator.module.css";
 
 /* ================= COMPONENT ================= */
 
@@ -80,6 +81,54 @@ export default function Estimator() {
         { name: "Oxygen Concentrator", watt: 600, quantity: 1 },
       ]
     },
+    { 
+      id: "retail", 
+      label: "Retail", 
+      icon: "🛒", 
+      desc: "Shops & Stores",
+      presets: [
+        { name: "Display Fridge", watt: 400, quantity: 2 },
+        { name: "POS System", watt: 150, quantity: 3 },
+        { name: "LED Display Lights", watt: 20, quantity: 15 },
+        { name: "Security Camera", watt: 15, quantity: 4 },
+      ]
+    },
+    { 
+      id: "hotel", 
+      label: "Hospitality", 
+      icon: "🏨", 
+      desc: "Hotels & Lodges",
+      presets: [
+        { name: "Room AC (1HP)", watt: 900, quantity: 10 },
+        { name: "Mini Fridge", watt: 80, quantity: 10 },
+        { name: "LED TV (32\")", watt: 50, quantity: 10 },
+        { name: "Lobby Lighting", watt: 200, quantity: 1 },
+      ]
+    },
+    { 
+      id: "restaurant", 
+      label: "Food Service", 
+      icon: "🍽️", 
+      desc: "Restaurants & Cafes",
+      presets: [
+        { name: "Commercial Fridge", watt: 600, quantity: 2 },
+        { name: "Microwave Oven", watt: 1200, quantity: 1 },
+        { name: "Blender", watt: 400, quantity: 2 },
+        { name: "Exhaust Fan", watt: 200, quantity: 2 },
+      ]
+    },
+    { 
+      id: "industrial", 
+      label: "Industrial", 
+      icon: "🏭", 
+      desc: "Factories & Workshops",
+      presets: [
+        { name: "Welding Machine", watt: 3000, quantity: 1 },
+        { name: "Air Compressor", watt: 2200, quantity: 1 },
+        { name: "Industrial Fan", watt: 300, quantity: 4 },
+        { name: "Grinder", watt: 1500, quantity: 2 },
+      ]
+    },
   ];
 
   /* ================= HANDLERS ================= */
@@ -107,127 +156,76 @@ export default function Estimator() {
     addAppliance({ name: "", watt: 0, quantity: 1 });
   };
 
+  /* ================= PROGRESS CALCULATION ================= */
+  const progress = property ? (address ? (appliances.length > 0 ? 100 : 66) : 33) : 0;
+
   /* ================= UI ================= */
 
   return (
-    <div className="container-wide" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div className="glass-panel p-responsive" style={{ 
-        borderRadius: 'var(--radius-lg)',
-        borderTop: '1px solid rgba(255,255,255,0.1)' 
-      }}>
-        {/* PROGRESS INDICATOR (Dope Feature) */}
+    <div className={styles.container}>
+      <div className={styles.glassPanel}>
+        {/* Progress Indicator */}
+        <div className={styles.progressContainer}>
+          <div className={styles.progressHeader}>
+            <span className={styles.progressLabel}>Configuration Progress</span>
+            <span className={styles.progressLabel}>{progress}%</span>
+          </div>
+          <div className={styles.progressBar}>
+            <div 
+              className={styles.progressFill}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Property Type Selection */}
         <div style={{ marginBottom: '40px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.8rem', color: 'var(--color-primary)' }}>
-             <span style={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Assessment Progress</span>
-             <span>{property ? (address ? (appliances.length > 0 ? "100%" : "75%") : "50%") : "25%"}</span>
-          </div>
-          <div style={{ height: '4px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
-             <div style={{ 
-               height: '100%', 
-               background: 'var(--color-primary)', 
-               width: property ? (address ? (appliances.length > 0 ? "100%" : "75%") : "50%") : "25%",
-               transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-               boxShadow: '0 0 10px var(--color-primary)'
-             }}></div>
-          </div>
-        </div>
-
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: "2rem", fontWeight: "700", marginBottom: "8px" }}>
-            Configuration
-          </h2>
-          <p style={{ color: "var(--color-text-muted)" }}>
-            Select your property type to load optimized energy presets.
-          </p>
-        </div>
-
-        {/* PROPERTY SELECTOR */}
-        <div className="grid-property" style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-          gap: '16px', 
-          marginBottom: '40px' 
-        }}>
-          {types.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => handlePropertyChange(t.id)}
-              aria-label={`Select ${t.label} property type`}
-              aria-pressed={property === t.id}
-              role="radio"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handlePropertyChange(t.id);
-                }
-              }}
-              style={{
-                background: property === t.id ? 'var(--color-primary)' : 'rgba(255,255,255,0.03)',
-                border: property === t.id ? 'none' : '1px solid rgba(255,255,255,0.08)',
-                color: property === t.id ? '#fff' : 'var(--color-text-muted)',
-                padding: '24px 20px',
-                borderRadius: 'var(--radius-md)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                textAlign: 'center',
-                gap: '12px',
-                transition: 'all 0.3s ease',
-                cursor: 'pointer',
-                position: 'relative',
-                overflow: 'hidden',
-                outline: 'none'
-              }}
-              onMouseOver={(e) => {
-                if (property !== t.id) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-              }}
-              onMouseOut={(e) => {
-                if (property !== t.id) e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.boxShadow = '0 0 0 3px rgba(251, 191, 36, 0.5)';
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              <span style={{ fontSize: '2rem' }}>{t.icon}</span>
-              <div>
-                <span style={{ fontSize: '1rem', fontWeight: 700, display: 'block' }}>{t.label}</span>
-                <span style={{ fontSize: '0.75rem', opacity: 0.6 }}>{t.desc}</span>
-              </div>
-              {property === t.id && (
-                <div style={{ 
-                  position: 'absolute', 
-                  bottom: '-4px', 
-                  right: '-4px', 
-                  background: '#fff', 
-                  color: 'var(--color-primary)', 
-                  width: '24px', 
-                  height: '24px', 
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '0.8rem'
-                }}>✓</div>
-              )}
-            </button>
-          ))}
-        </div>
-
-        {/* DETAILS FORM */}
-        <div style={{ 
-          opacity: property ? 1 : 0.5, 
-          pointerEvents: property ? 'auto' : 'none',
-          transition: 'opacity 0.3s ease'
-        }}>
+          <h3 style={{ fontWeight: "700", marginBottom: "20px" }}>
+            1️⃣ Select Property Type
+          </h3>
           
-          <div style={{ marginBottom: '24px' }}>
+          <div className={styles.propertyGrid}>
+            {types.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => handlePropertyChange(t.id)}
+                aria-label={`Select ${t.label} property type`}
+                aria-pressed={property === t.id}
+                role="radio"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handlePropertyChange(t.id);
+                  }
+                }}
+                className={`${styles.propertyCard} ${property === t.id ? styles.propertyCardActive : ''}`}
+              >
+                <span className={styles.propertyIcon}>{t.icon}</span>
+                <div>
+                  <span className={styles.propertyLabel}>{t.label}</span>
+                  <div className={styles.propertyDesc}>{t.desc}</div>
+                </div>
+                {property === t.id && (
+                  <span className={styles.propertyCheckmark}>✓</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Configuration Section */}
+        <div 
+          className={`${styles.formSection} ${!property ? styles.formSectionDisabled : ''}`}
+        >
+          <h3 style={{ fontWeight: "700", marginBottom: "20px" }}>
+            2️⃣ Installation Details
+          </h3>
+          
+          <div className={styles.fieldGroup}>
              <label 
                htmlFor="address-input"
-               style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: 'var(--color-text-muted)' }}
+               className={styles.label}
              >
                Installation Address
              </label>
@@ -245,25 +243,7 @@ export default function Estimator() {
                 aria-required="true"
                 aria-invalid={!!errors.address}
                 aria-describedby={errors.address ? 'address-error' : undefined}
-                style={{ 
-                  width: '100%', 
-                  background: 'rgba(255,255,255,0.05)', 
-                  border: errors.address ? '1px solid #ef4444' : '1px solid rgba(255,255,255,0.1)',
-                  borderRadius: 'var(--radius-sm)',
-                  padding: '12px 16px',
-                  color: '#fff',
-                  fontSize: '1rem',
-                  outline: 'none',
-                  transition: 'all 0.2s'
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = errors.address ? '#ef4444' : 'var(--color-primary)';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = errors.address ? '#ef4444' : 'rgba(255,255,255,0.1)';
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                }}
+                className={`${styles.inputField} ${errors.address ? styles.inputFieldError : ''}`}
               />
               {errors.address && (
                 <div id="address-error">
@@ -275,36 +255,29 @@ export default function Estimator() {
               )}
           </div>
 
-          <div style={{ marginBottom: '32px' }}>
-             <label style={{ display: 'block', marginBottom: '12px', fontWeight: 500 }}>
-               Daily Usage Target (Hours)
-             </label>
-             <input
-                type="range"
-                min="1"
-                max="24"
-                value={hours}
-                onChange={(e) => setHours(Number(e.target.value))}
-                style={{ width: '100%', accentColor: 'var(--color-primary)', cursor: 'pointer' }}
-              />
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>
-                <span>1 hr</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{hours} hours / day</span>
-                <span>24 hrs</span>
-              </div>
+          <div className={styles.rangeContainer}>
+              <label className={styles.label}>
+                Daily Usage Target (Hours)
+              </label>
+              <input
+                 type="range"
+                 min="1"
+                 max="24"
+                 value={hours}
+                 onChange={(e) => setHours(Number(e.target.value))}
+                 className={styles.rangeSlider}
+               />
+               <div className={styles.rangeLabels}>
+                 <span>1 hr</span>
+                 <span className={styles.rangeValue}>{hours} hours / day</span>
+                 <span>24 hrs</span>
+               </div>
           </div>
 
           <div style={{ marginBottom: '32px' }}>
-            <h3 style={{ fontWeight: "700", marginBottom: "20px", display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h3 className={styles.appliancesHeader}>
                <span>⚡ Your Appliances</span>
-               <span style={{ 
-                 fontSize: '0.75rem', 
-                 background: 'rgba(251, 191, 36, 0.15)', 
-                 padding: '4px 12px', 
-                 borderRadius: '100px',
-                 color: 'var(--color-primary)',
-                 fontWeight: 600
-               }}>{appliances.length} items</span>
+               <span className={styles.applianceCount}>{appliances.length} items</span>
             </h3>
 
             {/* Appliance Database Selector */}
@@ -316,63 +289,22 @@ export default function Estimator() {
                 display: 'block', 
                 marginBottom: '12px', 
                 fontWeight: 600,
-                color: 'var(--color-text-main)',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                color: 'var(--color-text-muted)'
               }}>
-                Your Appliance List
+                Appliance List
               </label>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+              <div className={styles.applianceList}>
                 {appliances.map((app, index) => (
-                  <div key={index} className="appliance-row" style={{
-                    display: "grid",
-                    gridTemplateColumns: "2fr 1fr 1fr auto",
-                    gap: "12px",
-                    alignItems: "center",
-                    background: "linear-gradient(135deg, rgba(251, 191, 36, 0.05) 0%, rgba(56, 189, 248, 0.05) 100%)",
-                    padding: "16px",
-                    borderRadius: "var(--radius-md)",
-                    border: "1px solid rgba(251, 191, 36, 0.2)",
-                    transition: 'all 0.3s ease',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(251, 191, 36, 0.4)';
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(251, 191, 36, 0.15)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(251, 191, 36, 0.2)';
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
-                  >
+                  <div key={index} className={styles.applianceRow}>
                     {/* Appliance Name */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <input
-                        style={{ 
-                          background: 'rgba(255,255,255,0.05)', 
-                          border: '1px solid rgba(255,255,255,0.1)', 
-                          color: '#fff', 
-                          borderRadius: '6px',
-                          padding: '10px 12px',
-                          fontSize: '0.95rem',
-                          fontWeight: 500,
-                          outline: 'none',
-                          transition: 'all 0.2s'
-                        }}
+                        className={styles.applianceInput}
                         placeholder="Appliance name"
                         value={app.name}
                         onChange={(e) => updateAppliance(index, 'name', e.target.value)}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = 'var(--color-primary)';
-                          e.target.style.background = 'rgba(255,255,255,0.08)';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = 'rgba(255,255,255,0.1)';
-                          e.target.style.background = 'rgba(255,255,255,0.05)';
-                        }}
                       />
                     </div>
 
@@ -382,42 +314,22 @@ export default function Estimator() {
                         type="number"
                         min="0"
                         step="10"
-                        style={{ 
-                          width: '100%',
-                          background: 'rgba(255,255,255,0.05)', 
-                          border: '1px solid rgba(255,255,255,0.1)', 
-                          color: '#fff', 
-                          borderRadius: '6px',
-                          padding: '10px 28px 10px 12px',
-                          textAlign: 'center',
-                          fontSize: '0.95rem',
-                          fontWeight: 600,
-                          outline: 'none',
-                          transition: 'all 0.2s'
-                        }}
+                        className={styles.applianceInput}
+                        style={{ textAlign: 'center' }}
                         placeholder="Watts"
                         value={app.watt === 0 ? '' : app.watt}
                         onChange={(e) => updateAppliance(index, 'watt', e.target.value === '' ? 0 : Number(e.target.value))}
-                        onFocus={(e) => {
-                          e.target.select();
-                          e.target.style.borderColor = 'var(--color-primary)';
-                          e.target.style.background = 'rgba(255,255,255,0.08)';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = 'rgba(255,255,255,0.1)';
-                          e.target.style.background = 'rgba(255,255,255,0.05)';
-                        }}
                       />
-                      <span style={{ 
-                        position: 'absolute', 
-                        right: '10px', 
-                        top: '50%', 
-                        transform: 'translateY(-50%)',
-                        fontSize: '0.75rem', 
-                        opacity: 0.6,
-                        color: 'var(--color-primary)',
-                        fontWeight: 600
-                      }}>W</span>
+                       <span style={{ 
+                         position: 'absolute', 
+                         right: '10px', 
+                         top: '50%', 
+                         transform: 'translateY(-50%)',
+                         fontSize: '0.75rem', 
+                         opacity: 0.6,
+                         color: 'var(--color-primary)',
+                         fontWeight: 600
+                       }}>W</span>
                     </div>
 
                     {/* Quantity Input */}
@@ -426,30 +338,10 @@ export default function Estimator() {
                         type="number"
                         min="1"
                         step="1"
-                        style={{ 
-                          width: '100%',
-                          background: 'rgba(255,255,255,0.05)', 
-                          border: '1px solid rgba(255,255,255,0.1)', 
-                          color: '#fff', 
-                          borderRadius: '6px',
-                          padding: '10px 32px 10px 12px',
-                          textAlign: 'center',
-                          fontSize: '0.95rem',
-                          fontWeight: 600,
-                          outline: 'none',
-                          transition: 'all 0.2s'
-                        }}
+                        className={styles.applianceInput}
+                        style={{ textAlign: 'center' }}
                         value={app.quantity === 0 ? '' : app.quantity}
                         onChange={(e) => updateAppliance(index, 'quantity', e.target.value === '' ? 1 : Number(e.target.value))}
-                        onFocus={(e) => {
-                          e.target.select();
-                          e.target.style.borderColor = 'var(--color-primary)';
-                          e.target.style.background = 'rgba(255,255,255,0.08)';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = 'rgba(255,255,255,0.1)';
-                          e.target.style.background = 'rgba(255,255,255,0.05)';
-                        }}
                       />
                        <span style={{ 
                          position: 'absolute', 
@@ -466,34 +358,8 @@ export default function Estimator() {
                     {/* Remove Button */}
                     <button
                       onClick={() => removeAppliance(index)}
-                      className="remove-btn"
+                      className={styles.removeButton}
                       aria-label="Remove appliance"
-                      style={{
-                        color: "#ff6b6b",
-                        background: "rgba(255, 107, 107, 0.1)",
-                        fontSize: "1.3rem",
-                        padding: "8px 12px",
-                        borderRadius: '6px',
-                        border: '1px solid rgba(255, 107, 107, 0.2)',
-                        transition: 'all 0.2s',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        position: 'relative',
-                        zIndex: 10,
-                        minWidth: '44px',
-                        minHeight: '44px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(255, 107, 107, 0.2)';
-                        e.currentTarget.style.borderColor = 'rgba(255, 107, 107, 0.4)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'rgba(255, 107, 107, 0.1)';
-                        e.currentTarget.style.borderColor = 'rgba(255, 107, 107, 0.2)';
-                      }}
                     >
                       ×
                     </button>
@@ -506,30 +372,7 @@ export default function Estimator() {
             <div style={{ marginTop: "20px", display: 'flex', gap: '16px' }}>
               <button
                 onClick={handleAddManualAppliance}
-                style={{
-                  background: "transparent",
-                  border: "2px dashed rgba(251, 191, 36, 0.3)",
-                  color: "var(--color-primary)",
-                  padding: "14px",
-                  width: "100%",
-                  borderRadius: "var(--radius-md)",
-                  fontSize: "0.95rem",
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  transition: 'all 0.3s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--color-primary)';
-                  e.currentTarget.style.background = 'rgba(251, 191, 36, 0.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'rgba(251, 191, 36, 0.3)';
-                  e.currentTarget.style.background = 'transparent';
-                }}
+                className={styles.addButton}
               >
                 <span style={{ fontSize: '1.2rem' }}>+</span>
                 <span>Add Custom Appliance</span>
@@ -537,31 +380,47 @@ export default function Estimator() {
             </div>
           </div>
 
-          <div style={{ marginTop: "40px", textAlign: 'center' }}>
+          <div className={styles.submitContainer}>
             <button 
-              className="btn-primary" 
+              className={`btn-primary ${styles.submitButton}`}
               onClick={handleEstimate} 
               disabled={loading}
-              style={{
-                background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%)',
-                color: '#fff',
-                padding: '18px 60px',
-                fontSize: '1.1rem',
-                borderRadius: '100px',
-                boxShadow: 'var(--shadow-glow)',
-                fontWeight: 700,
-                opacity: loading ? 0.7 : 1,
-                cursor: loading ? 'wait' : 'pointer'
-              }}
             >
               {loading ? "Analyzing Energy Profile..." : "Calculate Solar Needs"}
             </button>
           </div>
+
+          {/* VALIDATION ERRORS SUMMARY */}
+          {(errors.property || errors.appliances) && !loading && (
+            <div style={{ marginTop: '24px' }}>
+              {errors.property && (
+                <ValidationError 
+                  message={errors.property} 
+                  onDismiss={() => clearError('property')}
+                />
+              )}
+              {errors.appliances && (
+                <div style={{ marginTop: '8px' }}>
+                  <ValidationError 
+                    message={errors.appliances} 
+                    onDismiss={() => clearError('appliances')}
+                  />
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
+      {/* LOADING STATE */}
+      {loading && (
+        <div style={{ marginTop: '40px' }}>
+          <LoadingSpinner message="Calculating your solar system requirements..." />
+        </div>
+      )}
+
       {/* RESULTS DISPLAY */}
-      {result && <AppResult data={result} />}
+      {!loading && result && <AppResult data={result} />}
     </div>
   );
 }

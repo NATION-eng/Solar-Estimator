@@ -129,6 +129,18 @@ export default function Estimator() {
         { name: "Grinder", watt: 1500, quantity: 2 },
       ]
     },
+    { 
+      id: "worship", 
+      label: "Worship", 
+      icon: "🕌", 
+      desc: "Churches, Mosques & Temples",
+      presets: [
+        { name: "Sound System", watt: 800, quantity: 1 },
+        { name: "Projector", watt: 300, quantity: 2 },
+        { name: "Ceiling Fan", watt: 75, quantity: 10 },
+        { name: "LED Stage Lights", watt: 150, quantity: 8 },
+      ]
+    },
   ];
 
   /* ================= HANDLERS ================= */

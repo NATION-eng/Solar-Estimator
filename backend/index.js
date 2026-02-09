@@ -6,7 +6,7 @@ import { solarService } from "./services/solarService.js";
 import { energyModel } from "./services/energyModel.js";
 
 const app = express();
-const PORT = 5050;
+const PORT = process.env.PORT || 5050;
 
 /* ================= MIDDLEWARE ================= */
 // CORS configuration for production

@@ -98,6 +98,15 @@
       "property_type": "office",
       "status": "estimated",
       "created_at": "2026-02-09T12:16:12.261Z"
+    },
+    {
+      "id": 1770678103391,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Port harcourt ",
+      "property_type": "restaurant",
+      "status": "estimated",
+      "created_at": "2026-02-09T23:01:43.014Z"
     }
   ],
   "estimations": [
@@ -284,6 +293,24 @@
       "lat": 4.7676576,
       "lon": 7.0188527,
       "created_at": "2026-02-09T12:16:12.263Z"
+    },
+    {
+      "id": 1770678103272,
+      "lead_id": 1770678103391,
+      "totalSteadyWatts": 3600,
+      "maxSurgeWatts": 3600,
+      "dailyEnergyWh": 54000,
+      "recommendedInverter": 4500,
+      "systemVoltage": 48,
+      "batteryAh": 1758,
+      "chargeControllerAmps": 428,
+      "panelQuantity": 38,
+      "panelWattage": 450,
+      "batteryCapacityWh": 84375,
+      "estimated_price": 36431000,
+      "lat": 4.7676576,
+      "lon": 7.0188527,
+      "created_at": "2026-02-09T23:01:43.015Z"
     }
   ],
   "appliance_presets": [

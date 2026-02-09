@@ -9,7 +9,36 @@ const app = express();
 const PORT = 5050;
 
 /* ================= MIDDLEWARE ================= */
-app.use(cors());
+// CORS configuration for production
+const allowedOrigins = [
+  'http://localhost:5180',
+  'http://127.0.0.1:5180',
+  'https://solar-estimator.vercel.app',
+  'https://solar-estimator-*.vercel.app', // Preview deployments
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Check if origin is in allowed list or matches pattern
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed.includes('*')) {
+        const pattern = new RegExp('^' + allowed.replace(/\*/g, '.*') + '$');
+        return pattern.test(origin);
+      }
+      return allowed === origin;
+    });
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // Rate limiting to protect geocoding/weather API usage

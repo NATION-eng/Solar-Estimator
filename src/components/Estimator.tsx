@@ -4,46 +4,32 @@ import ApplianceSelector from "./ApplianceSelector";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ValidationError } from "./ValidationError";
 import { useFormValidation } from "../hooks/useFormValidation";
-import { API_ENDPOINTS, apiClient } from "../config/api";
-import type { Appliance, EstimationResult, PropertyType } from "../types";
-
-/* ================= TYPES ================= */
-
-/* ================= MOCK LOGIC (DEMO MODE) ================= */
-const mockEstimate = (appliances: Appliance[], hours: number): EstimationResult => {
-  const totalLoad = appliances.reduce((acc, curr) => acc + (curr.watt * curr.quantity), 0);
-  const dailyEnergy = totalLoad * hours;
-  
-  // Simple heuristic for demo
-  const inverter = Math.ceil(totalLoad * 1.5 / 1000) * 1000; 
-  const battery = Math.ceil(dailyEnergy * 1.2); 
-  
-  // Rough price estimation (just for demo visuals)
-  const price = (inverter * 150) + (battery * 100) + 50000; 
-
-  return {
-    totalLoadWatts: totalLoad,
-    dailyEnergyWh: dailyEnergy,
-    recommendedInverterW: inverter > 1000 ? inverter : 1000, // min 1kVA
-    batteryCapacityWh: battery,
-    estimatedPriceNaira: price
-  };
-};
+import { useEstimation } from "../hooks/useEstimation";
+import { useAppliances } from "../hooks/useAppliances";
+import type { PropertyType } from "../types";
 
 /* ================= COMPONENT ================= */
 
 export default function Estimator() {
+  // Form state
   const [property, setProperty] = useState("");
   const [address, setAddress] = useState("");
-  const [appliances, setAppliances] = useState<Appliance[]>([
+  const [hours, setHours] = useState(6);
+  
+  // Custom hooks
+  const { errors, validateEstimation, clearError } = useFormValidation();
+  const { result, loading, runEstimate } = useEstimation();
+  const { 
+    appliances, 
+    addAppliance, 
+    updateAppliance, 
+    removeAppliance, 
+    loadPresets 
+  } = useAppliances([
     { name: "LED TV", watt: 150, quantity: 1 },
     { name: "Refrigerator", watt: 200, quantity: 1 },
     { name: "Lighting Point", watt: 15, quantity: 5 },
   ]);
-  const [hours, setHours] = useState(6);
-  const [result, setResult] = useState<EstimationResult | null>(null);
-  const [loading, setLoading] = useState(false);
-  const { errors, validateEstimation, clearError } = useFormValidation();
 
   const types: PropertyType[] = [
     { 
@@ -102,80 +88,23 @@ export default function Estimator() {
     setProperty(typeId);
     const selected = types.find(t => t.id === typeId);
     if (selected) {
-      setAppliances(selected.presets);
+      loadPresets(selected.presets);
     }
   };
 
-  const runEstimate = async () => {
+  const handleEstimate = async () => {
     // Validate form before submission
     if (!validateEstimation(property, address, appliances)) {
       return; // Errors will be displayed in UI
     }
 
-    setLoading(true);
-    setResult(null);
-
-    try {
-      const payload = {
-        propertyType: property,
-        address: address,
-        hours: Number(hours),
-        appliances: appliances.map((a) => ({
-          name: a.name,
-          watt: Number(a.watt),
-          quantity: Number(a.quantity),
-          isSurgeHeavy: detectSurgeHeavy(a.name)
-        })),
-        contact: {
-          name: "Demo User",
-          phone: "0000000000",
-        },
-      };
-
-      const data = await apiClient.post<EstimationResult>(
-        API_ENDPOINTS.estimate,
-        payload
-      );
-
-      setResult(data);
-
-    } catch (error: any) {
-      console.error("Estimation error:", error);
-      
-      // Fallback to mock if backend unavailable
-      if (error.message.includes('Unable to connect')) {
-         const demoResult = mockEstimate(appliances, hours);
-         setResult(demoResult);
-      } else {
-        // Show error to user
-        alert(`Estimation failed: ${error.message}`);
-      }
-    } finally {
-      setLoading(false);
-    }
+    // Use the custom hook to run estimation
+    await runEstimate(property, address, hours, appliances);
   };
 
-  // Helper function to detect surge-heavy appliances
-  const detectSurgeHeavy = (name: string): boolean => {
-    const keywords = ['fridge', 'ac', 'pump', 'compressor', 'motor', 'freezer'];
-    return keywords.some(k => name.toLowerCase().includes(k));
-  };
-
-  const updateAppliance = (index: number, field: keyof Appliance, value: string | number) => {
-    const copy = [...appliances];
-    copy[index] = {
-      ...copy[index],
-      [field]: value
-    };
-    setAppliances(copy);
-  };
-
-  const removeAppliance = (index: number) => {
-    setAppliances(appliances.filter((_, i) => i !== index));
-  };
-
-  const addAppliance = () => {
-    setAppliances([...appliances, { name: "", watt: 0, quantity: 1 }]);
+  // Appliance management now handled by useAppliances hook
+  const handleAddManualAppliance = () => {
+    addAppliance({ name: "", watt: 0, quantity: 1 });
   };
 
   /* ================= UI ================= */
@@ -379,7 +308,7 @@ export default function Estimator() {
             </h3>
 
             {/* Appliance Database Selector */}
-            <ApplianceSelector onAdd={(newAppliance) => setAppliances([...appliances, newAppliance])} />
+            <ApplianceSelector onAdd={addAppliance} />
 
             {/* Manual Appliance List */}
             <div style={{ marginTop: '24px' }}>
@@ -576,7 +505,7 @@ export default function Estimator() {
             {/* Add Manual Appliance Button */}
             <div style={{ marginTop: "20px", display: 'flex', gap: '16px' }}>
               <button
-                onClick={addAppliance}
+                onClick={handleAddManualAppliance}
                 style={{
                   background: "transparent",
                   border: "2px dashed rgba(251, 191, 36, 0.3)",
@@ -611,7 +540,7 @@ export default function Estimator() {
           <div style={{ marginTop: "40px", textAlign: 'center' }}>
             <button 
               className="btn-primary" 
-              onClick={runEstimate} 
+              onClick={handleEstimate} 
               disabled={loading}
               style={{
                 background: 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%)',

@@ -17,6 +17,16 @@ body {
     radial-gradient(circle at 90% 80%, rgba(56, 189, 248, 0.1) 0%, transparent 40%);
   min-height: 100vh;
   overflow-x: hidden;
+  cursor: var(--cursor-default);
+}
+
+/* Custom cursor for interactive elements */
+button, a, input[type="button"], input[type="submit"], .clickable {
+  cursor: var(--cursor-pointer) !important;
+}
+
+input, textarea, select {
+  cursor: text;
 }
 
 h1, h2, h3, h4, h5, h6 {

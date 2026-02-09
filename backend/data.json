@@ -71,6 +71,33 @@
       "property_type": "home",
       "status": "estimated",
       "created_at": "2026-02-05T07:47:48.543Z"
+    },
+    {
+      "id": 1770638962591,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Lagos",
+      "property_type": "hospital",
+      "status": "estimated",
+      "created_at": "2026-02-09T12:09:21.741Z"
+    },
+    {
+      "id": 1770638983386,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Lagos",
+      "property_type": "home",
+      "status": "estimated",
+      "created_at": "2026-02-09T12:09:42.773Z"
+    },
+    {
+      "id": 1770639372864,
+      "name": "Demo User",
+      "phone": "0000000000",
+      "address": "Port harcourt ",
+      "property_type": "office",
+      "status": "estimated",
+      "created_at": "2026-02-09T12:16:12.261Z"
     }
   ],
   "estimations": [
@@ -203,6 +230,60 @@
       "lat": 4.7676576,
       "lon": 7.0188527,
       "created_at": "2026-02-05T07:47:48.546Z"
+    },
+    {
+      "id": 1770638962260,
+      "lead_id": 1770638962591,
+      "totalSteadyWatts": 1500,
+      "maxSurgeWatts": 900,
+      "dailyEnergyWh": 9000,
+      "recommendedInverter": 1875,
+      "systemVoltage": 24,
+      "batteryAh": 586,
+      "chargeControllerAmps": 135,
+      "panelQuantity": 6,
+      "panelWattage": 450,
+      "batteryCapacityWh": 14062.5,
+      "estimated_price": 6035750,
+      "lat": 6.4550575,
+      "lon": 3.3941795,
+      "created_at": "2026-02-09T12:09:21.742Z"
+    },
+    {
+      "id": 1770638983090,
+      "lead_id": 1770638983386,
+      "totalSteadyWatts": 385,
+      "maxSurgeWatts": 550,
+      "dailyEnergyWh": 2310,
+      "recommendedInverter": 550,
+      "systemVoltage": 12,
+      "batteryAh": 301,
+      "chargeControllerAmps": 90,
+      "panelQuantity": 2,
+      "panelWattage": 450,
+      "batteryCapacityWh": 3609.375,
+      "estimated_price": 2692000,
+      "lat": 6.4550575,
+      "lon": 3.3941795,
+      "created_at": "2026-02-09T12:09:42.776Z"
+    },
+    {
+      "id": 1770639372779,
+      "lead_id": 1770639372864,
+      "totalSteadyWatts": 2051,
+      "maxSurgeWatts": 1680,
+      "dailyEnergyWh": 24612,
+      "recommendedInverter": 2563.75,
+      "systemVoltage": 24,
+      "batteryAh": 1603,
+      "chargeControllerAmps": 405,
+      "panelQuantity": 18,
+      "panelWattage": 450,
+      "batteryCapacityWh": 38456.25,
+      "estimated_price": 15326062.5,
+      "lat": 4.7676576,
+      "lon": 7.0188527,
+      "created_at": "2026-02-09T12:16:12.263Z"
     }
   ],
   "appliance_presets": [

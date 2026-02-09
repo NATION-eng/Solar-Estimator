@@ -36,6 +36,10 @@
   --border-glass: 1px solid rgba(251, 191, 36, 0.2);
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  
+  /* --- CUSTOM CURSOR --- */
+  --cursor-default: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="%23fbbf24" opacity="0.2"/><circle cx="12" cy="12" r="4" fill="%23fbbf24"/></svg>') 12 12, auto;
+  --cursor-pointer: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="12" fill="%2338bdf8" opacity="0.3"/><circle cx="14" cy="14" r="5" fill="%2338bdf8"/></svg>') 14 14, pointer;
 }
 
 /* ================= UTILITIES ================= */
@@ -86,6 +90,23 @@
   0% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
   100% { transform: translateY(0px); }
+}
+
+/* Spinner Animation */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Slide In Animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes glow-pulse {

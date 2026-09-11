@@ -4,6 +4,7 @@
   max-width: 1240px;
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .desktopGrid {
@@ -43,6 +44,8 @@
   border-radius: var(--radius-lg);
   padding: 36px 32px;
   box-shadow: var(--shadow-card);
+  box-sizing: border-box;
+  width: 100%;
 }
 
 /* Stepper Navigation */

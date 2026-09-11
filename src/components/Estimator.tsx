@@ -11,8 +11,8 @@ import type { PropertyType } from "../types";
 import styles from "./Estimator.module.css";
 
 export default function Estimator() {
-  // Check if viewport is mobile or desktop/tablet
-  const isMobile = useMediaQuery('(max-width: 900px)');
+  // Check if viewport is mobile or desktop/tablet (matching 768px CSS breakpoint)
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   // Stepper state for mobile wizard (1: Location & Site, 2: Energy Audit, 3: Blueprint)
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -375,7 +375,7 @@ export default function Estimator() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
         <h3 className={styles.sectionTitle} style={{ margin: 0 }}>
           <span>⚡</span>
-          <span>3. Appliance Energy Audit ({appliances.length} Items)</span>
+          <span>{isMobile ? `Appliance Energy Audit (${appliances.length} Items)` : `3. Appliance Energy Audit (${appliances.length} Items)`}</span>
         </h3>
       </div>
 

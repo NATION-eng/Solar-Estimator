@@ -27,18 +27,20 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
             style={{
               color: "var(--color-primary)",
               fontWeight: "700",
-              fontSize: "0.78rem",
-              letterSpacing: "0.1em",
+              fontSize: "clamp(0.65rem, 2vw, 0.78rem)",
+              letterSpacing: "0.05em",
               display: "inline-flex",
               alignItems: "center",
               gap: "6px",
               border: '1px solid rgba(251, 191, 36, 0.3)',
-              padding: '6px 14px',
+              padding: '4px 12px',
               borderRadius: '100px',
-              background: 'rgba(251, 191, 36, 0.08)'
+              background: 'rgba(251, 191, 36, 0.08)',
+              maxWidth: '100%',
+              boxSizing: 'border-box'
             }}
           >
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-primary)', display: 'inline-block' }}></span>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-primary)', display: 'inline-block', flexShrink: 0 }}></span>
             <span>NIGERIAN IRRADIANCE SIZING ENGINE</span>
           </span>
         </div>
@@ -120,8 +122,8 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
           style={{
             background: 'var(--color-primary)',
             color: '#000',
-            padding: '14px 36px',
-            fontSize: '0.95rem',
+            padding: '14px 28px',
+            fontSize: 'clamp(0.85rem, 2.5vw, 0.95rem)',
             borderRadius: '100px',
             boxShadow: 'var(--shadow-glow)',
             fontWeight: 800,
@@ -131,7 +133,9 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
             justifyContent: 'center',
             gap: '8px',
             minHeight: '48px',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            maxWidth: '100%',
+            boxSizing: 'border-box'
           }}
         >
           <span>⚡</span>

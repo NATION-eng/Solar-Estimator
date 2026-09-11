@@ -63,9 +63,17 @@
 }
 
 .container-wide {
+  width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.p-responsive {
+  padding: 40px 32px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .flex-center {
@@ -289,25 +297,34 @@ button:active, .clickable:active {
     padding-bottom: 130px !important;
   }
 
+  /* Mobile: Dock PWA prompt at the top beneath header so it never covers the bottom navigation bar or Calculate button! */
   .pwa-install-banner-wrapper {
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
-    max-width: 440px;
+    position: fixed !important;
+    top: calc(56px + env(safe-area-inset-top, 8px)) !important;
+    bottom: auto !important;
+    left: 12px !important;
+    right: 12px !important;
+    transform: none !important;
+    width: auto !important;
+    max-width: 440px !important;
+    margin: 0 auto !important;
+    z-index: 1000 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8) !important;
   }
 }
 
 /* Desktop default: Sleek toast in bottom-right corner, never blocks main CTA */
-.pwa-install-banner-wrapper {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  left: auto;
-  transform: none;
-  width: calc(100% - 32px);
-  max-width: 380px;
-  z-index: 9999;
+@media (min-width: 769px) {
+  .pwa-install-banner-wrapper {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    left: auto;
+    transform: none;
+    width: calc(100% - 32px);
+    max-width: 380px;
+    z-index: 9999;
+  }
 }
 
 /* Micro Mobile (<380px) - iPhone SE, Galaxy Fold */
@@ -429,11 +446,6 @@ button:active, .clickable:active {
   }
 }
 
-/* Base utility defaults */
-.p-responsive {
-  padding: 40px 32px;
-  box-sizing: border-box;
-}
 
 .grid-property {
   display: grid;

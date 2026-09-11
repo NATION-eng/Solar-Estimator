@@ -39,11 +39,11 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
         </span>
         
         <h1 className="hero-title" style={{ 
-          fontSize: '4.5rem', 
-          fontWeight: 700, 
-          marginBottom: '24px',
-          letterSpacing: '-0.02em',
-          lineHeight: '1.1'
+          fontSize: 'clamp(2.2rem, 8vw, 4.4rem)', 
+          fontWeight: 800, 
+          marginBottom: '20px',
+          letterSpacing: '-0.03em',
+          lineHeight: '1.15'
         }}>
           <span className="text-gradient">Solar System</span>
           <br />
@@ -56,13 +56,14 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
         </h1>
         
         <p className="hero-subtitle" style={{ 
-          fontSize: '1.25rem', 
+          fontSize: 'clamp(0.95rem, 2.5vw, 1.25rem)', 
           maxWidth: '600px', 
-          margin: '0 auto 40px',
-          color: 'var(--color-text-muted)'
+          margin: '0 auto 32px',
+          color: 'var(--color-text-muted)',
+          lineHeight: 1.6
         }}>
-          Define your energy independence. Our proprietary algorithms calculate
-          your exact needs based on real-world efficiency standards.
+          Define your energy independence. Engineered sizing algorithms calculate
+          your exact hardware requirements based on Nigerian irradiance standards.
         </p>
         
         <button 
@@ -70,18 +71,23 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
           onClick={onBegin}
           style={{
             background: 'var(--color-primary)',
-            color: '#fff',
-            padding: '16px 48px',
-            fontSize: '1.1rem',
+            color: '#000',
+            padding: '16px 44px',
+            fontSize: '1rem',
             borderRadius: '100px',
             boxShadow: 'var(--shadow-glow)',
-            fontWeight: 600,
-            transition: 'var(--transition-fast)'
+            fontWeight: 700,
+            transition: 'var(--transition-fast)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px'
           }}
-          onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.03)'}
           onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
-          Begin Assessment
+          <span>⚡</span>
+          <span>Begin Assessment</span>
         </button>
       </div>
     </section>

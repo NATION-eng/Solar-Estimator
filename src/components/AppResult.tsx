@@ -1,25 +1,13 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import type { EstimationResult } from '../types';
+import LoadProfileChart from './LoadProfileChart';
+import SavingsCalculator from './SavingsCalculator';
+import EnvironmentalImpactCard from './EnvironmentalImpactCard';
+import { calculateEnvironmentalImpact } from '../utils/helpers';
 
 type ResultProps = {
-  data: {
-    totalLoadWatts: number;
-    dailyEnergyWh: number;
-    recommendedInverterW: number;
-    batteryCapacityWh: number;
-    estimatedPriceNaira?: number;
-    maxSurgeWatts?: number;
-    panelQuantity?: number;
-    panelWattage?: number;
-    paybackYears?: number;
-    systemVoltage?: number;
-    batteryAh?: number;
-    chargeControllerAmps?: number;
-    location?: {
-      address: string;
-      psh: number;
-    };
-  };
+  data: EstimationResult;
 };
 
 export default function AppResult({ data }: ResultProps) {
@@ -31,140 +19,173 @@ export default function AppResult({ data }: ResultProps) {
     }).format(amount);
   };
 
+  const environmentalImpact = data.environmental || calculateEnvironmentalImpact(data.dailyEnergyWh);
+
   const handleDownloadPDF = () => {
     try {
-      console.log("Starting exquisite PDF generation...");
-      
-      // Resilient constructor for jsPDF across various build environments
       const jsPDFConstructor = (jsPDF as any).default || jsPDF;
       const doc = new jsPDFConstructor();
       
       // Header overlay
       doc.setFillColor(5, 5, 5); 
-      doc.rect(0, 0, 210, 40, 'F');
+      doc.rect(0, 0, 210, 42, 'F');
       
-      doc.setTextColor(0, 240, 255); 
+      doc.setTextColor(251, 191, 36); 
       doc.setFontSize(22);
       doc.setFont('helvetica', 'bold');
-      doc.text("MasterviewCEL", 14, 20);
+      doc.text("MasterviewCEL Energy Solutions", 14, 18);
       
       doc.setTextColor(255, 255, 255);
-      doc.setFontSize(12);
+      doc.setFontSize(11);
       doc.setFont('helvetica', 'normal');
-      doc.text("Professional Solar Quotation", 14, 28);
+      doc.text("Engineered Solar Quotation & Technical Blueprint", 14, 28);
       
-      doc.setFontSize(10);
-      doc.text(`Reference Date: ${new Date().toLocaleDateString()}`, 160, 25);
+      doc.setFontSize(9);
+      doc.setTextColor(180, 180, 180);
+      doc.text(`Ref Date: ${new Date().toLocaleDateString()} | Location: ${data.location?.address || 'Nigeria'}`, 14, 36);
 
       // Section Title
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(14);
+      doc.setTextColor(20, 20, 20);
+      doc.setFontSize(13);
       doc.setFont('helvetica', 'bold');
-      doc.text("Technical Configuration", 14, 55);
+      doc.text("Technical Sizing & Hardware Configuration", 14, 52);
 
       const tableData = [
-        ['System Voltage', `${data.systemVoltage || '24'}V DC`],
-        ['Inverter Rating', `${((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA Pure Sine`],
-        ['Peak Surge Support', `${(data.maxSurgeWatts || 0).toLocaleString()} Watts`],
-        ['Battery Bank', `${data.batteryAh || '--'} Ah @ ${data.systemVoltage || '24'}V`],
-        ['Solar Array', `${data.panelQuantity || '--'} x 450W Monocrystalline`],
-        ['Daily Energy Yield', `${((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh/day`],
-        ['Charge Controller', `${data.chargeControllerAmps || '--'}A MPPT Sized`]
+        ['System Voltage', `${data.systemVoltage || '24'}V DC Architecture`],
+        ['Recommended Inverter', `${((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA Pure Sine Wave`],
+        ['Peak Surge Capacity', `${(data.maxSurgeWatts || 0).toLocaleString()} Watts`],
+        ['Battery Storage Bank', `${data.batteryAh || '--'} Ah @ ${data.systemVoltage || '24'}V (${data.batteryType || 'Lithium'})`],
+        ['Battery Storage Energy', `${((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh Reserve`],
+        ['Solar PV Array', `${data.panelQuantity || '--'} x 450W Monocrystalline Panels`],
+        ['Estimated Daily Yield', `${((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh / day`],
+        ['Charge Controller', `${data.chargeControllerAmps || '--'}A MPPT Controller`]
       ];
 
-      // Robust autoTable call
       const autoTableFunc = (autoTable as any).default || autoTable;
       if (typeof autoTableFunc === 'function') {
         autoTableFunc(doc, {
-          startY: 60,
-          head: [['Requirement', 'Engineering Specification']],
+          startY: 56,
+          head: [['Engineering Parameter', 'Recommended Specification']],
           body: tableData,
           theme: 'grid',
-          headStyles: { fillColor: [5, 5, 5], textColor: [0, 240, 255] },
-          styles: { fontSize: 10, cellPadding: 5 }
+          headStyles: { fillColor: [15, 23, 42], textColor: [251, 191, 36] },
+          styles: { fontSize: 9, cellPadding: 4 }
         });
       }
 
-      // Check final Y position
       const lastTable = (doc as any).lastAutoTable;
-      const finalY = (lastTable && lastTable.finalY) ? lastTable.finalY : 150;
+      const finalY = (lastTable && lastTable.finalY) ? lastTable.finalY : 145;
       
       // Pricing Highlight
-      doc.setFillColor(245, 250, 255);
-      doc.setDrawColor(0, 240, 255);
-      doc.rect(14, finalY + 10, 182, 30, 'FD');
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(251, 191, 36);
+      doc.rect(14, finalY + 8, 182, 34, 'FD');
       
-      doc.setFontSize(11);
-      doc.setTextColor(100, 100, 100);
-      doc.text("Estimated System Investment (NGN)", 20, finalY + 20);
+      doc.setFontSize(10);
+      doc.setTextColor(100, 116, 139);
+      doc.text("Turnkey System Investment (Inclusive of Hardware & Installation)", 20, finalY + 18);
       
       doc.setFontSize(20);
-      doc.setTextColor(0, 0, 0); 
+      doc.setTextColor(15, 23, 42); 
       doc.setFont('helvetica', 'bold');
       
-      const priceText = data.estimatedPriceNaira ? formatCurrency(data.estimatedPriceNaira) : "Consulting Required";
-      doc.text(priceText, 20, finalY + 32);
+      const priceText = data.estimatedPriceNaira ? formatCurrency(data.estimatedPriceNaira) : "Consultation Required";
+      doc.text(priceText, 20, finalY + 31);
+
+      // Environmental metrics
+      doc.setFontSize(10);
+      doc.setTextColor(20, 20, 20);
+      doc.text(`Estimated Annual CO2 Avoided: ${environmentalImpact.co2SavedAnnually.toLocaleString()} kg (~${environmentalImpact.treesEquivalent} Trees Equivalent)`, 14, finalY + 52);
 
       // Disclaimer & Footer
       doc.setFontSize(8);
       doc.setTextColor(120, 120, 120);
-      doc.text("Disclaimer: This is a high-fidelity estimate based on provided load profiles and geo-solar data. Final hardware selection may vary.", 14, 275);
-      doc.text("Visit: www.masterviewcel.com | © 2026 MasterviewCEL Energy Solutions", 14, 282);
+      doc.text("Disclaimer: Sizing based on provided load and geo-irradiance metrics. Final quote subject to physical site inspection.", 14, 275);
+      doc.text("MasterviewCEL Energy Solutions | www.masterviewcel.com | support@masterviewcel.com", 14, 282);
 
-      doc.save('Solar_Quotation_Masterview.pdf');
-      console.log("PDF successfully generated and saved.");
+      doc.save(`Solar_Quotation_${data.id || 'Masterview'}.pdf`);
     } catch (err: any) {
       console.error("PDF Component Failure:", err);
       alert(`Export Error: ${err.message || "Contact Support"}`);
     }
   };
 
+  const handleShareWhatsApp = () => {
+    const summary = [
+      `*🌞 MasterviewCEL Solar Blueprint*`,
+      `📍 Location: ${data.location?.address || 'Nigeria'}`,
+      `⚡ Daily Energy: ${((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh/day`,
+      `🔌 Inverter: ${((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA Pure Sine`,
+      `🔋 Battery: ${data.batteryAh || 0} Ah @ ${data.systemVoltage || 24}V (${data.batteryType || 'Lithium'})`,
+      `☀️ Solar Array: ${data.panelQuantity || 0} x 450W Panels`,
+      `💰 Investment: ${formatCurrency(data.estimatedPriceNaira || 0)}`,
+      `⏳ Payback: ${data.paybackYears ? `${data.paybackYears.toFixed(1)} Years` : '3.5 Years'}`,
+      `🌱 Annual CO2 Saved: ${environmentalImpact.co2SavedAnnually.toLocaleString()} kg`
+    ].join('\n');
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(summary)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   return (
-    <section className="animate-float" style={{ animationDuration: '8s' }}>
+    <section style={{ marginTop: '50px' }}>
       <div className="glass-panel p-responsive" style={{ 
-        marginTop: '60px', 
         borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--color-primary-glow)'
+        border: '1px solid var(--border-glass)'
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{ 
-            fontSize: '2rem', 
-            marginBottom: '10px' 
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+          <span style={{
+            color: 'var(--color-primary)',
+            fontWeight: 700,
+            fontSize: '0.8rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.2em',
+            padding: '4px 14px',
+            borderRadius: '100px',
+            background: 'rgba(251, 191, 36, 0.1)',
+            border: '1px solid rgba(251, 191, 36, 0.3)',
+            display: 'inline-block',
+            marginBottom: '12px'
           }}>
+            Technical Sizing Complete
+          </span>
+          <h2 style={{ fontSize: '2.4rem', fontWeight: 800, marginBottom: '8px' }}>
             <span className="text-gradient">Your Solar Blueprint</span>
           </h2>
-          <p style={{ color: 'var(--color-text-muted)' }}>
-            Based on your unique energy profile, here is our recommended configuration.
+          <p style={{ color: 'var(--color-text-muted)', maxWidth: '560px', margin: '0 auto' }}>
+            Engineered specifically for your power consumption profile and local solar irradiation levels.
           </p>
         </div>
 
-        <div className="grid-responsive" style={{ marginBottom: '40px' }}>
+        {/* Core Hardware Cards */}
+        <div className="grid-responsive" style={{ marginBottom: '32px' }}>
           {/* Inverter Card */}
           <div style={{ 
-            background: 'rgba(59, 130, 246, 0.1)', 
+            background: 'rgba(56, 189, 248, 0.08)', 
             padding: '24px', 
             borderRadius: 'var(--radius-md)',
-            borderLeft: '4px solid var(--color-primary)'
+            borderLeft: '4px solid var(--color-accent)'
           }}>
             <p style={{ 
               textTransform: 'uppercase', 
               fontSize: '0.75rem', 
               fontWeight: 700, 
               letterSpacing: '0.1em',
-              color: 'var(--color-primary)',
+              color: 'var(--color-accent)',
               marginBottom: '8px'
             }}>System Core</p>
-            <h3 className="result-card-title" style={{ fontSize: '1.8rem', fontWeight: 700 }}>
-              {data.systemVoltage}V / {(data.recommendedInverterW / 1000).toFixed(1)} kVA
+            <h3 className="result-card-title" style={{ fontSize: '1.9rem', fontWeight: 800 }}>
+              {data.systemVoltage}V / {((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA
             </h3>
-            <p style={{ fontSize: '0.9rem', opacity: 0.7, marginTop: '4px' }}>
-              Pure Sine Wave Inverter
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+              Pure Sine Wave Inverter (Surge: {(data.maxSurgeWatts || 0).toLocaleString()}W)
             </p>
           </div>
 
           {/* Battery Card */}
           <div style={{ 
-            background: 'rgba(16, 185, 129, 0.1)', 
+            background: 'rgba(16, 185, 129, 0.08)', 
             padding: '24px', 
             borderRadius: 'var(--radius-md)',
             borderLeft: '4px solid var(--color-success)'
@@ -177,145 +198,210 @@ export default function AppResult({ data }: ResultProps) {
               color: 'var(--color-success)',
               marginBottom: '8px'
             }}>Storage Bank</p>
-            <h3 className="result-card-title" style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+            <h3 className="result-card-title" style={{ fontSize: '1.9rem', fontWeight: 800 }}>
               {data.batteryAh} Ah
             </h3>
-            <p style={{ fontSize: '0.9rem', opacity: 0.7, marginTop: '4px' }}>
-              @ {data.systemVoltage}V (Lithium Recommended)
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+              @ {data.systemVoltage}V ({((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh {data.batteryType === 'lithium' ? 'Lithium LiFePO4' : 'Deep Cycle'})
             </p>
           </div>
 
           {/* Solar Card */}
-           <div style={{ 
-            background: 'rgba(245, 158, 11, 0.1)', 
+          <div style={{ 
+            background: 'rgba(251, 191, 36, 0.08)', 
             padding: '24px', 
             borderRadius: 'var(--radius-md)',
-            borderLeft: '4px solid var(--color-accent)'
+            borderLeft: '4px solid var(--color-primary)'
           }}>
             <p style={{ 
               textTransform: 'uppercase', 
               fontSize: '0.75rem', 
               fontWeight: 700, 
               letterSpacing: '0.1em',
-              color: 'var(--color-accent)',
+              color: 'var(--color-primary)',
               marginBottom: '8px'
-            }}>Energy Source</p>
-            <h3 className="result-card-title" style={{ fontSize: '1.8rem', fontWeight: 700 }}>
+            }}>Energy Harvester</p>
+            <h3 className="result-card-title" style={{ fontSize: '1.9rem', fontWeight: 800 }}>
               {data.panelQuantity} Panels
             </h3>
-             <p style={{ fontSize: '0.9rem', opacity: 0.7, marginTop: '4px' }}>
-               {data.chargeControllerAmps}A MPPT Controller
+            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+              450W Mono PV + {data.chargeControllerAmps}A MPPT Controller
             </p>
           </div>
         </div>
 
-        {/* Technical Blueprint Section (Dope Add-on) */}
+        {/* Technical Blueprint Table */}
         <div style={{ 
-          background: 'rgba(0,0,0,0.4)', 
+          background: 'rgba(0,0,0,0.3)', 
           padding: '24px', 
           borderRadius: 'var(--radius-md)',
-          marginBottom: '40px',
-          border: '1px solid rgba(255,255,255,0.05)'
+          marginBottom: '32px',
+          border: '1px solid rgba(255,255,255,0.06)'
         }}>
-          <h4 style={{ color: 'var(--color-primary)', fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '16px', letterSpacing: '0.1em' }}>Technical Specifications</h4>
-          <div className="grid-responsive-narrow" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
+          <h4 style={{ color: 'var(--color-primary)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '16px', letterSpacing: '0.1em' }}>
+            Technical Engineering Specifications
+          </h4>
+          <div className="grid-responsive-narrow" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Peak Surge Load</span>
-              <span style={{ fontWeight: 600 }}>{data.maxSurgeWatts?.toLocaleString()} W</span>
+              <span style={{ fontWeight: 600 }}>{(data.maxSurgeWatts || 0).toLocaleString()} W</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
               <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Daily Energy Usage</span>
-              <span style={{ fontWeight: 600 }}>{(data.dailyEnergyWh / 1000).toFixed(1)} kWh</span>
+              <span style={{ fontWeight: 600 }}>{((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Solar Yield (Local)</span>
-              <span style={{ fontWeight: 600 }}>{data.location?.psh.toFixed(2)} Hrs/Day</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Solar Irradiance (Local)</span>
+              <span style={{ fontWeight: 600 }}>{data.location?.psh ? `${data.location.psh.toFixed(2)} PSH` : '4.80 PSH'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Inverter Efficiency</span>
-              <span style={{ fontWeight: 600 }}>92% Pure Sine</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Architecture</span>
+              <span style={{ fontWeight: 600 }}>{data.systemVoltage}V DC Pure Sine</span>
             </div>
           </div>
         </div>
+
+        {/* 24-Hour Load Profile Chart */}
+        {data.appliances && data.appliances.length > 0 && (
+          <div style={{ marginBottom: '32px' }}>
+            <LoadProfileChart 
+              appliances={data.appliances} 
+              hours={data.dailyHours || 6} 
+            />
+          </div>
+        )}
 
         {/* Cost & ROI */}
         <div className="flex-responsive" style={{ 
           display: 'flex',
           gap: '20px',
-          marginBottom: '40px'
+          marginBottom: '32px'
         }}>
+          <div style={{ 
+            flex: 1.4,
+            textAlign: 'left', 
+            padding: '28px', 
+            background: 'var(--color-bg-deep)', 
+            borderRadius: 'var(--radius-md)',
+            border: '1px solid rgba(251, 191, 36, 0.3)'
+          }}>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: '8px', fontSize: '0.9rem' }}>Estimated System Investment</p>
             <div style={{ 
-              flex: 1.5,
-              textAlign: 'left', 
-              padding: '30px', 
-              background: 'var(--color-bg-deep)', 
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid rgba(255,150,0,0.2)'
+              fontSize: '2.4rem', 
+              fontWeight: 800, 
+              color: 'var(--color-primary)',
+              lineHeight: 1.1
             }}>
-              <p style={{ color: 'var(--color-text-muted)', marginBottom: '8px' }}>Estimated System Cost</p>
-              <div style={{ 
-                fontSize: '2.2rem', 
-                fontWeight: 800, 
-                color: 'var(--color-accent)',
-                lineHeight: 1.2
-              }}>
-                {formatCurrency(data.estimatedPriceNaira || 0)}
-              </div>
+              {formatCurrency(data.estimatedPriceNaira || 0)}
             </div>
+            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '8px' }}>
+              Includes solar PV modules, pure sine inverter, storage bank, MPPT controller, cabling & installation.
+            </p>
+          </div>
 
-            <div style={{ 
-              flex: 1,
-              textAlign: 'center', 
-              padding: '30px', 
-              background: 'rgba(255,255,255,0.03)', 
-              borderRadius: 'var(--radius-md)',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center'
-            }}>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8rem', marginBottom: '4px' }}>Estimated Payback</p>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700 }}>
-                {data.paybackYears ? `${data.paybackYears.toFixed(1)} Years` : 'N/A'}
-              </div>
-              <p style={{ fontSize: '0.7rem', opacity: 0.5 }}>vs Grid Tariff</p>
+          <div style={{ 
+            flex: 1,
+            textAlign: 'center', 
+            padding: '28px', 
+            background: 'rgba(255,255,255,0.03)', 
+            borderRadius: 'var(--radius-md)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            border: '1px solid rgba(255,255,255,0.05)'
+          }}>
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Estimated Payback</p>
+            <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-success)' }}>
+              {data.paybackYears ? `${data.paybackYears.toFixed(1)} Years` : '3.5 Years'}
             </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+              Based on Nigerian grid tariff parity & generator diesel replacement
+            </p>
+          </div>
+        </div>
+
+        {/* Interactive Savings & Tariff Sensitivity Calculator */}
+        <div style={{ marginBottom: '32px' }}>
+          <SavingsCalculator 
+            systemCost={data.estimatedPriceNaira || 0} 
+            dailyEnergyWh={data.dailyEnergyWh} 
+            paybackYears={data.paybackYears || 3.5} 
+          />
+        </div>
+
+        {/* Environmental Impact Card */}
+        <div style={{ marginBottom: '36px' }}>
+          <EnvironmentalImpactCard impact={environmentalImpact} />
         </div>
 
         {data.location?.address && (
           <div style={{ 
-            marginBottom: '40px', 
-            padding: '12px', 
+            marginBottom: '32px', 
+            padding: '14px', 
             background: 'rgba(0,0,0,0.3)', 
-            borderRadius: '10px',
+            borderRadius: '12px',
             fontSize: '0.85rem',
             color: 'var(--color-text-muted)',
             display: 'flex',
             alignItems: 'center',
             gap: '8px'
           }}>
-             <span>📍</span>
-             <span>Optimized for: <strong>{data.location.address}</strong></span>
+            <span style={{ fontSize: '1.2rem' }}>📍</span>
+            <span>Tailored installation region: <strong style={{ color: 'var(--color-text-main)' }}>{data.location.address}</strong></span>
           </div>
         )}
 
-        {/* CTA */}
-        <div style={{ textAlign: 'center' }}>
+        {/* Call to Actions */}
+        <div style={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          justifyContent: 'center', 
+          gap: '12px',
+          paddingTop: '16px'
+        }}>
           <button 
             onClick={handleDownloadPDF}
             className="btn-primary" 
             style={{
-              background: 'var(--color-text-main)',
-              color: 'var(--color-bg-deep)',
-              padding: '16px 32px',
+              background: 'var(--color-primary)',
+              color: '#000',
+              padding: '16px 28px',
               borderRadius: 'var(--radius-sm)',
               fontWeight: 700,
               fontSize: '1rem',
-              transition: 'transform 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              flex: '1 1 260px',
+              minHeight: '52px'
             }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            Download Quotation PDF
+            <span>📄</span>
+            <span>Download Quotation PDF</span>
+          </button>
+
+          <button 
+            onClick={handleShareWhatsApp}
+            style={{
+              background: '#25D366',
+              color: '#fff',
+              padding: '16px 28px',
+              borderRadius: 'var(--radius-sm)',
+              fontWeight: 700,
+              fontSize: '1rem',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              flex: '1 1 220px',
+              minHeight: '52px'
+            }}
+          >
+            <span>💬</span>
+            <span>Share via WhatsApp</span>
           </button>
         </div>
       </div>

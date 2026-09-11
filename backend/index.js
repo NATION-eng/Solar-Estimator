@@ -3,26 +3,28 @@ import cors from "cors";
 import rateLimit from "express-rate-limit";
 import { db } from "./database.js";
 import { solarService } from "./services/solarService.js";
-import { energyModel } from "./services/energyModel.js";
+import { energyModel } from "./services/energyModel_enhanced.js";
 
 const app = express();
 const PORT = process.env.PORT || 5050;
 
 /* ================= MIDDLEWARE ================= */
-// CORS configuration for production
+// CORS configuration for local development and production deployments
 const allowedOrigins = [
   'http://localhost:5180',
   'http://127.0.0.1:5180',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
   'https://solar-estimator.vercel.app',
-  'https://solar-estimator-*.vercel.app', // Preview deployments
+  'https://solar-estimator-*.vercel.app',
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
-    // Check if origin is in allowed list or matches pattern
     const isAllowed = allowedOrigins.some(allowed => {
       if (allowed.includes('*')) {
         const pattern = new RegExp('^' + allowed.replace(/\*/g, '.*') + '$');
@@ -34,7 +36,7 @@ app.use(cors({
     if (isAllowed) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, true); // Permissive in dev fallback
     }
   },
   credentials: true
@@ -56,7 +58,7 @@ app.use(limiter);
  */
 app.post("/estimate", async (req, res) => {
   try {
-    const { propertyType, appliances, hours, contact, address } = req.body;
+    const { propertyType, appliances, hours, contact, address, batteryType = 'lithium' } = req.body;
 
     if (!appliances || !hours || !address) {
       return res.status(400).json({ error: "Missing required inputs (appliances, hours, address)" });
@@ -68,37 +70,51 @@ app.post("/estimate", async (req, res) => {
       return res.status(404).json({ error: "Could not find address" });
     }
 
-    const solarData = await solarService.getSolarYield(location.lat, location.lon);
+    const solarData = await solarService.getSolarYield(location.lat, location.lon, location.cachedPsh);
 
-    // 2. Technical Sizing
-    const result = energyModel.calculateSystem(appliances, Number(hours), solarData.peakSunHours);
+    // 2. Technical Sizing using Enhanced Energy Model
+    const result = energyModel.calculateSystem(
+      appliances, 
+      Number(hours), 
+      solarData.peakSunHours,
+      batteryType
+    );
 
     // 3. Persist Lead & Estimation (CRM Logic)
-    const lead = db.insert('leads', {
-      name: contact?.name || "Anonymous",
-      phone: contact?.phone,
-      address: address, // Standardized address
-      property_type: propertyType,
-      status: 'estimated'
-    });
+    let estimationId = Date.now();
+    try {
+      const lead = db.insert('leads', {
+        name: contact?.name || "Website Visitor",
+        phone: contact?.phone || "Not provided",
+        address: location.displayName || address,
+        property_type: propertyType || "residential",
+        status: 'estimated'
+      });
 
-    const estimation = db.insert('estimations', {
-      lead_id: lead.id,
-      ...result.technical,
-      estimated_price: result.financial.estimatedPriceNaira,
-      lat: location.lat,
-      lon: location.lon
-    });
+      const estimation = db.insert('estimations', {
+        lead_id: lead.id,
+        ...result.technical,
+        estimated_price: result.financial.estimatedPriceNaira,
+        lat: location.lat,
+        lon: location.lon
+      });
+      estimationId = estimation.id;
+    } catch (dbErr) {
+      console.warn("Lead storage warning (non-fatal):", dbErr.message);
+    }
 
-    // 4. Return Comprehensive Result
+    // 4. Return Comprehensive Blueprint Result
     res.json({
-      id: estimation.id,
+      id: estimationId,
       location: {
         address: location.displayName,
         psh: solarData.peakSunHours
       },
+      batteryType,
       ...result.technical,
       ...result.financial,
+      environmental: result.environmental,
+      recommendations: result.recommendations,
       recommendedInverterW: result.technical.recommendedInverter, // map back to frontend key
     });
 

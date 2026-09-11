@@ -2,6 +2,7 @@ import { useRef, RefObject } from "react";
 import Hero from "./components/Hero";
 import Estimator from "./components/Estimator";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import PWAInstallBanner from "./components/PWAInstallBanner";
 import "./styles/design-system.css"; 
 
 function App() {
@@ -31,6 +32,8 @@ function App() {
         }}>
           <p>© 2026 MasterviewCEL. All rights reserved.</p>
         </footer>
+        
+        <PWAInstallBanner />
       </div>
     </ErrorBoundary>
   );

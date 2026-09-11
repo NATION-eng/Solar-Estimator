@@ -7,12 +7,40 @@ export interface Appliance {
   hours?: number;
   surgeFactor?: number;
   category?: string;
+  isSurgeHeavy?: boolean;
+}
+
+export interface EnvironmentalImpact {
+  co2SavedAnnually: number;
+  treesEquivalent: number;
+  coalAvoided: number;
+  lifetimeOffset: number;
+}
+
+export interface BatteryHealth {
+  cyclesRemaining: number;
+  yearsOfLife: number;
+  replacementCost: number;
+  depthOfDischarge: number;
+}
+
+export interface FinancingOption {
+  downPaymentPercent: number;
+  downPaymentAmount: number;
+  loanAmount: number;
+  months: number;
+  monthlyPayment: number;
+  totalPayment: number;
+  totalInterest: number;
 }
 
 export interface EstimationResult {
+  id?: number | string;
   totalLoadWatts: number;
+  totalSteadyWatts?: number;
   dailyEnergyWh: number;
   recommendedInverterW: number;
+  recommendedInverter?: number;
   batteryCapacityWh: number;
   estimatedPriceNaira?: number;
   maxSurgeWatts?: number;
@@ -21,7 +49,14 @@ export interface EstimationResult {
   paybackYears?: number;
   systemVoltage?: number;
   batteryAh?: number;
+  batteryType?: 'lithium' | 'gel' | 'tubular';
   chargeControllerAmps?: number;
+  inverterEfficiency?: number;
+  breakdown?: Record<string, number>;
+  environmental?: EnvironmentalImpact;
+  recommendations?: string[];
+  appliances?: Appliance[];
+  dailyHours?: number;
   location?: {
     address: string;
     psh: number;

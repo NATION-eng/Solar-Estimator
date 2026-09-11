@@ -87,22 +87,23 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
         </label>
         
         {/* Category Pills */}
-        <div style={{
-          display: 'flex',
-          gap: '8px',
-          flexWrap: 'wrap',
-          marginBottom: '12px',
-        }}>
+        <div 
+          className="scroll-touch-x"
+          style={{
+            marginBottom: '12px',
+          }}
+        >
           {Object.entries(CATEGORIES).map(([key, cat]) => (
             <button
               key={key}
+              type="button"
               onClick={() => {
                 setSelectedCategory(selectedCategory === key ? null : key);
                 setSearchQuery('');
                 setShowSuggestions(true);
               }}
               style={{
-                padding: '6px 12px',
+                padding: '7px 14px',
                 background: selectedCategory === key 
                   ? 'var(--color-primary)' 
                   : 'rgba(255,255,255,0.05)',
@@ -116,20 +117,10 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                 transition: 'all 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '4px',
-                fontWeight: selectedCategory === key ? 600 : 400,
-              }}
-              onMouseEnter={(e) => {
-                if (selectedCategory !== key) {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (selectedCategory !== key) {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                }
+                gap: '6px',
+                fontWeight: selectedCategory === key ? 700 : 500,
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}
             >
               <span>{cat.icon}</span>

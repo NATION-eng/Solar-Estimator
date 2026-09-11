@@ -36,10 +36,6 @@
   --border-glass: 1px solid rgba(251, 191, 36, 0.2);
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-smooth: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-  
-  /* --- CUSTOM CURSOR --- */
-  --cursor-default: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="%23fbbf24" opacity="0.2"/><circle cx="12" cy="12" r="4" fill="%23fbbf24"/></svg>') 12 12, auto;
-  --cursor-pointer: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="12" fill="%2338bdf8" opacity="0.3"/><circle cx="14" cy="14" r="5" fill="%2338bdf8"/></svg>') 14 14, pointer;
 }
 
 /* ================= UTILITIES ================= */
@@ -121,109 +117,160 @@
 
 /* ================= MEDIA QUERIES & RESPONSIVE HELPER CLASSES ================= */
 
-/* Small Mobile (<640px) */
-@media (max-width: 640px) {
+/* Universal Touch & Safe Area Helpers */
+.scroll-touch-x {
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  gap: 8px;
+  padding: 4px 2px 8px 2px;
+}
+.scroll-touch-x::-webkit-scrollbar {
+  display: none;
+}
+
+/* Micro Mobile (<380px) - iPhone SE, Galaxy Fold */
+@media (max-width: 380px) {
   :root {
-      --radius-lg: 16px; /* Smaller radius for mobile */
+    --radius-lg: 14px;
+    --radius-md: 10px;
   }
 
-  /* Padding adjustments */
+  .container-wide {
+    padding: 0 10px !important;
+  }
+
+  .p-responsive {
+    padding: 20px 12px !important;
+  }
+
+  h1.hero-title {
+    font-size: 1.85rem !important;
+    line-height: 1.15 !important;
+  }
+
+  p.hero-subtitle {
+    font-size: 0.9rem !important;
+  }
+
+  .result-card-title {
+    font-size: 1.25rem !important;
+  }
+
+  .btn-primary {
+    padding: 12px 18px !important;
+    font-size: 0.9rem !important;
+    width: 100% !important;
+  }
+}
+
+/* Standard Mobile (381px - 640px) */
+@media (max-width: 640px) {
+  :root {
+    --radius-lg: 18px;
+  }
+
   .pad-section {
-      padding: 30px 20px !important;
+    padding: 28px 16px !important;
   }
   
   .container-wide {
-    padding: 0 16px;
+    padding: 0 14px;
   }
   
-  /* Typography adjustments */
   h1.hero-title {
-      font-size: 2.5rem !important; /* Smaller hero title */
-      word-wrap: break-word; /* Prevent overflow */
+    font-size: clamp(2rem, 8vw, 2.75rem) !important;
+    word-wrap: break-word;
+    line-height: 1.15;
   }
   
   p.hero-subtitle {
-     font-size: 1rem !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 28px !important;
   }
   
   .btn-primary {
-      padding: 14px 24px !important;
-      font-size: 1rem !important;
-      width: 100%; /* Full width buttons on mobile */
-      justify-content: center;
-      display: flex;
+    padding: 14px 24px !important;
+    font-size: 0.95rem !important;
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
   }
 
-  /* Layout Resets */
   .flex-responsive {
-      flex-direction: column;
+    flex-direction: column !important;
   }
 
   .grid-responsive {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
     gap: 16px;
   }
 
   .result-card-title {
-    font-size: 1.4rem !important;
+    font-size: 1.45rem !important;
   }
 
   .grid-responsive-narrow {
     grid-template-columns: 1fr !important;
+    gap: 10px !important;
   }
-  
-  /* Estimator Form Specifics */
-  .appliance-row {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 16px !important;
-  }
-  
-  .appliance-row input {
-      width: 100% !important;
-      text-align: left !important;
-  }
-  
-  .appliance-row .remove-btn {
-      align-self: flex-end;
-      background: rgba(255, 0, 0, 0.1) !important;
-      padding: 4px 12px !important;
-      border-radius: 4px;
+
+  .p-responsive {
+    padding: 24px 16px !important;
   }
 }
 
-/* Tablet (640px - 1024px) */
+/* Tablet (641px - 1024px) */
 @media (min-width: 641px) and (max-width: 1024px) {
   .hero-title {
-      font-size: 3.5rem !important;
+    font-size: clamp(2.8rem, 6vw, 3.8rem) !important;
   }
   
   .pad-section {
-      padding: 40px 30px !important;
+    padding: 40px 28px !important;
+  }
+
+  .p-responsive {
+    padding: 44px 32px !important;
+  }
+
+  .grid-responsive {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
   }
 }
 
-/* Utility to force responsive padding on any element */
+/* Desktop & Ultrawide (>1025px) */
+@media (min-width: 1025px) {
+  .p-responsive {
+    padding: 60px 48px;
+  }
+}
+
+/* Base utility defaults */
 .p-responsive {
-    padding: 60px 40px;
+  padding: 50px 36px;
+  box-sizing: border-box;
 }
 
-@media (max-width: 640px) {
-    .p-responsive {
-        padding: 30px 20px !important;
-    }
-}
-
-/* Utility for responsive property selector grid */
 .grid-property {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
 }
 
 @media (max-width: 480px) {
-    .grid-property {
-        grid-template-columns: 1fr 1fr; /* 2 columns on very small screens */
-    }
+  .grid-property {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .grid-property {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
 }

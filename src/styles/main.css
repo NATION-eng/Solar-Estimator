@@ -1,6 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
-
-:root {
+/* 
+ * DEPRECATED: Please use src/styles/design-system.css as the single source of truth.
+ * This file is retained for legacy reference only.
+ */
   --primary: #0066ff;
   --bg-color: #ffffff;
   --text-main: #0a0a0b;

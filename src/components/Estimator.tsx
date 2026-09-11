@@ -16,6 +16,7 @@ export default function Estimator() {
   const [property, setProperty] = useState("");
   const [address, setAddress] = useState("");
   const [hours, setHours] = useState(6);
+  const [batteryType, setBatteryType] = useState<'lithium' | 'gel' | 'tubular'>('lithium');
   
   // Custom hooks
   const { errors, validateEstimation, clearError } = useFormValidation();
@@ -160,7 +161,7 @@ export default function Estimator() {
     }
 
     // Use the custom hook to run estimation
-    await runEstimate(property, address, hours, appliances);
+    await runEstimate(property, address, hours, appliances, batteryType);
   };
 
   // Appliance management now handled by useAppliances hook
@@ -265,11 +266,40 @@ export default function Estimator() {
                   />
                 </div>
               )}
+
+              {/* Quick City Presets */}
+              <div style={{ marginTop: '10px', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Quick Select:</span>
+                {['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano', 'Enugu'].map((city) => (
+                  <button
+                    key={city}
+                    type="button"
+                    onClick={() => {
+                      setAddress(city);
+                      if (errors.address) clearError('address');
+                    }}
+                    style={{
+                      background: address === city ? 'var(--color-primary)' : 'rgba(255,255,255,0.06)',
+                      color: address === city ? '#000' : 'var(--color-text-muted)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '100px',
+                      padding: '4px 12px',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {city}
+                  </button>
+                ))}
+              </div>
           </div>
 
+          {/* Daily Usage Hours */}
           <div className={styles.rangeContainer}>
               <label className={styles.label}>
-                Daily Usage Target (Hours)
+                Daily Backup / Usage Target (Hours)
               </label>
               <input
                  type="range"
@@ -284,6 +314,56 @@ export default function Estimator() {
                  <span className={styles.rangeValue}>{hours} hours / day</span>
                  <span>24 hrs</span>
                </div>
+          </div>
+
+          {/* Battery Chemistry Selection */}
+          <div style={{ marginBottom: '28px' }}>
+            <label className={styles.label} style={{ marginBottom: '10px', display: 'block' }}>
+              Preferred Storage Technology
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={() => setBatteryType('lithium')}
+                style={{
+                  padding: '14px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: batteryType === 'lithium' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
+                  background: batteryType === 'lithium' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(0,0,0,0.2)',
+                  color: 'var(--color-text-main)',
+                  textAlign: 'left',
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: batteryType === 'lithium' ? 'var(--color-primary)' : 'inherit' }}>
+                  🔋 Lithium LiFePO4
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                  80% DOD • 10-15 yr life • Compact
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setBatteryType('tubular')}
+                style={{
+                  padding: '14px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: batteryType === 'tubular' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
+                  background: batteryType === 'tubular' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(0,0,0,0.2)',
+                  color: 'var(--color-text-main)',
+                  textAlign: 'left',
+                  cursor: 'pointer'
+                }}
+              >
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: batteryType === 'tubular' ? 'var(--color-primary)' : 'inherit' }}>
+                  ⚡ Deep Cycle / Tubular
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                  50% DOD • Budget-friendly • Heavy-duty
+                </div>
+              </button>
+            </div>
           </div>
 
           <div style={{ marginBottom: '32px' }}>

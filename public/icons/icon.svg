@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)" stroke="#fbbf24" stroke-width="8" stroke-opacity="0.3"/>
+  <circle cx="256" cy="180" r="80" fill="url(#sun)"/>
+  <g stroke="#fbbf24" stroke-width="10" stroke-linecap="round">
+    <line x1="256" y1="50" x2="256" y2="78"/>
+    <line x1="356" y1="80" x2="336" y2="100"/>
+    <line x1="386" y1="180" x2="358" y2="180"/>
+    <line x1="356" y1="280" x2="336" y2="260"/>
+    <line x1="156" y1="80" x2="176" y2="100"/>
+    <line x1="126" y1="180" x2="154" y2="180"/>
+    <line x1="156" y1="280" x2="176" y2="260"/>
+  </g>
+  <path d="M140 320 L372 320 L400 440 L112 440 Z" fill="url(#panel)" stroke="#ffffff" stroke-width="4" stroke-opacity="0.4"/>
+  <line x1="217" y1="320" x2="208" y2="440" stroke="#020617" stroke-width="4"/>
+  <line x1="295" y1="320" x2="304" y2="440" stroke="#020617" stroke-width="4"/>
+  <line x1="126" y1="380" x2="386" y2="380" stroke="#020617" stroke-width="4"/>
+</svg>

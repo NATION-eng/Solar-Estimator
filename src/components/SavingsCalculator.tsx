@@ -125,17 +125,17 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         {/* Grid Cost */}
         <div style={{
           background: 'rgba(239, 68, 68, 0.1)',
-          padding: '20px',
+          padding: 'clamp(12px, 3vw, 20px)',
           borderRadius: '12px',
           border: '1px solid rgba(239, 68, 68, 0.2)',
         }}>
-          <div style={{ fontSize: '0.75rem', color: 'rgba(239, 68, 68, 0.8)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ fontSize: '0.72rem', color: 'rgba(239, 68, 68, 0.8)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Grid Electricity
           </div>
-          <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#ef4444', marginBottom: '8px' }}>
+          <div style={{ fontSize: 'clamp(0.95rem, 3.2vw, 1.3rem)', fontWeight: 700, color: '#ef4444', marginBottom: '6px' }}>
             {formatCurrency(monthlyGridCost)}/mo
           </div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
             {formatCurrency(annualGridCost)}/year
           </div>
         </div>
@@ -143,17 +143,17 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         {/* Solar Cost */}
         <div style={{
           background: 'rgba(16, 185, 129, 0.1)',
-          padding: '20px',
+          padding: 'clamp(12px, 3vw, 20px)',
           borderRadius: '12px',
           border: '1px solid rgba(16, 185, 129, 0.2)',
         }}>
-          <div style={{ fontSize: '0.75rem', color: 'rgba(16, 185, 129, 0.8)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ fontSize: '0.72rem', color: 'rgba(16, 185, 129, 0.8)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Solar Energy
           </div>
-          <div style={{ fontSize: '1.3rem', fontWeight: 700, color: '#10b981', marginBottom: '8px' }}>
+          <div style={{ fontSize: 'clamp(0.95rem, 3.2vw, 1.3rem)', fontWeight: 700, color: '#10b981', marginBottom: '6px' }}>
             {formatCurrency(annualSolarCost / 12)}/mo
           </div>
-          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
             {formatCurrency(annualSolarCost)}/year
           </div>
         </div>
@@ -162,20 +162,22 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
       {/* Savings Highlight */}
       <div style={{
         background: 'rgba(251, 191, 36, 0.15)',
-        padding: '24px',
+        padding: 'clamp(16px, 4vw, 24px)',
         borderRadius: '12px',
         textAlign: 'center',
         marginBottom: '24px',
       }}>
-        <div style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '8px' }}>
+        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '6px' }}>
           Total Savings Over {years} Years
         </div>
         <div style={{
-          fontSize: '2.5rem',
+          fontSize: 'clamp(1.5rem, 5.5vw, 2.4rem)',
           fontWeight: 800,
           color: totalSavings > 0 ? 'var(--color-success)' : '#ef4444',
-          marginBottom: '12px',
+          marginBottom: '10px',
           textShadow: '0 0 20px rgba(251, 191, 36, 0.3)',
+          lineHeight: 1.15,
+          wordBreak: 'break-word'
         }}>
           {formatCurrency(Math.abs(totalSavings))}
         </div>

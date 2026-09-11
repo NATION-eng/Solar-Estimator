@@ -128,7 +128,7 @@ export default function AppResult({ data }: ResultProps) {
   };
 
   return (
-    <div style={{ marginTop: '12px' }}>
+    <div style={{ marginTop: '12px', paddingBottom: '36px' }}>
       {/* Blueprint Header */}
       <div style={{ textAlign: 'center', marginBottom: '24px' }}>
         <span style={{
@@ -207,27 +207,28 @@ export default function AppResult({ data }: ResultProps) {
       </div>
 
       {/* Core Hardware Cards */}
+      {/* Core Hardware Cards */}
       <div className="grid-responsive" style={{ marginBottom: '28px' }}>
         {/* Inverter Card */}
         <div style={{ 
           background: 'rgba(56, 189, 248, 0.08)', 
-          padding: '20px', 
+          padding: 'clamp(14px, 3.5vw, 22px)', 
           borderRadius: 'var(--radius-md)',
           borderLeft: '4px solid var(--color-accent)',
           border: '1px solid rgba(56, 189, 248, 0.2)'
         }}>
             <p style={{ 
               textTransform: 'uppercase', 
-              fontSize: '0.75rem', 
+              fontSize: '0.72rem', 
               fontWeight: 700, 
               letterSpacing: '0.1em',
               color: 'var(--color-accent)',
-              marginBottom: '8px'
-            }}>System Core</p>
-            <h3 className="result-card-title" style={{ fontSize: '1.9rem', fontWeight: 800 }}>
+              marginBottom: '6px'
+            }}>⚡ System Core</p>
+            <h3 className="result-card-title" style={{ fontSize: 'clamp(1.3rem, 4.5vw, 1.9rem)', fontWeight: 800 }}>
               {data.systemVoltage}V / {((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA
             </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
               Pure Sine Wave Inverter (Surge: {(data.maxSurgeWatts || 0).toLocaleString()}W)
             </p>
           </div>
@@ -235,22 +236,23 @@ export default function AppResult({ data }: ResultProps) {
           {/* Battery Card */}
           <div style={{ 
             background: 'rgba(16, 185, 129, 0.08)', 
-            padding: '24px', 
+            padding: 'clamp(14px, 3.5vw, 22px)', 
             borderRadius: 'var(--radius-md)',
-            borderLeft: '4px solid var(--color-success)'
+            borderLeft: '4px solid var(--color-success)',
+            border: '1px solid rgba(16, 185, 129, 0.2)'
           }}>
             <p style={{ 
               textTransform: 'uppercase', 
-              fontSize: '0.75rem', 
+              fontSize: '0.72rem', 
               fontWeight: 700, 
               letterSpacing: '0.1em',
               color: 'var(--color-success)',
-              marginBottom: '8px'
-            }}>Storage Bank</p>
-            <h3 className="result-card-title" style={{ fontSize: '1.9rem', fontWeight: 800 }}>
+              marginBottom: '6px'
+            }}>🔋 Storage Bank</p>
+            <h3 className="result-card-title" style={{ fontSize: 'clamp(1.3rem, 4.5vw, 1.9rem)', fontWeight: 800 }}>
               {data.batteryAh} Ah
             </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
               @ {data.systemVoltage}V ({((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh {data.batteryType === 'lithium' ? 'Lithium LiFePO4' : 'Deep Cycle'})
             </p>
           </div>
@@ -258,22 +260,23 @@ export default function AppResult({ data }: ResultProps) {
           {/* Solar Card */}
           <div style={{ 
             background: 'rgba(251, 191, 36, 0.08)', 
-            padding: '24px', 
+            padding: 'clamp(14px, 3.5vw, 22px)', 
             borderRadius: 'var(--radius-md)',
-            borderLeft: '4px solid var(--color-primary)'
+            borderLeft: '4px solid var(--color-primary)',
+            border: '1px solid rgba(251, 191, 36, 0.2)'
           }}>
             <p style={{ 
               textTransform: 'uppercase', 
-              fontSize: '0.75rem', 
+              fontSize: '0.72rem', 
               fontWeight: 700, 
               letterSpacing: '0.1em',
               color: 'var(--color-primary)',
-              marginBottom: '8px'
-            }}>Energy Harvester</p>
-            <h3 className="result-card-title" style={{ fontSize: '1.9rem', fontWeight: 800 }}>
+              marginBottom: '6px'
+            }}>☀️ Energy Harvester</p>
+            <h3 className="result-card-title" style={{ fontSize: 'clamp(1.3rem, 4.5vw, 1.9rem)', fontWeight: 800 }}>
               {data.panelQuantity} Panels
             </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+            <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
               450W Mono PV + {data.chargeControllerAmps}A MPPT Controller
             </p>
           </div>
@@ -282,7 +285,7 @@ export default function AppResult({ data }: ResultProps) {
         {/* Technical Blueprint Table */}
         <div style={{ 
           background: 'rgba(0,0,0,0.3)', 
-          padding: '24px', 
+          padding: 'clamp(16px, 4vw, 24px)', 
           borderRadius: 'var(--radius-md)',
           marginBottom: '32px',
           border: '1px solid rgba(255,255,255,0.06)'
@@ -290,22 +293,22 @@ export default function AppResult({ data }: ResultProps) {
           <h4 style={{ color: 'var(--color-primary)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '16px', letterSpacing: '0.1em' }}>
             Technical Engineering Specifications
           </h4>
-          <div className="grid-responsive-narrow" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
+          <div className="grid-responsive-narrow" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Peak Surge Load</span>
-              <span style={{ fontWeight: 600 }}>{(data.maxSurgeWatts || 0).toLocaleString()} W</span>
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Peak Surge Load</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{(data.maxSurgeWatts || 0).toLocaleString()} W</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Daily Energy Usage</span>
-              <span style={{ fontWeight: 600 }}>{((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh</span>
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Daily Energy Usage</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Solar Irradiance (Local)</span>
-              <span style={{ fontWeight: 600 }}>{data.location?.psh ? `${data.location.psh.toFixed(2)} PSH` : '4.80 PSH'}</span>
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Solar Irradiance (Local)</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{data.location?.psh ? `${data.location.psh.toFixed(2)} PSH` : '4.80 PSH'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Architecture</span>
-              <span style={{ fontWeight: 600 }}>{data.systemVoltage}V DC Pure Sine</span>
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Architecture</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{data.systemVoltage}V DC Pure Sine</span>
             </div>
           </div>
         </div>
@@ -322,28 +325,29 @@ export default function AppResult({ data }: ResultProps) {
 
         {/* Cost & ROI */}
         <div className="flex-responsive" style={{ 
-          display: 'flex',
-          gap: '20px',
-          marginBottom: '32px'
+          display: 'flex', 
+          gap: '16px',
+          marginBottom: '28px'
         }}>
           <div style={{ 
             flex: 1.4,
             textAlign: 'left', 
-            padding: '28px', 
+            padding: 'clamp(16px, 4vw, 28px)', 
             background: 'var(--color-bg-deep)', 
             borderRadius: 'var(--radius-md)',
             border: '1px solid rgba(251, 191, 36, 0.3)'
           }}>
-            <p style={{ color: 'var(--color-text-muted)', marginBottom: '8px', fontSize: '0.9rem' }}>Estimated System Investment</p>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: '8px', fontSize: '0.85rem' }}>Estimated System Investment</p>
             <div style={{ 
-              fontSize: '2.4rem', 
+              fontSize: 'clamp(1.5rem, 5.5vw, 2.4rem)', 
               fontWeight: 800, 
               color: 'var(--color-primary)',
-              lineHeight: 1.1
+              lineHeight: 1.1,
+              wordBreak: 'break-word'
             }}>
               {formatCurrency(data.estimatedPriceNaira || 0)}
             </div>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '8px' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '8px', lineHeight: 1.4 }}>
               Includes solar PV modules, pure sine inverter, storage bank, MPPT controller, cabling & installation.
             </p>
           </div>
@@ -351,7 +355,7 @@ export default function AppResult({ data }: ResultProps) {
           <div style={{ 
             flex: 1,
             textAlign: 'center', 
-            padding: '28px', 
+            padding: 'clamp(16px, 4vw, 28px)', 
             background: 'rgba(255,255,255,0.03)', 
             borderRadius: 'var(--radius-md)',
             display: 'flex',
@@ -360,7 +364,7 @@ export default function AppResult({ data }: ResultProps) {
             border: '1px solid rgba(255,255,255,0.05)'
           }}>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginBottom: '6px' }}>Estimated Payback</p>
-            <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-success)' }}>
+            <div style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 800, color: 'var(--color-success)' }}>
               {data.paybackYears ? `${data.paybackYears.toFixed(1)} Years` : '3.5 Years'}
             </div>
             <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>

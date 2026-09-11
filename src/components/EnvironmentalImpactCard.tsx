@@ -42,72 +42,78 @@ export default function EnvironmentalImpactCard({ impact }: EnvironmentalImpactP
       
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
-        gap: '12px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(95px, 1fr))',
+        gap: '10px',
       }}>
         {/* CO2 Saved */}
         <div style={{
-          background: 'rgba(0,0,0,0.2)',
-          padding: '20px',
+          background: 'rgba(0,0,0,0.25)',
+          padding: 'clamp(12px, 3vw, 20px) 8px',
           borderRadius: '12px',
           textAlign: 'center',
-          border: '1px solid rgba(16, 185, 129, 0.1)',
+          border: '1px solid rgba(16, 185, 129, 0.15)',
         }}>
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>💨</div>
+          <div style={{ fontSize: '1.6rem', marginBottom: '6px' }}>💨</div>
           <div style={{
-            fontSize: '2rem',
+            fontSize: 'clamp(1.1rem, 4vw, 1.8rem)',
             fontWeight: 700,
             color: 'var(--color-success)',
             marginBottom: '4px',
+            lineHeight: 1.2,
+            wordBreak: 'break-word',
           }}>
             {impact.co2SavedAnnually.toLocaleString()}
           </div>
-          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-            kg CO₂ Saved/Year
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', lineHeight: 1.3 }}>
+            kg CO₂ Saved/Yr
           </div>
         </div>
         
         {/* Trees Equivalent */}
         <div style={{
-          background: 'rgba(0,0,0,0.2)',
-          padding: '20px',
+          background: 'rgba(0,0,0,0.25)',
+          padding: 'clamp(12px, 3vw, 20px) 8px',
           borderRadius: '12px',
           textAlign: 'center',
-          border: '1px solid rgba(16, 185, 129, 0.1)',
+          border: '1px solid rgba(16, 185, 129, 0.15)',
         }}>
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>🌳</div>
+          <div style={{ fontSize: '1.6rem', marginBottom: '6px' }}>🌳</div>
           <div style={{
-            fontSize: '2rem',
+            fontSize: 'clamp(1.1rem, 4vw, 1.8rem)',
             fontWeight: 700,
             color: 'var(--color-success)',
             marginBottom: '4px',
+            lineHeight: 1.2,
+            wordBreak: 'break-word',
           }}>
             {impact.treesEquivalent}
           </div>
-          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-            Trees Planted Equivalent
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', lineHeight: 1.3 }}>
+            Trees Planted
           </div>
         </div>
         
         {/* Coal Avoided */}
         <div style={{
-          background: 'rgba(0,0,0,0.2)',
-          padding: '20px',
+          background: 'rgba(0,0,0,0.25)',
+          padding: 'clamp(12px, 3vw, 20px) 8px',
           borderRadius: '12px',
           textAlign: 'center',
-          border: '1px solid rgba(16, 185, 129, 0.1)',
+          border: '1px solid rgba(16, 185, 129, 0.15)',
         }}>
-          <div style={{ fontSize: '2rem', marginBottom: '8px' }}>⛏️</div>
+          <div style={{ fontSize: '1.6rem', marginBottom: '6px' }}>⛏️</div>
           <div style={{
-            fontSize: '2rem',
+            fontSize: 'clamp(1.1rem, 4vw, 1.8rem)',
             fontWeight: 700,
             color: 'var(--color-success)',
             marginBottom: '4px',
+            lineHeight: 1.2,
+            wordBreak: 'break-word',
           }}>
             {impact.coalAvoided.toLocaleString()}
           </div>
-          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
-            kg Coal Avoided/Year
+          <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', lineHeight: 1.3 }}>
+            kg Coal Saved/Yr
           </div>
         </div>
       </div>

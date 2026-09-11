@@ -96,48 +96,48 @@ export default function LoadProfileChart({ appliances, hours }: LoadProfileChart
       {/* Stats */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-        gap: '12px',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '8px',
         marginTop: '16px',
       }}>
         <div style={{
           background: 'rgba(255,255,255,0.03)',
-          padding: '12px',
+          padding: '10px 6px',
           borderRadius: '8px',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
+          <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>
             Peak Load
           </div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-primary)' }}>
+          <div style={{ fontSize: 'clamp(0.88rem, 3.5vw, 1.15rem)', fontWeight: 800, color: 'var(--color-primary)' }}>
             {formatPower(maxLoad)}
           </div>
         </div>
         
         <div style={{
           background: 'rgba(255,255,255,0.03)',
-          padding: '12px',
+          padding: '10px 6px',
           borderRadius: '8px',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
+          <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>
             Average Load
           </div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-accent)' }}>
+          <div style={{ fontSize: 'clamp(0.88rem, 3.5vw, 1.15rem)', fontWeight: 800, color: 'var(--color-accent)' }}>
             {formatPower(avgLoad)}
           </div>
         </div>
         
         <div style={{
           background: 'rgba(255,255,255,0.03)',
-          padding: '12px',
+          padding: '10px 6px',
           borderRadius: '8px',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
+          <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginBottom: '2px' }}>
             Active Hours
           </div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>
+          <div style={{ fontSize: 'clamp(0.88rem, 3.5vw, 1.15rem)', fontWeight: 800 }}>
             {profile.filter(p => p.load > 0).length}h
           </div>
         </div>

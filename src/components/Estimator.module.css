@@ -365,17 +365,25 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
-.applianceCardLeft {
+.applianceHeader {
   flex: 1.2;
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
-.applianceCardRight {
+.applianceNameWrap {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
+}
+
+.applianceIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .applianceNameInput {
@@ -388,6 +396,7 @@
   padding: 4px 0;
   outline: none;
   flex: 1;
+  min-width: 0;
   transition: border-color 0.2s;
 }
 
@@ -395,7 +404,11 @@
   border-bottom-color: var(--color-primary);
 }
 
-.deleteBtn {
+.deleteBtnMobile {
+  display: none;
+}
+
+.deleteBtnDesktop {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.2);
   color: #ef4444;
@@ -408,19 +421,28 @@
   cursor: pointer;
   font-size: 1.1rem;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
-.deleteBtn:hover {
+.deleteBtnDesktop:hover {
   background: #ef4444;
   color: #fff;
 }
 
-.applianceCardBottom {
+.applianceControls {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.applianceSubtotal {
+  min-width: 68px;
+  text-align: right;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--color-accent);
+  white-space: nowrap;
 }
 
 .wattInputGroup {
@@ -622,67 +644,115 @@
     flex-direction: column;
     align-items: stretch;
     padding: 12px 14px;
-    gap: 10px;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
   }
 
-  .applianceCardLeft {
+  .applianceHeader {
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-
-  .applianceCardRight {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  /* Enhanced Touch Steppers for Mobile */
-  .qtyStepperGroup {
-    padding: 4px 8px;
     gap: 8px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
   }
 
-  .qtyBtn {
-    width: 38px;
-    height: 38px;
-    border-radius: 8px;
-    font-size: 1.3rem;
-    background: rgba(255, 255, 255, 0.12);
-  }
-
-  .qtyValue {
-    font-size: 1.1rem;
-    min-width: 28px;
-  }
-
-  .wattInputGroup {
-    padding: 6px 12px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 10px;
-  }
-
-  .wattInputField {
-    font-size: 16px !important;
-    width: 64px;
+  .applianceNameWrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
   }
 
   .applianceNameInput {
     font-size: 16px !important;
-    padding: 6px 0;
+    padding: 4px 0;
+    width: 100%;
+    min-width: 0;
   }
 
-  .deleteBtn {
-    width: 38px;
-    height: 38px;
+  .deleteBtnMobile {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    color: #ef4444;
+    width: 32px;
+    height: 32px;
     border-radius: 8px;
-    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+
+  .deleteBtnMobile:active {
+    background: #ef4444;
+    color: #fff;
+  }
+
+  .deleteBtnDesktop {
+    display: none !important;
+  }
+
+  .applianceControls {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  /* Enhanced Touch Steppers for Mobile */
+  .qtyStepperGroup {
+    padding: 2px 4px;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .qtyBtn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    font-size: 1.15rem;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .qtyValue {
+    font-size: 0.95rem;
+    min-width: 22px;
+    text-align: center;
+  }
+
+  .wattInputGroup {
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .wattInputField {
+    font-size: 16px !important;
+    width: 48px;
+    text-align: center;
+  }
+
+  .wattLabel {
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
+
+  .applianceSubtotal {
+    font-size: 0.85rem;
+    min-width: 55px;
+    text-align: right;
   }
 
   .inputField {
@@ -743,12 +813,8 @@
   }
 
   .applianceCard {
-    padding: 12px;
+    padding: 10px 12px;
     gap: 10px;
-  }
-
-  .applianceCardBottom {
-    justify-content: space-between;
   }
 }
 

@@ -386,19 +386,30 @@ export default function Estimator() {
       <div className={styles.applianceList}>
         {appliances.map((app, index) => (
           <div key={index} className={styles.applianceCard}>
-            {/* Left: Appliance Name */}
-            <div className={styles.applianceCardLeft}>
-              <span style={{ fontSize: '1.1rem' }}>🔌</span>
-              <input
-                className={styles.applianceNameInput}
-                placeholder="Appliance name"
-                value={app.name}
-                onChange={(e) => updateAppliance(index, 'name', e.target.value)}
-              />
+            {/* Header Row: Icon + Name + Mobile Delete */}
+            <div className={styles.applianceHeader}>
+              <div className={styles.applianceNameWrap}>
+                <span className={styles.applianceIcon}>🔌</span>
+                <input
+                  className={styles.applianceNameInput}
+                  placeholder="Appliance name"
+                  value={app.name}
+                  onChange={(e) => updateAppliance(index, 'name', e.target.value)}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => removeAppliance(index)}
+                className={styles.deleteBtnMobile}
+                aria-label={`Remove ${app.name || 'appliance'}`}
+              >
+                ×
+              </button>
             </div>
 
-            {/* Right: Wattage, Quantity, Subtotal, Delete */}
-            <div className={styles.applianceCardRight}>
+            {/* Controls Row: Wattage, Quantity, Subtotal, Desktop Delete */}
+            <div className={styles.applianceControls}>
               <div className={styles.wattInputGroup}>
                 <input
                   type="number"
@@ -408,7 +419,7 @@ export default function Estimator() {
                   onChange={(e) => updateAppliance(index, 'watt', e.target.value === '' ? 0 : Number(e.target.value))}
                   className={styles.wattInputField}
                 />
-                <span className={styles.wattLabel}>Watts</span>
+                <span className={styles.wattLabel}>W</span>
               </div>
 
               <div className={styles.qtyStepperGroup}>
@@ -431,15 +442,15 @@ export default function Estimator() {
                 </button>
               </div>
 
-              <div style={{ minWidth: '70px', textAlign: 'right', fontWeight: 700, fontSize: '0.88rem', color: 'var(--color-accent)' }}>
+              <div className={styles.applianceSubtotal}>
                 {(app.watt * app.quantity).toLocaleString()} W
               </div>
 
               <button
                 type="button"
                 onClick={() => removeAppliance(index)}
-                className={styles.deleteBtn}
-                aria-label="Remove appliance"
+                className={styles.deleteBtnDesktop}
+                aria-label={`Remove ${app.name || 'appliance'}`}
               >
                 ×
               </button>
@@ -657,37 +668,91 @@ export default function Estimator() {
             {/* Mobile Step 3: Solar Blueprint */}
             {currentStep === 3 && (
               <div ref={resultsRef}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
-                  <div>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 700, textTransform: 'uppercase' }}>
-                      ✓ Calculation Complete
-                    </span>
-                    <h3 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '4px 0 0' }}>
-                      Your Solar Blueprint
-                    </h3>
-                  </div>
+                {result && !loading && (
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center', 
+                    marginBottom: '16px', 
+                    paddingBottom: '12px',
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
+                  }}>
+                    <button
+                      type="button"
+                      onClick={() => goToStep(2)}
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.06)',
+                        color: 'var(--color-text-muted)',
+                        border: '1px solid rgba(255, 255, 255, 0.12)',
+                        padding: '6px 14px',
+                        borderRadius: '100px',
+                        fontSize: '0.8rem',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>←</span>
+                      <span>Edit Loads ({appliances.length})</span>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => goToStep(2)}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.08)',
-                      color: '#fff',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
-                      padding: '8px 16px',
-                      borderRadius: '100px',
-                      fontSize: '0.85rem',
-                      fontWeight: 600,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    ✎ Modify Appliances ({appliances.length})
-                  </button>
-                </div>
+                    <button
+                      type="button"
+                      onClick={handleEstimate}
+                      disabled={loading}
+                      style={{
+                        background: 'rgba(251, 191, 36, 0.1)',
+                        color: 'var(--color-primary)',
+                        border: '1px solid rgba(251, 191, 36, 0.3)',
+                        padding: '6px 14px',
+                        borderRadius: '100px',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <span>⚡</span>
+                      <span>Recalculate</span>
+                    </button>
+                  </div>
+                )}
 
                 {loading && (
-                  <div style={{ padding: '40px 0' }}>
+                  <div style={{ padding: '60px 0' }}>
                     <LoadingSpinner message="Calculating your exact solar and storage requirements..." />
+                  </div>
+                )}
+
+                {!loading && !result && (
+                  <div style={{
+                    textAlign: 'center',
+                    padding: '44px 18px',
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    marginTop: '12px'
+                  }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '12px' }}>☀️</div>
+                    <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '8px' }}>
+                      Ready to Generate Your Solar Blueprint?
+                    </h3>
+                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.88rem', maxWidth: '360px', margin: '0 auto 24px', lineHeight: 1.5 }}>
+                      You have {appliances.length} appliances configured ({totalSteadyWatts.toLocaleString()}W continuous load). Run our calculation engine to size your inverter, batteries, and PV array!
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleEstimate}
+                      className={styles.nextBtn}
+                      style={{ maxWidth: '280px', margin: '0 auto', display: 'flex', justifyContent: 'center', width: '100%' }}
+                    >
+                      <span>Calculate Solar Blueprint</span>
+                      <span>🚀</span>
+                    </button>
                   </div>
                 )}
 

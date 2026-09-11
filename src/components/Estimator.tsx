@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import AppResult from "./AppResult";
 import ApplianceSelector from "./ApplianceSelector";
 import { LoadingSpinner } from "./LoadingSpinner";
@@ -9,13 +9,14 @@ import { useAppliances } from "../hooks/useAppliances";
 import type { PropertyType } from "../types";
 import styles from "./Estimator.module.css";
 
-/* ================= COMPONENT ================= */
-
 export default function Estimator() {
+  // Stepper state (1: Property & Location, 2: Energy Audit, 3: Blueprint)
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
+
   // Form state
-  const [property, setProperty] = useState("");
-  const [address, setAddress] = useState("");
-  const [hours, setHours] = useState(6);
+  const [property, setProperty] = useState("home");
+  const [address, setAddress] = useState("Lagos");
+  const [hours, setHours] = useState(8);
   const [batteryType, setBatteryType] = useState<'lithium' | 'gel' | 'tubular'>('lithium');
   
   // Custom hooks
@@ -28,22 +29,25 @@ export default function Estimator() {
     removeAppliance, 
     loadPresets 
   } = useAppliances([
-    { name: "LED TV", watt: 150, quantity: 1 },
-    { name: "Refrigerator", watt: 200, quantity: 1 },
-    { name: "Lighting Point", watt: 15, quantity: 5 },
+    { name: "LED TV (43\")", watt: 65, quantity: 1 },
+    { name: "Inverter Fridge", watt: 120, quantity: 1 },
+    { name: "Standing Fan", watt: 55, quantity: 2 },
+    { name: "LED Bulbs", watt: 9, quantity: 8 },
   ]);
+
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const types: PropertyType[] = [
     { 
       id: "home", 
       label: "Residential", 
       icon: "🏠", 
-      desc: "Homes & Apartments",
+      desc: "Homes & Flats",
       presets: [
         { name: "LED TV (43\")", watt: 65, quantity: 1 },
         { name: "Inverter Fridge", watt: 120, quantity: 1 },
         { name: "Standing Fan", watt: 55, quantity: 2 },
-        { name: "LED Bulbs", watt: 9, quantity: 10 },
+        { name: "LED Bulbs", watt: 9, quantity: 8 },
       ]
     },
     { 
@@ -52,34 +56,10 @@ export default function Estimator() {
       icon: "🏢", 
       desc: "Offices & Studios",
       presets: [
-        { name: "Workstation/Laptop", watt: 85, quantity: 5 },
+        { name: "Workstation / Laptop", watt: 85, quantity: 4 },
         { name: "Inverter AC (1.5HP)", watt: 1100, quantity: 1 },
         { name: "Office Printer", watt: 450, quantity: 1 },
         { name: "Water Dispenser", watt: 600, quantity: 1 },
-      ]
-    },
-    { 
-      id: "school", 
-      label: "Education", 
-      icon: "🏫", 
-      desc: "Schools & Labs",
-      presets: [
-        { name: "Classroom Fan", watt: 75, quantity: 8 },
-        { name: "Smart Projector", watt: 250, quantity: 2 },
-        { name: "Desktop Computer", watt: 200, quantity: 10 },
-        { name: "PA System", watt: 400, quantity: 1 },
-      ]
-    },
-    { 
-      id: "hospital", 
-      label: "Medical", 
-      icon: "🏥", 
-      desc: "Clinics & Pharmacies",
-      presets: [
-        { name: "Vaccine Fridge", watt: 300, quantity: 1 },
-        { name: "Vital Monitor", watt: 150, quantity: 2 },
-        { name: "Surgical Light", watt: 100, quantity: 3 },
-        { name: "Oxygen Concentrator", watt: 600, quantity: 1 },
       ]
     },
     { 
@@ -88,10 +68,46 @@ export default function Estimator() {
       icon: "🛒", 
       desc: "Shops & Stores",
       presets: [
-        { name: "Display Fridge", watt: 400, quantity: 2 },
-        { name: "POS System", watt: 150, quantity: 3 },
-        { name: "LED Display Lights", watt: 20, quantity: 15 },
-        { name: "Security Camera", watt: 15, quantity: 4 },
+        { name: "Display Chiller", watt: 400, quantity: 1 },
+        { name: "POS & Billing", watt: 150, quantity: 2 },
+        { name: "Display Lights", watt: 20, quantity: 10 },
+        { name: "CCTV System", watt: 30, quantity: 1 },
+      ]
+    },
+    { 
+      id: "restaurant", 
+      label: "Food Service", 
+      icon: "🍽️", 
+      desc: "Cafes & Dining",
+      presets: [
+        { name: "Commercial Freezer", watt: 600, quantity: 2 },
+        { name: "Blender / Grinder", watt: 450, quantity: 2 },
+        { name: "Exhaust Fan", watt: 150, quantity: 2 },
+        { name: "Dining Lighting", watt: 15, quantity: 12 },
+      ]
+    },
+    { 
+      id: "hospital", 
+      label: "Medical", 
+      icon: "🏥", 
+      desc: "Clinics & Labs",
+      presets: [
+        { name: "Vaccine Fridge", watt: 250, quantity: 1 },
+        { name: "Sterilizer", watt: 800, quantity: 1 },
+        { name: "Examination Light", watt: 80, quantity: 2 },
+        { name: "Laboratory PC", watt: 150, quantity: 2 },
+      ]
+    },
+    { 
+      id: "school", 
+      label: "Education", 
+      icon: "🏫", 
+      desc: "Schools & Tech",
+      presets: [
+        { name: "Smart Projector", watt: 250, quantity: 2 },
+        { name: "Classroom Fan", watt: 75, quantity: 6 },
+        { name: "Computer Lab", watt: 180, quantity: 8 },
+        { name: "PA Speaker System", watt: 350, quantity: 1 },
       ]
     },
     { 
@@ -100,49 +116,40 @@ export default function Estimator() {
       icon: "🏨", 
       desc: "Hotels & Lodges",
       presets: [
-        { name: "Room AC (1HP)", watt: 900, quantity: 10 },
-        { name: "Mini Fridge", watt: 80, quantity: 10 },
-        { name: "LED TV (32\")", watt: 50, quantity: 10 },
-        { name: "Lobby Lighting", watt: 200, quantity: 1 },
-      ]
-    },
-    { 
-      id: "restaurant", 
-      label: "Food Service", 
-      icon: "🍽️", 
-      desc: "Restaurants & Cafes",
-      presets: [
-        { name: "Commercial Fridge", watt: 600, quantity: 2 },
-        { name: "Microwave Oven", watt: 1200, quantity: 1 },
-        { name: "Blender", watt: 400, quantity: 2 },
-        { name: "Exhaust Fan", watt: 200, quantity: 2 },
+        { name: "Room Mini Fridge", watt: 80, quantity: 6 },
+        { name: "LED TV (32\")", watt: 50, quantity: 6 },
+        { name: "Lobby Lighting", watt: 150, quantity: 1 },
+        { name: "WiFi Infrastructure", watt: 45, quantity: 2 },
       ]
     },
     { 
       id: "industrial", 
       label: "Industrial", 
       icon: "🏭", 
-      desc: "Factories & Workshops",
+      desc: "Workshops",
       presets: [
-        { name: "Welding Machine", watt: 3000, quantity: 1 },
-        { name: "Air Compressor", watt: 2200, quantity: 1 },
-        { name: "Industrial Fan", watt: 300, quantity: 4 },
-        { name: "Grinder", watt: 1500, quantity: 2 },
+        { name: "Drill Press / Lathe", watt: 1200, quantity: 1 },
+        { name: "Air Compressor", watt: 1800, quantity: 1 },
+        { name: "Industrial Fan", watt: 250, quantity: 3 },
       ]
     },
     { 
       id: "worship", 
       label: "Worship", 
       icon: "🕌", 
-      desc: "Churches, Mosques & Temples",
+      desc: "Churches & Mosques",
       presets: [
-        { name: "Sound System", watt: 800, quantity: 1 },
-        { name: "Projector", watt: 300, quantity: 2 },
-        { name: "Ceiling Fan", watt: 75, quantity: 10 },
-        { name: "LED Stage Lights", watt: 150, quantity: 8 },
+        { name: "Audio Amplifier", watt: 800, quantity: 1 },
+        { name: "Ceiling Fans", watt: 75, quantity: 8 },
+        { name: "Stage Lights", watt: 100, quantity: 6 },
+        { name: "HD Projector", watt: 280, quantity: 2 },
       ]
     },
   ];
+
+  // Calculated stats
+  const totalSteadyWatts = appliances.reduce((sum, a) => sum + (Number(a.watt) * Number(a.quantity)), 0);
+  const dailyEnergyKwh = ((totalSteadyWatts * hours) / 1000).toFixed(1);
 
   /* ================= HANDLERS ================= */
 
@@ -154,123 +161,132 @@ export default function Estimator() {
     }
   };
 
+  const handleQtyChange = (index: number, delta: number) => {
+    const current = appliances[index].quantity;
+    const newQty = Math.max(1, current + delta);
+    updateAppliance(index, 'quantity', newQty);
+  };
+
   const handleEstimate = async () => {
-    // Validate form before submission
     if (!validateEstimation(property, address, appliances)) {
-      return; // Errors will be displayed in UI
+      return;
     }
 
-    // Use the custom hook to run estimation
     await runEstimate(property, address, hours, appliances, batteryType);
+    setCurrentStep(3);
+
+    setTimeout(() => {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 150);
   };
-
-  // Appliance management now handled by useAppliances hook
-  const handleAddManualAppliance = () => {
-    addAppliance({ name: "", watt: 0, quantity: 1 });
-  };
-
-  /* ================= PROGRESS CALCULATION ================= */
-  const progress = property ? (address ? (appliances.length > 0 ? 100 : 66) : 33) : 0;
-
-  /* ================= UI ================= */
 
   return (
     <div className={styles.container}>
       <div className={styles.glassPanel}>
-        {/* Progress Indicator */}
-        <div className={styles.progressContainer}>
-          <div className={styles.progressHeader}>
-            <span className={styles.progressLabel}>Configuration Progress</span>
-            <span className={styles.progressLabel}>{progress}%</span>
+        {/* Modern Stepper Header */}
+        <div className={styles.stepperBar}>
+          <button 
+            type="button"
+            onClick={() => setCurrentStep(1)}
+            className={`${styles.stepperTab} ${currentStep === 1 ? styles.stepperTabActive : ''}`}
+          >
+            <span className={styles.stepNumber}>1</span>
+            <span>Location & Site</span>
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => setCurrentStep(2)}
+            className={`${styles.stepperTab} ${currentStep === 2 ? styles.stepperTabActive : ''}`}
+          >
+            <span className={styles.stepNumber}>2</span>
+            <span>Energy Audit ({appliances.length})</span>
+          </button>
+
+          <button 
+            type="button"
+            onClick={() => {
+              if (result) setCurrentStep(3);
+              else handleEstimate();
+            }}
+            className={`${styles.stepperTab} ${currentStep === 3 ? styles.stepperTabActive : ''}`}
+          >
+            <span className={styles.stepNumber}>3</span>
+            <span>Blueprint</span>
+          </button>
+        </div>
+
+        {/* Live Load Status Bar */}
+        <div className={styles.liveLoadBar}>
+          <div className={styles.liveLoadMetric}>
+            <span className={styles.liveLoadLabel}>Total Steady Load</span>
+            <span className={styles.liveLoadValue}>{totalSteadyWatts.toLocaleString()} W</span>
           </div>
-          <div className={styles.progressBar}>
-            <div 
-              className={styles.progressFill}
-              style={{ width: `${progress}%` }}
-            />
+
+          <div className={styles.liveLoadMetric} style={{ textAlign: 'center' }}>
+            <span className={styles.liveLoadLabel}>Daily Target</span>
+            <span className={styles.liveLoadValue}>{dailyEnergyKwh} kWh/d</span>
+          </div>
+
+          <div className={styles.liveLoadMetric} style={{ textAlign: 'right' }}>
+            <span className={styles.liveLoadLabel}>Backup Hours</span>
+            <span className={styles.liveLoadValue}>{hours} hrs</span>
           </div>
         </div>
 
-        {/* Property Type Selection */}
-        <div style={{ marginBottom: '40px' }}>
-          <h3 style={{ fontWeight: "700", marginBottom: "20px" }}>
-            1️⃣ Select Property Type
-          </h3>
-          
-          <div className={styles.propertyGrid}>
-            {types.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => handlePropertyChange(t.id)}
-                aria-label={`Select ${t.label} property type`}
-                aria-pressed={property === t.id}
-                role="radio"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handlePropertyChange(t.id);
-                  }
-                }}
-                className={`${styles.propertyCard} ${property === t.id ? styles.propertyCardActive : ''}`}
-              >
-                <span className={styles.propertyIcon}>{t.icon}</span>
-                <div>
+        {/* ================= STEP 1: PROPERTY & LOCATION ================= */}
+        {currentStep === 1 && (
+          <div>
+            <h3 style={{ fontWeight: 800, fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>📍</span>
+              <span>Select Property & Target Location</span>
+            </h3>
+
+            {/* Property Tiles */}
+            <div className={styles.propertyGrid}>
+              {types.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => handlePropertyChange(t.id)}
+                  className={`${styles.propertyCard} ${property === t.id ? styles.propertyCardActive : ''}`}
+                >
+                  <span className={styles.propertyIcon}>{t.icon}</span>
                   <span className={styles.propertyLabel}>{t.label}</span>
-                  <div className={styles.propertyDesc}>{t.desc}</div>
-                </div>
-                {property === t.id && (
-                  <span className={styles.propertyCheckmark}>✓</span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+                  <span className={styles.propertyDesc}>{t.desc}</span>
+                  {property === t.id && (
+                    <span className={styles.propertyCheckmark}>✓</span>
+                  )}
+                </button>
+              ))}
+            </div>
 
-        {/* Configuration Section */}
-        <div 
-          className={`${styles.formSection} ${!property ? styles.formSectionDisabled : ''}`}
-        >
-          <h3 style={{ fontWeight: "700", marginBottom: "20px" }}>
-            2️⃣ Installation Details
-          </h3>
-          
-          <div className={styles.fieldGroup}>
-             <label 
-               htmlFor="address-input"
-               className={styles.label}
-             >
-               Installation Address
-             </label>
-             <input
+            {/* Location Input & City Chips */}
+            <div className={styles.fieldGroup}>
+              <label htmlFor="address-input" className={styles.label}>
+                Installation Location in Nigeria
+              </label>
+              <input
                 id="address-input"
                 type="text"
-                placeholder="Enter your location in Nigeria (e.g., Lagos, Abuja, Port Harcourt)"
+                placeholder="Enter city or address (e.g. Lagos, Abuja, Port Harcourt)"
                 value={address}
                 onChange={(e) => {
                   setAddress(e.target.value);
                   if (errors.address) clearError('address');
                 }}
-                disabled={!property}
-                aria-label="Installation address"
-                aria-required="true"
-                aria-invalid={!!errors.address}
-                aria-describedby={errors.address ? 'address-error' : undefined}
                 className={`${styles.inputField} ${errors.address ? styles.inputFieldError : ''}`}
               />
               {errors.address && (
-                <div id="address-error">
-                  <ValidationError 
-                    message={errors.address} 
-                    onDismiss={() => clearError('address')}
-                  />
+                <div style={{ marginTop: '8px' }}>
+                  <ValidationError message={errors.address} onDismiss={() => clearError('address')} />
                 </div>
               )}
 
               {/* Quick City Presets */}
-              <div style={{ marginTop: '10px', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Quick Select:</span>
-                {['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano', 'Enugu'].map((city) => (
+              <div className={styles.presetChipsRow}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', alignSelf: 'center' }}>Popular:</span>
+                {['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano', 'Enugu', 'Benin'].map((city) => (
                   <button
                     key={city}
                     type="button"
@@ -278,241 +294,268 @@ export default function Estimator() {
                       setAddress(city);
                       if (errors.address) clearError('address');
                     }}
-                    style={{
-                      background: address === city ? 'var(--color-primary)' : 'rgba(255,255,255,0.06)',
-                      color: address === city ? '#000' : 'var(--color-text-muted)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      borderRadius: '100px',
-                      padding: '4px 12px',
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
+                    className={`${styles.presetChip} ${address === city ? styles.presetChipActive : ''}`}
                   >
                     {city}
                   </button>
                 ))}
               </div>
-          </div>
+            </div>
 
-          {/* Daily Usage Hours */}
-          <div className={styles.rangeContainer}>
-              <label className={styles.label}>
-                Daily Backup / Usage Target (Hours)
-              </label>
+            {/* Hours Slider & Presets */}
+            <div className={styles.rangeContainer}>
+              <div className={styles.rangeLabels}>
+                <label className={styles.label} style={{ margin: 0 }}>Daily Target Backup</label>
+                <span className={styles.rangeValue}>{hours} Hours / Day</span>
+              </div>
               <input
-                 type="range"
-                 min="1"
-                 max="24"
-                 value={hours}
-                 onChange={(e) => setHours(Number(e.target.value))}
-                 className={styles.rangeSlider}
-               />
-               <div className={styles.rangeLabels}>
-                 <span>1 hr</span>
-                 <span className={styles.rangeValue}>{hours} hours / day</span>
-                 <span>24 hrs</span>
-               </div>
-          </div>
+                type="range"
+                min="1"
+                max="24"
+                value={hours}
+                onChange={(e) => setHours(Number(e.target.value))}
+                className={styles.rangeSlider}
+              />
+              <div className={styles.presetChipsRow}>
+                {[
+                  { label: '4h (Night)', val: 4 },
+                  { label: '8h (Business)', val: 8 },
+                  { label: '12h (Extended)', val: 12 },
+                  { label: '18h (Heavy)', val: 18 },
+                  { label: '24h (Full Off-Grid)', val: 24 }
+                ].map((p) => (
+                  <button
+                    key={p.val}
+                    type="button"
+                    onClick={() => setHours(p.val)}
+                    className={`${styles.presetChip} ${hours === p.val ? styles.presetChipActive : ''}`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          {/* Battery Chemistry Selection */}
-          <div style={{ marginBottom: '28px' }}>
-            <label className={styles.label} style={{ marginBottom: '10px', display: 'block' }}>
-              Preferred Storage Technology
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
-              <button
-                type="button"
-                onClick={() => setBatteryType('lithium')}
-                style={{
-                  padding: '14px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: batteryType === 'lithium' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
-                  background: batteryType === 'lithium' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(0,0,0,0.2)',
-                  color: 'var(--color-text-main)',
-                  textAlign: 'left',
-                  cursor: 'pointer'
-                }}
-              >
-                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: batteryType === 'lithium' ? 'var(--color-primary)' : 'inherit' }}>
-                  🔋 Lithium LiFePO4
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                  80% DOD • 10-15 yr life • Compact
-                </div>
-              </button>
+            {/* Battery Chemistry */}
+            <div style={{ marginBottom: '20px' }}>
+              <label className={styles.label}>Storage Technology</label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setBatteryType('lithium')}
+                  style={{
+                    padding: '14px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: batteryType === 'lithium' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
+                    background: batteryType === 'lithium' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(0,0,0,0.2)',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    color: '#fff'
+                  }}
+                >
+                  <div style={{ fontWeight: 800, fontSize: '0.9rem', color: batteryType === 'lithium' ? 'var(--color-primary)' : 'inherit' }}>
+                    🔋 Lithium LiFePO4
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                    80% DOD • 10-15yr lifespan
+                  </div>
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setBatteryType('tubular')}
-                style={{
-                  padding: '14px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: batteryType === 'tubular' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
-                  background: batteryType === 'tubular' ? 'rgba(251, 191, 36, 0.1)' : 'rgba(0,0,0,0.2)',
-                  color: 'var(--color-text-main)',
-                  textAlign: 'left',
-                  cursor: 'pointer'
-                }}
+                <button
+                  type="button"
+                  onClick={() => setBatteryType('tubular')}
+                  style={{
+                    padding: '14px 12px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: batteryType === 'tubular' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
+                    background: batteryType === 'tubular' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(0,0,0,0.2)',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    color: '#fff'
+                  }}
+                >
+                  <div style={{ fontWeight: 800, fontSize: '0.9rem', color: batteryType === 'tubular' ? 'var(--color-primary)' : 'inherit' }}>
+                    ⚡ Deep Cycle Tubular
+                  </div>
+                  <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                    50% DOD • Cost-effective
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Step 1 Actions */}
+            <div className={styles.stepActions}>
+              <div></div>
+              <button 
+                type="button" 
+                onClick={() => setCurrentStep(2)}
+                className={styles.nextBtn}
               >
-                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: batteryType === 'tubular' ? 'var(--color-primary)' : 'inherit' }}>
-                  ⚡ Deep Cycle / Tubular
-                </div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                  50% DOD • Budget-friendly • Heavy-duty
-                </div>
+                <span>Continue to Energy Audit</span>
+                <span>→</span>
               </button>
             </div>
           </div>
+        )}
 
-          <div style={{ marginBottom: '32px' }}>
-            <h3 className={styles.appliancesHeader}>
-               <span>⚡ Your Appliances</span>
-               <span className={styles.applianceCount}>{appliances.length} items</span>
-            </h3>
+        {/* ================= STEP 2: ENERGY AUDIT & APPLIANCES ================= */}
+        {currentStep === 2 && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h3 style={{ fontWeight: 800, fontSize: '1.25rem', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>⚡</span>
+                <span>Energy Audit ({appliances.length} Appliances)</span>
+              </h3>
+            </div>
 
-            {/* Appliance Database Selector */}
+            {/* Quick Catalog Selector */}
             <ApplianceSelector onAdd={addAppliance} />
 
-            {/* Manual Appliance List */}
-            <div style={{ marginTop: '24px' }}>
-              <label style={{ 
-                display: 'block', 
-                marginBottom: '12px', 
-                fontWeight: 600,
-                fontSize: '0.9rem',
-                color: 'var(--color-text-muted)'
-              }}>
-                Appliance List
-              </label>
-
-              <div className={styles.applianceList}>
-                {appliances.map((app, index) => (
-                  <div key={index} className={styles.applianceRow}>
-                    {/* Appliance Name */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <input
-                        className={styles.applianceInput}
-                        placeholder="Appliance name"
-                        value={app.name}
-                        onChange={(e) => updateAppliance(index, 'name', e.target.value)}
-                      />
-                    </div>
-
-                    {/* Wattage Input */}
-                    <div style={{ position: 'relative' }}>
-                      <input
-                        type="number"
-                        min="0"
-                        step="10"
-                        className={styles.applianceInput}
-                        style={{ textAlign: 'center' }}
-                        placeholder="Watts"
-                        value={app.watt === 0 ? '' : app.watt}
-                        onChange={(e) => updateAppliance(index, 'watt', e.target.value === '' ? 0 : Number(e.target.value))}
-                      />
-                       <span style={{ 
-                         position: 'absolute', 
-                         right: '10px', 
-                         top: '50%', 
-                         transform: 'translateY(-50%)',
-                         fontSize: '0.75rem', 
-                         opacity: 0.6,
-                         color: 'var(--color-primary)',
-                         fontWeight: 600
-                       }}>W</span>
-                    </div>
-
-                    {/* Quantity Input */}
-                    <div style={{ position: 'relative' }}>
-                      <input
-                        type="number"
-                        min="1"
-                        step="1"
-                        className={styles.applianceInput}
-                        style={{ textAlign: 'center' }}
-                        value={app.quantity === 0 ? '' : app.quantity}
-                        onChange={(e) => updateAppliance(index, 'quantity', e.target.value === '' ? 1 : Number(e.target.value))}
-                      />
-                       <span style={{ 
-                         position: 'absolute', 
-                         right: '10px', 
-                         top: '50%', 
-                         transform: 'translateY(-50%)',
-                         fontSize: '0.75rem', 
-                         opacity: 0.6,
-                         color: 'var(--color-accent)',
-                         fontWeight: 600
-                       }}>Qty</span>
-                    </div>
-
-                    {/* Remove Button */}
+            {/* Appliance Cards List */}
+            <div className={styles.applianceList}>
+              {appliances.map((app, index) => (
+                <div key={index} className={styles.applianceCard}>
+                  {/* Top Row: Name and Delete */}
+                  <div className={styles.applianceCardTop}>
+                    <input
+                      className={styles.applianceNameInput}
+                      placeholder="Appliance name"
+                      value={app.name}
+                      onChange={(e) => updateAppliance(index, 'name', e.target.value)}
+                    />
                     <button
+                      type="button"
                       onClick={() => removeAppliance(index)}
-                      className={styles.removeButton}
+                      className={styles.deleteBtn}
                       aria-label="Remove appliance"
                     >
                       ×
                     </button>
                   </div>
-                ))}
-              </div>
+
+                  {/* Bottom Row: Wattage Pill + Touch Stepper Quantity */}
+                  <div className={styles.applianceCardBottom}>
+                    <div className={styles.wattInputGroup}>
+                      <input
+                        type="number"
+                        min="0"
+                        step="5"
+                        value={app.watt === 0 ? '' : app.watt}
+                        onChange={(e) => updateAppliance(index, 'watt', e.target.value === '' ? 0 : Number(e.target.value))}
+                        className={styles.wattInputField}
+                      />
+                      <span className={styles.wattLabel}>Watts</span>
+                    </div>
+
+                    <div className={styles.qtyStepperGroup}>
+                      <button 
+                        type="button" 
+                        onClick={() => handleQtyChange(index, -1)}
+                        className={styles.qtyBtn}
+                        aria-label="Decrease quantity"
+                      >
+                        -
+                      </button>
+                      <span className={styles.qtyValue}>{app.quantity}</span>
+                      <button 
+                        type="button" 
+                        onClick={() => handleQtyChange(index, 1)}
+                        className={styles.qtyBtn}
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {/* Add Manual Appliance Button */}
-            <div style={{ marginTop: "20px", display: 'flex', gap: '16px' }}>
-              <button
-                onClick={handleAddManualAppliance}
-                className={styles.addButton}
+            {/* Add Custom Appliance Button */}
+            <button
+              type="button"
+              onClick={() => addAppliance({ name: "", watt: 100, quantity: 1 })}
+              className={styles.addCustomBtn}
+            >
+              <span style={{ fontSize: '1.2rem' }}>+</span>
+              <span>Add Custom Appliance</span>
+            </button>
+
+            {/* Validation Errors */}
+            {(errors.property || errors.appliances) && (
+              <div style={{ marginTop: '16px' }}>
+                {errors.property && <ValidationError message={errors.property} onDismiss={() => clearError('property')} />}
+                {errors.appliances && <ValidationError message={errors.appliances} onDismiss={() => clearError('appliances')} />}
+              </div>
+            )}
+
+            {/* Step 2 Actions */}
+            <div className={styles.stepActions}>
+              <button 
+                type="button" 
+                onClick={() => setCurrentStep(1)}
+                className={styles.backBtn}
               >
-                <span style={{ fontSize: '1.2rem' }}>+</span>
-                <span>Add Custom Appliance</span>
+                ← Back to Location
+              </button>
+
+              <button 
+                type="button" 
+                onClick={handleEstimate}
+                disabled={loading}
+                className={styles.nextBtn}
+              >
+                <span>{loading ? "Analyzing Energy Needs..." : "Calculate Solar Blueprint"}</span>
+                <span>🚀</span>
               </button>
             </div>
           </div>
+        )}
 
-          <div className={styles.submitContainer}>
-            <button 
-              className={`btn-primary ${styles.submitButton}`}
-              onClick={handleEstimate} 
-              disabled={loading}
-            >
-              {loading ? "Analyzing Energy Profile..." : "Calculate Solar Needs"}
-            </button>
-          </div>
+        {/* ================= STEP 3: RESULTS / BLUEPRINT ================= */}
+        {currentStep === 3 && (
+          <div ref={resultsRef}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <span style={{ fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 700, textTransform: 'uppercase' }}>
+                  ✓ Calculation Complete
+                </span>
+                <h3 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '4px 0 0' }}>
+                  Your Solar Blueprint
+                </h3>
+              </div>
 
-          {/* VALIDATION ERRORS SUMMARY */}
-          {(errors.property || errors.appliances) && !loading && (
-            <div style={{ marginTop: '24px' }}>
-              {errors.property && (
-                <ValidationError 
-                  message={errors.property} 
-                  onDismiss={() => clearError('property')}
-                />
-              )}
-              {errors.appliances && (
-                <div style={{ marginTop: '8px' }}>
-                  <ValidationError 
-                    message={errors.appliances} 
-                    onDismiss={() => clearError('appliances')}
-                  />
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={() => setCurrentStep(2)}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  color: '#fff',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  padding: '8px 16px',
+                  borderRadius: '100px',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  cursor: 'pointer'
+                }}
+              >
+                ✎ Modify Appliances ({appliances.length})
+              </button>
             </div>
-          )}
-        </div>
+
+            {loading && (
+              <div style={{ padding: '40px 0' }}>
+                <LoadingSpinner message="Calculating your exact solar and storage requirements..." />
+              </div>
+            )}
+
+            {!loading && result && (
+              <AppResult data={result} />
+            )}
+          </div>
+        )}
       </div>
-
-      {/* LOADING STATE */}
-      {loading && (
-        <div style={{ marginTop: '40px' }}>
-          <LoadingSpinner message="Calculating your solar system requirements..." />
-        </div>
-      )}
-
-      {/* RESULTS DISPLAY */}
-      {!loading && result && <AppResult data={result} />}
     </div>
   );
 }

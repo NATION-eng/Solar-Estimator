@@ -26,7 +26,7 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
   return (
     <div style={{
       background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
-      padding: '28px',
+      padding: 'clamp(16px, 4vw, 28px)',
       borderRadius: 'var(--radius-md)',
       border: '1px solid rgba(251, 191, 36, 0.2)',
       marginTop: '24px',
@@ -35,26 +35,26 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        marginBottom: '20px',
+        marginBottom: '18px',
       }}>
-        <span style={{ fontSize: '2rem' }}>💰</span>
+        <span style={{ fontSize: '1.8rem' }}>💰</span>
         <h4 style={{
-          color: 'var(--color-accent)',
-          fontSize: '1.1rem',
+          color: 'var(--color-primary)',
+          fontSize: '1.05rem',
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
         }}>
-          Savings Calculator
+          Financial Savings & Tariff Sensitivity
         </h4>
       </div>
       
       {/* Interactive Controls */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '20px',
-        marginBottom: '28px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+        gap: '16px',
+        marginBottom: '24px',
       }}>
         <div>
           <label style={{

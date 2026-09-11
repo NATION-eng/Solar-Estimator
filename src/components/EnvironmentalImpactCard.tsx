@@ -8,7 +8,7 @@ export default function EnvironmentalImpactCard({ impact }: EnvironmentalImpactP
   return (
     <div style={{
       background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%)',
-      padding: '28px',
+      padding: 'clamp(16px, 4vw, 28px)',
       borderRadius: 'var(--radius-md)',
       border: '1px solid rgba(16, 185, 129, 0.2)',
       marginTop: '24px',
@@ -17,12 +17,12 @@ export default function EnvironmentalImpactCard({ impact }: EnvironmentalImpactP
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
-        marginBottom: '20px',
+        marginBottom: '16px',
       }}>
-        <span style={{ fontSize: '2rem' }}>🌍</span>
+        <span style={{ fontSize: '1.8rem' }}>🌍</span>
         <h4 style={{
           color: 'var(--color-success)',
-          fontSize: '1.1rem',
+          fontSize: '1.05rem',
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
@@ -33,18 +33,17 @@ export default function EnvironmentalImpactCard({ impact }: EnvironmentalImpactP
       
       <p style={{
         color: 'var(--color-text-muted)',
-        fontSize: '0.9rem',
-        marginBottom: '24px',
-        lineHeight: 1.6,
+        fontSize: '0.85rem',
+        marginBottom: '20px',
+        lineHeight: 1.5,
       }}>
-        By switching to solar energy, you'll make a significant positive impact on the environment. 
-        Here's what your system will accomplish:
+        By switching to solar energy, you'll make a significant positive impact on the environment:
       </p>
       
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-        gap: '20px',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))',
+        gap: '12px',
       }}>
         {/* CO2 Saved */}
         <div style={{

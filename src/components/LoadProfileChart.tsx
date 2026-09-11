@@ -19,16 +19,16 @@ export default function LoadProfileChart({ appliances, hours }: LoadProfileChart
   return (
     <div style={{
       background: 'rgba(0,0,0,0.3)',
-      padding: '24px',
+      padding: 'clamp(14px, 3.5vw, 24px)',
       borderRadius: 'var(--radius-md)',
       border: '1px solid rgba(255,255,255,0.05)',
     }}>
       <h4 style={{
         color: 'var(--color-primary)',
-        fontSize: '0.9rem',
+        fontSize: '0.85rem',
         fontWeight: 700,
         textTransform: 'uppercase',
-        marginBottom: '16px',
+        marginBottom: '14px',
         letterSpacing: '0.1em',
       }}>
         24-Hour Load Profile
@@ -37,10 +37,10 @@ export default function LoadProfileChart({ appliances, hours }: LoadProfileChart
       <div style={{
         display: 'flex',
         alignItems: 'flex-end',
-        gap: '4px',
-        height: '200px',
-        marginBottom: '16px',
-        padding: '16px 0',
+        gap: '3px',
+        height: 'clamp(130px, 22vh, 180px)',
+        marginBottom: '12px',
+        padding: '12px 0',
         borderBottom: '1px solid rgba(255,255,255,0.1)',
       }}>
         {profile.map((item, index) => {

@@ -1,143 +1,189 @@
-/* Estimator Component Styles */
+/* Estimator Component Styles - Modern Mobile & Cross-Device Engine */
 
 .container {
-  max-width: 1000px;
+  max-width: 1080px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .glassPanel {
+  background: var(--color-bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
   border-radius: var(--radius-lg);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 36px 32px;
+  box-shadow: var(--shadow-card);
 }
 
-/* Progress Indicator */
-.progressContainer {
-  margin-bottom: 40px;
-}
-
-.progressHeader {
+/* Stepper Navigation */
+.stepperBar {
   display: flex;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 100px;
+  padding: 4px;
+  margin-bottom: 32px;
+  gap: 4px;
+}
+
+.stepperTab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 100px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+
+.stepperTab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stepperTabActive {
+  background: var(--color-primary) !important;
+  color: #000 !important;
+  font-weight: 700;
+  box-shadow: 0 0 15px var(--color-primary-glow);
+}
+
+.stepNumber {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.stepperTabActive .stepNumber {
+  background: #000;
+  color: var(--color-primary);
+  font-weight: 800;
+}
+
+/* Live Load Stat Bar */
+.liveLoadBar {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 0.8rem;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(56, 189, 248, 0.05) 100%);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  margin-bottom: 28px;
+}
+
+.liveLoadMetric {
+  display: flex;
+  flex-direction: column;
+}
+
+.liveLoadLabel {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.liveLoadValue {
+  font-size: 1.15rem;
+  font-weight: 800;
   color: var(--color-primary);
 }
 
-.progressLabel {
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.progressBar {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.progressFill {
-  height: 100%;
-  background: var(--color-primary);
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 10px var(--color-primary);
-}
-
-/* Property Selector */
+/* Property Grid */
 .propertyGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 28px;
 }
 
 .propertyCard {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--color-text-muted);
-  padding: 24px 20px;
+  padding: 18px 14px;
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 12px;
-  transition: all 0.3s ease;
+  gap: 8px;
+  transition: all 0.25s ease;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
   outline: none;
 }
 
 .propertyCard:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.propertyCard:focus {
-  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.5);
+  border-color: rgba(251, 191, 36, 0.4);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .propertyCardActive {
-  background: var(--color-primary);
-  border: none;
-  color: #fff;
-}
-
-.propertyCardActive:hover {
-  border-color: var(--color-primary);
+  background: rgba(251, 191, 36, 0.12) !important;
+  border: 1.5px solid var(--color-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
 }
 
 .propertyIcon {
-  font-size: 2rem;
+  font-size: 1.8rem;
+  line-height: 1;
 }
 
 .propertyLabel {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  display: block;
+  color: #fff;
 }
 
 .propertyDesc {
-  font-size: 0.75rem;
-  opacity: 0.6;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
 }
 
 .propertyCheckmark {
   position: absolute;
-  bottom: -4px;
-  right: -4px;
-  background: #fff;
-  color: var(--color-primary);
-  width: 24px;
-  height: 24px;
+  top: 8px;
+  right: 8px;
+  background: var(--color-primary);
+  color: #000;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 800;
 }
 
-/* Form Fields */
-.formSection {
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity 0.3s ease;
-}
-
-.formSectionDisabled {
-  opacity: 0.5;
-  pointer-events: none;
-}
-
+/* Fields & Inputs */
 .fieldGroup {
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 }
 
 .label {
   display: block;
   margin-bottom: 8px;
-  font-weight: 500;
-  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text-main);
 }
 
 .inputField {
@@ -145,271 +191,324 @@
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-sm);
-  padding: 12px 16px;
+  padding: 14px 16px;
   color: #fff;
   font-size: 1rem;
   outline: none;
   transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .inputField:focus {
   border-color: var(--color-primary);
   background: rgba(255, 255, 255, 0.08);
-}
-
-.inputField:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
 }
 
 .inputFieldError {
   border-color: #ef4444;
 }
 
-.inputFieldError:focus {
-  border-color: #ef4444;
-}
-
 /* Range Slider */
 .rangeContainer {
-  margin-bottom: 32px;
+  margin-bottom: 26px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .rangeSlider {
   width: 100%;
+  height: 6px;
   accent-color: var(--color-primary);
   cursor: pointer;
+  margin: 12px 0;
 }
 
 .rangeLabels {
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .rangeValue {
   color: var(--color-primary);
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 1rem;
 }
 
-/* Appliances Section */
-.appliancesHeader {
-  font-weight: 700;
-  margin-bottom: 20px;
+/* Presets Chip Row */
+.presetChipsRow {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
 }
 
-.applianceCount {
-  font-size: 0.75rem;
-  background: rgba(251, 191, 36, 0.15);
-  padding: 4px 12px;
+.presetChip {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 100px;
-  color: var(--color-primary);
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
   font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
+.presetChip:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.presetChipActive {
+  background: var(--color-primary) !important;
+  color: #000 !important;
+  border-color: var(--color-primary) !important;
+}
+
+/* Appliance Cards */
 .applianceList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.applianceCard {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.applianceRow {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
-  gap: 12px;
+.applianceCard:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.applianceCardTop {
+  display: flex;
   align-items: center;
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.2s;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-.applianceRow:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-.applianceInput {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  outline: none;
-  transition: all 0.2s;
-}
-
-.applianceInput:focus {
-  border-color: var(--color-primary);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.removeButton {
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid rgba(255, 107, 107, 0.2);
-  color: #ff6b6b;
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: all 0.2s;
-  font-weight: bold;
-}
-
-.removeButton:hover {
-  background: rgba(255, 107, 107, 0.2);
-  border-color: rgba(255, 107, 107, 0.4);
-}
-
-.addButton {
+.applianceNameInput {
   background: transparent;
-  border: 2px dashed rgba(251, 191, 36, 0.3);
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 4px 0;
+  outline: none;
+  flex: 1;
+  transition: border-color 0.2s;
+}
+
+.applianceNameInput:focus {
+  border-bottom-color: var(--color-primary);
+}
+
+.deleteBtn {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.applianceCardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.wattInputGroup {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  gap: 4px;
+}
+
+.wattInputField {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  width: 60px;
+  text-align: center;
+  outline: none;
+}
+
+.wattLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
   color: var(--color-primary);
-  padding: 14px;
+}
+
+.qtyStepperGroup {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  gap: 6px;
+}
+
+.qtyBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.qtyBtn:hover {
+  background: var(--color-primary);
+  color: #000;
+}
+
+.qtyValue {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+  min-width: 24px;
+  text-align: center;
+}
+
+.addCustomBtn {
+  background: transparent;
+  border: 1.5px dashed rgba(251, 191, 36, 0.4);
+  color: var(--color-primary);
+  padding: 12px;
   width: 100%;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   font-size: 0.95rem;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  font-weight: 700;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  margin-top: 12px;
 }
 
-.addButton:hover {
+.addCustomBtn:hover {
   border-color: var(--color-primary);
-  background: rgba(251, 191, 36, 0.05);
+  background: rgba(251, 191, 36, 0.06);
 }
 
-/* Submit Button */
-.submitContainer {
-  margin-top: 40px;
-  text-align: center;
+/* Step Navigation Actions */
+.stepActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.submitButton {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+.backBtn {
+  background: rgba(255, 255, 255, 0.06);
   color: #fff;
-  padding: 18px 60px;
-  font-size: 1.1rem;
-  border-radius: 100px;
-  box-shadow: var(--shadow-glow);
-  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 14px 24px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
+  transition: all 0.2s;
+  min-height: 48px;
+}
+
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.nextBtn {
+  background: var(--color-primary);
+  color: #000;
   border: none;
+  padding: 14px 32px;
+  border-radius: var(--radius-sm);
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
   transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
 }
 
-.submitButton:hover {
-  transform: scale(1.05);
+.nextBtn:hover {
+  transform: scale(1.02);
 }
 
-.submitButton:disabled {
-  opacity: 0.7;
-  cursor: wait;
+.nextBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-/* Responsive */
+/* ================= RESPONSIVE RULES ================= */
+
 @media (max-width: 768px) {
-  .container {
-    padding: 0;
+  .glassPanel {
+    padding: 24px 16px;
+    border-radius: var(--radius-md);
   }
 
   .propertyGrid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-  }
-
-  .propertyCard {
-    padding: 14px 8px;
-    gap: 6px;
-    border-radius: var(--radius-sm);
-  }
-
-  .propertyIcon {
-    font-size: 1.6rem;
-  }
-
-  .propertyLabel {
-    font-size: 0.85rem;
-  }
-
-  .propertyDesc {
-    font-size: 0.68rem;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  .submitButton {
-    width: 100%;
-    padding: 16px 24px;
-    font-size: 1rem;
-    border-radius: var(--radius-sm);
-  }
-}
-
-@media (max-width: 640px) {
-  .applianceRow {
-    display: grid;
-    grid-template-columns: 1fr 1fr 42px;
-    grid-template-rows: auto auto;
-    gap: 8px;
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--radius-sm);
-  }
-
-  .applianceRow > div:first-child {
-    grid-column: 1 / 3;
-    grid-row: 1;
-  }
-
-  .applianceRow > .removeButton {
-    grid-column: 3;
-    grid-row: 1;
-    height: 40px;
-    width: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-  }
-
-  .applianceRow > div:nth-child(2) {
-    grid-column: 1;
-    grid-row: 2;
-  }
-
-  .applianceRow > div:nth-child(3) {
-    grid-column: 2 / 4;
-    grid-row: 2;
-  }
-}
-
-@media (max-width: 440px) {
-  .propertyGrid {
-    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
-  
+
   .propertyCard {
     padding: 12px 6px;
+    gap: 4px;
+    border-radius: var(--radius-sm);
   }
 
   .propertyIcon {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
   }
 
   .propertyLabel {
@@ -417,16 +516,68 @@
   }
 
   .propertyDesc {
+    font-size: 0.65rem;
     display: none;
   }
 
-  .applianceInput {
+  .stepperTab {
     padding: 8px 10px;
-    font-size: 0.85rem;
+    font-size: 0.78rem;
+    gap: 4px;
   }
 
-  .removeButton {
-    padding: 6px 10px;
+  .stepActions {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .backBtn, .nextBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 440px) {
+  .propertyGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .propertyCard {
+    padding: 10px 4px;
+  }
+
+  .propertyIcon {
+    font-size: 1.3rem;
+  }
+
+  .propertyLabel {
+    font-size: 0.75rem;
+  }
+
+  .stepperBar {
+    border-radius: var(--radius-sm);
+  }
+
+  .stepperTab {
+    font-size: 0.72rem;
+  }
+
+  .liveLoadBar {
+    padding: 10px 12px;
+  }
+
+  .liveLoadValue {
     font-size: 1rem;
+  }
+
+  .applianceCardBottom {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 340px) {
+  .propertyGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }

@@ -130,6 +130,180 @@
   display: none;
 }
 
+/* Touch Ergonomics & Mobile Tap Delay Elimination */
+button, input, select, textarea, a, .clickable {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active, .clickable:active {
+  transform: scale(0.97);
+}
+
+.desktop-only {
+  display: inline;
+}
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: inline !important;
+  }
+}
+
+/* Prevent unwanted iOS Safari page auto-zoom on inputs */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="number"],
+  input[type="search"],
+  input[type="email"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile Fixed Bottom Navigation Bar & Action Dock */
+.mobile-bottom-bar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-bar {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background: rgba(2, 6, 23, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(251, 191, 36, 0.25);
+    padding: 10px 16px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);
+  }
+
+  .mobile-bar-action-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .mobile-live-summary {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .mobile-live-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+  }
+
+  .mobile-live-val {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+
+  .mobile-action-btn {
+    background: var(--color-primary);
+    color: #000;
+    font-weight: 800;
+    font-size: 0.92rem;
+    padding: 10px 18px;
+    border-radius: 100px;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 0 16px var(--color-primary-glow);
+    white-space: nowrap;
+    min-height: 44px;
+    cursor: pointer;
+  }
+
+  .mobile-tabs-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 6px;
+  }
+
+  .mobile-tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 0;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .mobile-tab-btn.active {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  .mobile-tab-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .mobile-tab-badge {
+    position: absolute;
+    top: 0px;
+    right: calc(50% - 18px);
+    background: var(--color-primary);
+    color: #000;
+    font-size: 0.62rem;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 100px;
+    line-height: 1.2;
+  }
+
+  /* Ensure page content is not hidden by the fixed bottom bar */
+  .app-main-content {
+    padding-bottom: 130px !important;
+  }
+
+  .pwa-install-banner-wrapper {
+    bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+.pwa-install-banner-wrapper {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 480px;
+  z-index: 9999;
+}
+
 /* Micro Mobile (<380px) - iPhone SE, Galaxy Fold */
 @media (max-width: 380px) {
   :root {
@@ -142,16 +316,16 @@
   }
 
   .p-responsive {
-    padding: 20px 12px !important;
+    padding: 16px 12px !important;
   }
 
   h1.hero-title {
-    font-size: 1.85rem !important;
+    font-size: 1.75rem !important;
     line-height: 1.15 !important;
   }
 
   p.hero-subtitle {
-    font-size: 0.9rem !important;
+    font-size: 0.88rem !important;
   }
 
   .result-card-title {
@@ -172,26 +346,26 @@
   }
 
   .pad-section {
-    padding: 28px 16px !important;
+    padding: 24px 14px !important;
   }
   
   .container-wide {
-    padding: 0 14px;
+    padding: 0 12px;
   }
   
   h1.hero-title {
-    font-size: clamp(2rem, 8vw, 2.75rem) !important;
+    font-size: clamp(1.85rem, 7.5vw, 2.5rem) !important;
     word-wrap: break-word;
     line-height: 1.15;
   }
   
   p.hero-subtitle {
-    font-size: 0.95rem !important;
-    margin-bottom: 28px !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 20px !important;
   }
   
   .btn-primary {
-    padding: 14px 24px !important;
+    padding: 14px 20px !important;
     font-size: 0.95rem !important;
     width: 100%;
     min-height: 48px;
@@ -206,7 +380,7 @@
 
   .grid-responsive {
     grid-template-columns: 1fr !important;
-    gap: 16px;
+    gap: 14px;
   }
 
   .result-card-title {
@@ -219,7 +393,7 @@
   }
 
   .p-responsive {
-    padding: 24px 16px !important;
+    padding: 20px 14px !important;
   }
 }
 
@@ -245,13 +419,13 @@
 /* Desktop & Ultrawide (>1025px) */
 @media (min-width: 1025px) {
   .p-responsive {
-    padding: 60px 48px;
+    padding: 50px 40px;
   }
 }
 
 /* Base utility defaults */
 .p-responsive {
-  padding: 50px 36px;
+  padding: 40px 32px;
   box-sizing: border-box;
 }
 
@@ -274,3 +448,4 @@
     gap: 8px;
   }
 }
+

@@ -15,17 +15,18 @@ function App() {
   return (
     <ErrorBoundary>
       <div className="app-wrapper">
-        {/* Modern Top App Header */}
+        {/* Modern Top App Header with iOS Safe Area Inset */}
         <header style={{
           width: '100%',
           borderBottom: '1px solid var(--border-glass)',
-          background: 'rgba(2, 6, 23, 0.8)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
+          background: 'rgba(2, 6, 23, 0.88)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           position: 'sticky',
           top: 0,
           zIndex: 100,
-          padding: '12px 0'
+          paddingTop: 'max(12px, env(safe-area-inset-top, 12px))',
+          paddingBottom: '12px'
         }}>
           <div className="container-wide" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -35,7 +36,7 @@ function App() {
               </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{
                 fontSize: '0.72rem',
                 fontWeight: 700,
@@ -71,9 +72,9 @@ function App() {
           </div>
         </header>
 
-        <main className="container-wide" style={{ paddingTop: '1.5rem', paddingBottom: '4rem' }}>
+        <main className="container-wide app-main-content" style={{ paddingTop: '1rem', paddingBottom: '3rem' }}>
           <Hero onBegin={scrollToEstimator} />
-          <div style={{ margin: 'clamp(1.5rem, 4vw, 3rem) 0' }}></div>
+          <div style={{ margin: 'clamp(1rem, 3vw, 2.5rem) 0' }}></div>
           <div ref={estimatorRef}>
             <Estimator />
           </div>
@@ -81,12 +82,12 @@ function App() {
         
         <footer style={{ 
           textAlign: 'center', 
-          padding: '2rem', 
+          padding: '2rem 1rem calc(4rem + env(safe-area-inset-bottom, 0px))', 
           borderTop: 'var(--border-glass)',
           color: 'var(--color-text-muted)',
-          fontSize: '0.9rem'
+          fontSize: '0.85rem'
         }}>
-          <p>© 2026 MasterviewCEL. All rights reserved.</p>
+          <p>© 2026 MasterviewCEL Energy Solutions. Engineered for Nigeria.</p>
         </footer>
         
         <PWAInstallBanner />

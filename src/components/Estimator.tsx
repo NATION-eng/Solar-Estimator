@@ -180,33 +180,40 @@ export default function Estimator() {
     }, 150);
   };
 
+  const topContainerRef = useRef<HTMLDivElement>(null);
+
+  const goToStep = (step: 1 | 2 | 3) => {
+    setCurrentStep(step);
+    topContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
   return (
-    <div className={styles.container}>
+    <div className={styles.container} ref={topContainerRef}>
       <div className={styles.glassPanel}>
         {/* Modern Stepper Header */}
         <div className={styles.stepperBar}>
           <button 
             type="button"
-            onClick={() => setCurrentStep(1)}
+            onClick={() => goToStep(1)}
             className={`${styles.stepperTab} ${currentStep === 1 ? styles.stepperTabActive : ''}`}
           >
             <span className={styles.stepNumber}>1</span>
-            <span>Location & Site</span>
+            <span><span className="desktop-only">Location & </span>Site</span>
           </button>
 
           <button 
             type="button"
-            onClick={() => setCurrentStep(2)}
+            onClick={() => goToStep(2)}
             className={`${styles.stepperTab} ${currentStep === 2 ? styles.stepperTabActive : ''}`}
           >
             <span className={styles.stepNumber}>2</span>
-            <span>Energy Audit ({appliances.length})</span>
+            <span><span className="desktop-only">Energy </span>Audit ({appliances.length})</span>
           </button>
 
           <button 
             type="button"
             onClick={() => {
-              if (result) setCurrentStep(3);
+              if (result) goToStep(3);
               else handleEstimate();
             }}
             className={`${styles.stepperTab} ${currentStep === 3 ? styles.stepperTabActive : ''}`}
@@ -555,6 +562,96 @@ export default function Estimator() {
             )}
           </div>
         )}
+      </div>
+
+      {/* Mobile Fixed Bottom Navigation Bar & Action Dock */}
+      <div className="mobile-bottom-bar">
+        <div className="mobile-bar-action-row">
+          <div className="mobile-live-summary">
+            <span className="mobile-live-label">
+              {currentStep === 1 ? 'Current Load' : currentStep === 2 ? `${appliances.length} Appliances` : 'Turnkey Investment'}
+            </span>
+            <span className="mobile-live-val">
+              {currentStep === 3 && result?.estimatedPriceNaira 
+                ? `₦${(result.estimatedPriceNaira || 0).toLocaleString()}`
+                : `⚡ ${totalSteadyWatts.toLocaleString()}W • ${dailyEnergyKwh} kWh/d`}
+            </span>
+          </div>
+
+          {currentStep === 1 && (
+            <button
+              type="button"
+              onClick={() => goToStep(2)}
+              className="mobile-action-btn"
+            >
+              <span>Audit Items ({appliances.length})</span>
+              <span>→</span>
+            </button>
+          )}
+
+          {currentStep === 2 && (
+            <button
+              type="button"
+              onClick={handleEstimate}
+              disabled={loading}
+              className="mobile-action-btn"
+            >
+              <span>{loading ? 'Analyzing...' : 'Calculate Blueprint'}</span>
+              <span>🚀</span>
+            </button>
+          )}
+
+          {currentStep === 3 && (
+            <button
+              type="button"
+              onClick={() => {
+                if (result) {
+                  const summary = `*🌞 MasterviewCEL Solar Blueprint*\n📍 Location: ${result.location?.address || 'Nigeria'}\n⚡ Daily Energy: ${((result.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh/day\n🔌 Inverter: ${((result.recommendedInverterW || 0) / 1000).toFixed(1)} kVA\n🔋 Battery: ${result.batteryAh || 0} Ah\n☀️ Solar Array: ${result.panelQuantity || 0} Panels\n💰 Investment: ₦${(result.estimatedPriceNaira || 0).toLocaleString()}`;
+                  window.open(`https://wa.me/?text=${encodeURIComponent(summary)}`, '_blank');
+                }
+              }}
+              className="mobile-action-btn"
+              style={{ background: '#25D366', color: '#fff' }}
+            >
+              <span>Share Quote</span>
+              <span>💬</span>
+            </button>
+          )}
+        </div>
+
+        {/* Bottom Pinned Tabs */}
+        <div className="mobile-tabs-row">
+          <button
+            type="button"
+            onClick={() => goToStep(1)}
+            className={`mobile-tab-btn ${currentStep === 1 ? 'active' : ''}`}
+          >
+            <span className="mobile-tab-icon">📍</span>
+            <span>Site</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => goToStep(2)}
+            className={`mobile-tab-btn ${currentStep === 2 ? 'active' : ''}`}
+          >
+            <span className="mobile-tab-icon">⚡</span>
+            <span>Audit</span>
+            <span className="mobile-tab-badge">{appliances.length}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              if (result) goToStep(3);
+              else handleEstimate();
+            }}
+            className={`mobile-tab-btn ${currentStep === 3 ? 'active' : ''}`}
+          >
+            <span className="mobile-tab-icon">📊</span>
+            <span>Blueprint</span>
+          </button>
+        </div>
       </div>
     </div>
   );

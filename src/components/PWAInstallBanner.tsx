@@ -65,14 +65,7 @@ export default function PWAInstallBanner() {
   if (!showBanner) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      bottom: '16px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      width: 'calc(100% - 32px)',
-      maxWidth: '480px',
-      zIndex: 9999,
+    <div className="pwa-install-banner-wrapper" style={{
       background: 'rgba(15, 23, 42, 0.95)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',

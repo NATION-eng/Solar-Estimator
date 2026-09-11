@@ -128,45 +128,94 @@ export default function AppResult({ data }: ResultProps) {
   };
 
   return (
-    <section style={{ marginTop: '50px' }}>
-      <div className="glass-panel p-responsive" style={{ 
-        borderRadius: 'var(--radius-lg)',
-        border: '1px solid var(--border-glass)'
-      }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '36px' }}>
-          <span style={{
-            color: 'var(--color-primary)',
-            fontWeight: 700,
-            fontSize: '0.8rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.2em',
-            padding: '4px 14px',
-            borderRadius: '100px',
-            background: 'rgba(251, 191, 36, 0.1)',
-            border: '1px solid rgba(251, 191, 36, 0.3)',
-            display: 'inline-block',
-            marginBottom: '12px'
-          }}>
-            Technical Sizing Complete
-          </span>
-          <h2 style={{ fontSize: '2.4rem', fontWeight: 800, marginBottom: '8px' }}>
-            <span className="text-gradient">Your Solar Blueprint</span>
-          </h2>
-          <p style={{ color: 'var(--color-text-muted)', maxWidth: '560px', margin: '0 auto' }}>
-            Engineered specifically for your power consumption profile and local solar irradiation levels.
-          </p>
-        </div>
+    <div style={{ marginTop: '12px' }}>
+      {/* Blueprint Header */}
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <span style={{
+          color: 'var(--color-primary)',
+          fontWeight: 700,
+          fontSize: '0.75rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.15em',
+          padding: '4px 14px',
+          borderRadius: '100px',
+          background: 'rgba(251, 191, 36, 0.1)',
+          border: '1px solid rgba(251, 191, 36, 0.3)',
+          display: 'inline-block',
+          marginBottom: '10px'
+        }}>
+          TECHNICAL SIZING COMPLETE
+        </span>
+        <h2 style={{ fontSize: 'clamp(1.6rem, 5vw, 2.4rem)', fontWeight: 800, marginBottom: '6px' }}>
+          <span className="text-gradient">Your Solar Blueprint</span>
+        </h2>
+        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', maxWidth: '560px', margin: '0 auto 16px' }}>
+          Engineered specifically for your power consumption profile and local solar irradiation levels.
+        </p>
 
-        {/* Core Hardware Cards */}
-        <div className="grid-responsive" style={{ marginBottom: '32px' }}>
-          {/* Inverter Card */}
-          <div style={{ 
-            background: 'rgba(56, 189, 248, 0.08)', 
-            padding: '24px', 
-            borderRadius: 'var(--radius-md)',
-            borderLeft: '4px solid var(--color-accent)'
-          }}>
+        {/* Quick Action Buttons (Top Access for Mobile) */}
+        <div style={{
+          display: 'flex',
+          gap: '10px',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          marginBottom: '24px'
+        }}>
+          <button 
+            onClick={handleDownloadPDF}
+            style={{
+              background: 'var(--color-primary)',
+              color: '#000',
+              padding: '12px 20px',
+              borderRadius: '100px',
+              fontWeight: 800,
+              fontSize: '0.88rem',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              boxShadow: '0 0 15px var(--color-primary-glow)',
+              minHeight: '44px'
+            }}
+          >
+            <span>📄</span>
+            <span>Download PDF Quote</span>
+          </button>
+
+          <button 
+            onClick={handleShareWhatsApp}
+            style={{
+              background: '#25D366',
+              color: '#fff',
+              padding: '12px 20px',
+              borderRadius: '100px',
+              fontWeight: 700,
+              fontSize: '0.88rem',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              minHeight: '44px'
+            }}
+          >
+            <span>💬</span>
+            <span>Share via WhatsApp</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Core Hardware Cards */}
+      <div className="grid-responsive" style={{ marginBottom: '28px' }}>
+        {/* Inverter Card */}
+        <div style={{ 
+          background: 'rgba(56, 189, 248, 0.08)', 
+          padding: '20px', 
+          borderRadius: 'var(--radius-md)',
+          borderLeft: '4px solid var(--color-accent)',
+          border: '1px solid rgba(56, 189, 248, 0.2)'
+        }}>
             <p style={{ 
               textTransform: 'uppercase', 
               fontSize: '0.75rem', 
@@ -404,7 +453,6 @@ export default function AppResult({ data }: ResultProps) {
             <span>Share via WhatsApp</span>
           </button>
         </div>
-      </div>
-    </section>
+    </div>
   );
 }

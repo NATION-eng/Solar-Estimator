@@ -492,7 +492,7 @@
 
 @media (max-width: 768px) {
   .glassPanel {
-    padding: 24px 16px;
+    padding: 16px 12px;
     border-radius: var(--radius-md);
   }
 
@@ -505,35 +505,117 @@
     padding: 12px 6px;
     gap: 4px;
     border-radius: var(--radius-sm);
+    min-height: 84px;
+    justify-content: center;
   }
 
   .propertyIcon {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
 
   .propertyLabel {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    font-weight: 700;
   }
 
   .propertyDesc {
-    font-size: 0.65rem;
     display: none;
   }
 
+  .stepperBar {
+    padding: 3px;
+    margin-bottom: 20px;
+    gap: 2px;
+  }
+
   .stepperTab {
-    padding: 8px 10px;
-    font-size: 0.78rem;
+    padding: 8px 6px;
+    font-size: 0.74rem;
     gap: 4px;
+  }
+
+  .stepNumber {
+    width: 18px;
+    height: 18px;
+    font-size: 0.68rem;
+  }
+
+  /* Enhanced Touch Steppers for Mobile */
+  .qtyStepperGroup {
+    padding: 4px 8px;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+  }
+
+  .qtyBtn {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .qtyValue {
+    font-size: 1.1rem;
+    min-width: 28px;
+  }
+
+  .wattInputGroup {
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+  }
+
+  .wattInputField {
+    font-size: 16px !important;
+    width: 64px;
+  }
+
+  .applianceNameInput {
+    font-size: 16px !important;
+    padding: 6px 0;
+  }
+
+  .deleteBtn {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    font-size: 1.3rem;
+  }
+
+  .inputField {
+    font-size: 16px !important;
+    padding: 14px 14px;
+  }
+
+  .liveLoadBar {
+    padding: 12px 14px;
+    margin-bottom: 20px;
+  }
+
+  .liveLoadLabel {
+    font-size: 0.65rem;
+  }
+
+  .liveLoadValue {
+    font-size: 1rem;
   }
 
   .stepActions {
     flex-direction: column-reverse;
     gap: 10px;
+    margin-top: 24px;
+    padding-top: 16px;
   }
 
   .backBtn, .nextBtn {
     width: 100%;
     justify-content: center;
+    min-height: 48px;
+    font-size: 0.95rem;
   }
 }
 
@@ -545,30 +627,25 @@
 
   .propertyCard {
     padding: 10px 4px;
+    min-height: 76px;
   }
 
   .propertyIcon {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
   }
 
   .propertyLabel {
-    font-size: 0.75rem;
-  }
-
-  .stepperBar {
-    border-radius: var(--radius-sm);
-  }
-
-  .stepperTab {
     font-size: 0.72rem;
   }
 
-  .liveLoadBar {
-    padding: 10px 12px;
+  .stepperTab {
+    font-size: 0.68rem;
+    padding: 6px 4px;
   }
 
-  .liveLoadValue {
-    font-size: 1rem;
+  .applianceCard {
+    padding: 12px;
+    gap: 10px;
   }
 
   .applianceCardBottom {
@@ -581,3 +658,4 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+

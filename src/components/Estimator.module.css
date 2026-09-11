@@ -1,9 +1,38 @@
 /* Estimator Component Styles - Modern Mobile & Cross-Device Engine */
 
 .container {
-  max-width: 1080px;
+  max-width: 1240px;
   margin: 0 auto;
   width: 100%;
+}
+
+.desktopGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap: 36px;
+  align-items: start;
+}
+
+.desktopLeftCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.desktopRightCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.desktopSectionTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glassPanel {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { formatCurrency } from '../utils/helpers';
+import CustomEmoji from './CustomEmoji';
 
 interface SavingsCalculatorProps {
   systemCost: number;
@@ -37,7 +38,7 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         gap: '12px',
         marginBottom: '18px',
       }}>
-        <span style={{ fontSize: '1.8rem' }}>💰</span>
+        <CustomEmoji name="coins" size={26} color="var(--color-primary)" />
         <h4 style={{
           color: 'var(--color-primary)',
           fontSize: '1.05rem',
@@ -184,8 +185,22 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         <div style={{
           fontSize: '0.85rem',
           color: 'var(--color-text-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '6px',
         }}>
-          {totalSavings > 0 ? '✅ Net Profit' : '⏳ Break-even not yet reached'}
+          {totalSavings > 0 ? (
+            <>
+              <CustomEmoji name="check" size={14} color="var(--color-success)" />
+              <span>Net Profit</span>
+            </>
+          ) : (
+            <>
+              <CustomEmoji name="clock" size={14} color="var(--color-text-muted)" />
+              <span>Break-even not yet reached</span>
+            </>
+          )}
         </div>
       </div>
       

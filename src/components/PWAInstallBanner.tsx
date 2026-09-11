@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import CustomEmoji from './CustomEmoji';
 
 export default function PWAInstallBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -151,7 +152,9 @@ export default function PWAInstallBanner() {
             maxWidth: '360px',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '2rem', marginBottom: '12px' }}>📲</div>
+            <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+              <CustomEmoji name="phone" size={36} color="var(--color-primary)" />
+            </div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: '#fff' }}>
               Add to iPhone Home Screen
             </h3>

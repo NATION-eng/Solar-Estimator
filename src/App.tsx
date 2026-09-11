@@ -3,6 +3,7 @@ import Hero from "./components/Hero";
 import Estimator from "./components/Estimator";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import PWAInstallBanner from "./components/PWAInstallBanner";
+import CustomEmoji from "./components/CustomEmoji";
 import "./styles/design-system.css"; 
 
 function App() {
@@ -30,7 +31,7 @@ function App() {
         }}>
           <div className="container-wide" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '1.4rem' }}>☀️</span>
+              <CustomEmoji name="sun" size={24} />
               <span style={{ fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.02em', color: '#fff' }}>
                 Masterview<span style={{ color: 'var(--color-primary)' }}>CEL</span>
               </span>

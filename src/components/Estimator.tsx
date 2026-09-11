@@ -3,6 +3,7 @@ import AppResult from "./AppResult";
 import ApplianceSelector from "./ApplianceSelector";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ValidationError } from "./ValidationError";
+import CustomEmoji from "./CustomEmoji";
 import { useFormValidation } from "../hooks/useFormValidation";
 import { useEstimation } from "../hooks/useEstimation";
 import { useAppliances } from "../hooks/useAppliances";
@@ -198,7 +199,7 @@ export default function Estimator() {
   const renderPropertyGrid = () => (
     <div style={{ marginBottom: '28px' }}>
       <h3 className={styles.sectionTitle}>
-        <span>🏠</span>
+        <CustomEmoji name="home" size={20} />
         <span>1. Select Property Type</span>
       </h3>
       <div className={styles.propertyGrid}>
@@ -209,11 +210,15 @@ export default function Estimator() {
             onClick={() => handlePropertyChange(t.id)}
             className={`${styles.propertyCard} ${property === t.id ? styles.propertyCardActive : ''}`}
           >
-            <span className={styles.propertyIcon}>{t.icon}</span>
+            <span className={styles.propertyIcon}>
+              <CustomEmoji name={t.id} size={28} />
+            </span>
             <span className={styles.propertyLabel}>{t.label}</span>
             <span className={styles.propertyDesc}>{t.desc}</span>
             {property === t.id && (
-              <span className={styles.propertyCheckmark}>✓</span>
+              <span className={styles.propertyCheckmark}>
+                <CustomEmoji name="check" size={14} color="var(--color-primary)" />
+              </span>
             )}
           </button>
         ))}
@@ -225,7 +230,7 @@ export default function Estimator() {
   const renderParameters = () => (
     <div style={{ marginBottom: '32px' }}>
       <h3 className={styles.sectionTitle}>
-        <span>⚙️</span>
+        <CustomEmoji name="layers" size={20} />
         <span>2. System Parameters & Site Configuration</span>
       </h3>
 
@@ -233,8 +238,9 @@ export default function Estimator() {
         {/* Param Box 1: Location */}
         <div className={styles.paramBox}>
           <div>
-            <label htmlFor="address-input" className={styles.label}>
-              📍 Installation City / Region
+            <label htmlFor="address-input" className={styles.label} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <CustomEmoji name="pin" size={14} />
+              <span>Installation City / Region</span>
             </label>
             <input
               id="address-input"
@@ -277,7 +283,10 @@ export default function Estimator() {
         <div className={styles.paramBox}>
           <div>
             <div className={styles.rangeLabels}>
-              <label className={styles.label} style={{ margin: 0 }}>⏱️ Daily Backup Target</label>
+              <label className={styles.label} style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <CustomEmoji name="clock" size={15} />
+                <span>Daily Backup Target</span>
+              </label>
               <span className={styles.rangeValue}>{hours} Hours / Day</span>
             </div>
             <input
@@ -312,8 +321,9 @@ export default function Estimator() {
 
         {/* Param Box 3: Battery Storage Technology */}
         <div className={styles.paramBox}>
-          <label className={styles.label} style={{ marginBottom: '10px' }}>
-            🔋 Storage Technology
+          <label className={styles.label} style={{ marginBottom: '10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <CustomEmoji name="battery" size={15} />
+            <span>Storage Technology</span>
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', height: '100%' }}>
             <button
@@ -374,7 +384,7 @@ export default function Estimator() {
     <div style={{ marginBottom: '32px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
         <h3 className={styles.sectionTitle} style={{ margin: 0 }}>
-          <span>⚡</span>
+          <CustomEmoji name="bolt" size={18} />
           <span>{isMobile ? `Appliance Energy Audit (${appliances.length} Items)` : `3. Appliance Energy Audit (${appliances.length} Items)`}</span>
         </h3>
       </div>
@@ -389,7 +399,9 @@ export default function Estimator() {
             {/* Header Row: Icon + Name + Mobile Delete */}
             <div className={styles.applianceHeader}>
               <div className={styles.applianceNameWrap}>
-                <span className={styles.applianceIcon}>🔌</span>
+                <span className={styles.applianceIcon}>
+                  <CustomEmoji name="plug" size={16} />
+                </span>
                 <input
                   className={styles.applianceNameInput}
                   placeholder="Appliance name"
@@ -544,7 +556,7 @@ export default function Estimator() {
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >
                 <span>{loading ? "Analyzing Energy Profile..." : "Calculate Solar Blueprint"}</span>
-                <span>🚀</span>
+                <CustomEmoji name="rocket" size={20} color="#000" />
               </button>
             </div>
 
@@ -632,7 +644,7 @@ export default function Estimator() {
                     className={styles.nextBtn}
                   >
                     <span>Continue to Energy Audit</span>
-                    <span>→</span>
+                    <CustomEmoji name="arrow-right" size={16} />
                   </button>
                 </div>
               </div>
@@ -648,8 +660,10 @@ export default function Estimator() {
                     type="button" 
                     onClick={() => goToStep(1)}
                     className={styles.backBtn}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                   >
-                    ← Back to Site
+                    <CustomEmoji name="arrow-left" size={16} />
+                    <span>Back to Site</span>
                   </button>
 
                   <button 
@@ -659,7 +673,7 @@ export default function Estimator() {
                     className={styles.nextBtn}
                   >
                     <span>{loading ? "Analyzing Energy..." : "Calculate Blueprint"}</span>
-                    <span>🚀</span>
+                    <CustomEmoji name="rocket" size={16} />
                   </button>
                 </div>
               </div>
@@ -694,7 +708,7 @@ export default function Estimator() {
                         gap: '6px'
                       }}
                     >
-                      <span>←</span>
+                      <CustomEmoji name="arrow-left" size={14} />
                       <span>Edit Loads ({appliances.length})</span>
                     </button>
 
@@ -716,7 +730,7 @@ export default function Estimator() {
                         gap: '6px'
                       }}
                     >
-                      <span>⚡</span>
+                      <CustomEmoji name="bolt" size={14} />
                       <span>Recalculate</span>
                     </button>
                   </div>
@@ -737,7 +751,9 @@ export default function Estimator() {
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     marginTop: '12px'
                   }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '12px' }}>☀️</div>
+                    <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
+                      <CustomEmoji name="sun" size={48} color="var(--color-primary)" />
+                    </div>
                     <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '8px' }}>
                       Ready to Generate Your Solar Blueprint?
                     </h3>
@@ -751,7 +767,7 @@ export default function Estimator() {
                       style={{ maxWidth: '280px', margin: '0 auto', display: 'flex', justifyContent: 'center', width: '100%' }}
                     >
                       <span>Calculate Solar Blueprint</span>
-                      <span>🚀</span>
+                      <CustomEmoji name="rocket" size={16} />
                     </button>
                   </div>
                 )}
@@ -773,10 +789,15 @@ export default function Estimator() {
               <span className="mobile-live-label">
                 {currentStep === 1 ? 'Current Load' : currentStep === 2 ? `${appliances.length} Appliances` : 'Turnkey Investment'}
               </span>
-              <span className="mobile-live-val">
-                {currentStep === 3 && result?.estimatedPriceNaira 
-                  ? `₦${(result.estimatedPriceNaira || 0).toLocaleString()}`
-                  : `⚡ ${totalSteadyWatts.toLocaleString()}W • ${dailyEnergyKwh} kWh/d`}
+              <span className="mobile-live-val" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                {currentStep === 3 && result?.estimatedPriceNaira ? (
+                  `₦${(result.estimatedPriceNaira || 0).toLocaleString()}`
+                ) : (
+                  <>
+                    <CustomEmoji name="bolt" size={12} />
+                    <span>{totalSteadyWatts.toLocaleString()}W • {dailyEnergyKwh} kWh/d</span>
+                  </>
+                )}
               </span>
             </div>
 
@@ -787,7 +808,7 @@ export default function Estimator() {
                 className="mobile-action-btn"
               >
                 <span>Audit Items ({appliances.length})</span>
-                <span>→</span>
+                <CustomEmoji name="arrow-right" size={14} />
               </button>
             )}
 
@@ -799,7 +820,7 @@ export default function Estimator() {
                 className="mobile-action-btn"
               >
                 <span>{loading ? 'Analyzing...' : 'Calculate Blueprint'}</span>
-                <span>🚀</span>
+                <CustomEmoji name="rocket" size={15} />
               </button>
             )}
 
@@ -816,7 +837,7 @@ export default function Estimator() {
                 style={{ background: '#25D366', color: '#fff' }}
               >
                 <span>Share Quote</span>
-                <span>💬</span>
+                <CustomEmoji name="whatsapp" size={15} color="#fff" />
               </button>
             )}
           </div>
@@ -828,7 +849,9 @@ export default function Estimator() {
               onClick={() => goToStep(1)}
               className={`mobile-tab-btn ${currentStep === 1 ? 'active' : ''}`}
             >
-              <span className="mobile-tab-icon">📍</span>
+              <span className="mobile-tab-icon">
+                <CustomEmoji name="pin" size={18} />
+              </span>
               <span>Site</span>
             </button>
 
@@ -837,7 +860,9 @@ export default function Estimator() {
               onClick={() => goToStep(2)}
               className={`mobile-tab-btn ${currentStep === 2 ? 'active' : ''}`}
             >
-              <span className="mobile-tab-icon">⚡</span>
+              <span className="mobile-tab-icon">
+                <CustomEmoji name="bolt" size={18} />
+              </span>
               <span>Audit</span>
               <span className="mobile-tab-badge">{appliances.length}</span>
             </button>
@@ -850,7 +875,9 @@ export default function Estimator() {
               }}
               className={`mobile-tab-btn ${currentStep === 3 ? 'active' : ''}`}
             >
-              <span className="mobile-tab-icon">📊</span>
+              <span className="mobile-tab-icon">
+                <CustomEmoji name="chart" size={18} />
+              </span>
               <span>Blueprint</span>
             </button>
           </div>

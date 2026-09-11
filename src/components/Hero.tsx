@@ -1,3 +1,5 @@
+import CustomEmoji from './CustomEmoji';
+
 export default function Hero({ onBegin }: { onBegin: () => void }) {
   return (
     <section className="glass-panel p-responsive" style={{ 
@@ -40,7 +42,7 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
               boxSizing: 'border-box'
             }}
           >
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-primary)', display: 'inline-block', flexShrink: 0 }}></span>
+            <CustomEmoji name="sun" size={13} />
             <span>NIGERIAN IRRADIANCE SIZING ENGINE</span>
           </span>
         </div>
@@ -88,9 +90,13 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
             borderRadius: '100px',
             background: 'rgba(255,255,255,0.04)',
             border: '1px solid rgba(255,255,255,0.08)',
-            color: '#cbd5e1'
+            color: '#cbd5e1',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px'
           }}>
-            📍 17+ Nigerian Cities
+            <CustomEmoji name="pin" size={13} />
+            <span>17+ Nigerian Cities</span>
           </span>
           <span style={{
             fontSize: '0.74rem',
@@ -99,9 +105,13 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
             borderRadius: '100px',
             background: 'rgba(255,255,255,0.04)',
             border: '1px solid rgba(255,255,255,0.08)',
-            color: '#cbd5e1'
+            color: '#cbd5e1',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px'
           }}>
-            🔋 LiFePO4 & Tubular
+            <CustomEmoji name="battery" size={13} />
+            <span>LiFePO4 & Tubular</span>
           </span>
           <span style={{
             fontSize: '0.74rem',
@@ -110,9 +120,13 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
             borderRadius: '100px',
             background: 'rgba(255,255,255,0.04)',
             border: '1px solid rgba(255,255,255,0.08)',
-            color: '#cbd5e1'
+            color: '#cbd5e1',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px'
           }}>
-            📄 Instant PDF & WhatsApp
+            <CustomEmoji name="document" size={13} />
+            <span>Instant PDF & WhatsApp</span>
           </span>
         </div>
         
@@ -138,7 +152,7 @@ export default function Hero({ onBegin }: { onBegin: () => void }) {
             boxSizing: 'border-box'
           }}
         >
-          <span>⚡</span>
+          <CustomEmoji name="bolt" size={18} color="#000" />
           <span>Begin Sizing Assessment</span>
         </button>
       </div>

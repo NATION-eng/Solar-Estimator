@@ -1,4 +1,5 @@
 import type { EnvironmentalImpact } from '../types';
+import CustomEmoji from './CustomEmoji';
 
 interface EnvironmentalImpactProps {
   impact: EnvironmentalImpact;
@@ -19,7 +20,7 @@ export default function EnvironmentalImpactCard({ impact }: EnvironmentalImpactP
         gap: '12px',
         marginBottom: '16px',
       }}>
-        <span style={{ fontSize: '1.8rem' }}>🌍</span>
+        <CustomEmoji name="globe" size={24} />
         <h4 style={{
           color: 'var(--color-success)',
           fontSize: '1.05rem',
@@ -53,7 +54,9 @@ export default function EnvironmentalImpactCard({ impact }: EnvironmentalImpactP
           textAlign: 'center',
           border: '1px solid rgba(16, 185, 129, 0.15)',
         }}>
-          <div style={{ fontSize: '1.6rem', marginBottom: '6px' }}>💨</div>
+          <div style={{ marginBottom: '6px' }}>
+            <CustomEmoji name="wind" size={26} color="#38bdf8" />
+          </div>
           <div style={{
             fontSize: 'clamp(1.1rem, 4vw, 1.8rem)',
             fontWeight: 700,
@@ -77,7 +80,9 @@ export default function EnvironmentalImpactCard({ impact }: EnvironmentalImpactP
           textAlign: 'center',
           border: '1px solid rgba(16, 185, 129, 0.15)',
         }}>
-          <div style={{ fontSize: '1.6rem', marginBottom: '6px' }}>🌳</div>
+          <div style={{ marginBottom: '6px' }}>
+            <CustomEmoji name="tree" size={26} color="#10b981" />
+          </div>
           <div style={{
             fontSize: 'clamp(1.1rem, 4vw, 1.8rem)',
             fontWeight: 700,
@@ -101,7 +106,9 @@ export default function EnvironmentalImpactCard({ impact }: EnvironmentalImpactP
           textAlign: 'center',
           border: '1px solid rgba(16, 185, 129, 0.15)',
         }}>
-          <div style={{ fontSize: '1.6rem', marginBottom: '6px' }}>⛏️</div>
+          <div style={{ marginBottom: '6px' }}>
+            <CustomEmoji name="coal" size={26} color="#fbbf24" />
+          </div>
           <div style={{
             fontSize: 'clamp(1.1rem, 4vw, 1.8rem)',
             fontWeight: 700,
@@ -150,9 +157,15 @@ export default function EnvironmentalImpactCard({ impact }: EnvironmentalImpactP
         borderRadius: '4px',
         fontSize: '0.85rem',
         color: 'var(--color-text-muted)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
       }}>
-        <strong style={{ color: 'var(--color-accent)' }}>💡 Did you know?</strong> Your solar system's environmental 
-        impact is equivalent to taking {Math.round(impact.co2SavedAnnually / 4600)} car(s) off the road annually!
+        <CustomEmoji name="lightbulb" size={16} color="var(--color-accent)" />
+        <div>
+          <strong style={{ color: 'var(--color-accent)' }}>Did you know?</strong> Your solar system's environmental 
+          impact is equivalent to taking {Math.round(impact.co2SavedAnnually / 4600)} car(s) off the road annually!
+        </div>
       </div>
     </div>
   );

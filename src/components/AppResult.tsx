@@ -4,6 +4,7 @@ import type { EstimationResult } from '../types';
 import LoadProfileChart from './LoadProfileChart';
 import SavingsCalculator from './SavingsCalculator';
 import EnvironmentalImpactCard from './EnvironmentalImpactCard';
+import CustomEmoji from './CustomEmoji';
 import { calculateEnvironmentalImpact } from '../utils/helpers';
 
 type ResultProps = {
@@ -174,12 +175,12 @@ export default function AppResult({ data }: ResultProps) {
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               boxShadow: '0 0 15px var(--color-primary-glow)',
               minHeight: '44px'
             }}
           >
-            <span>📄</span>
+            <CustomEmoji name="document" size={17} color="#000" />
             <span>Download PDF Quote</span>
           </button>
 
@@ -196,17 +197,16 @@ export default function AppResult({ data }: ResultProps) {
               cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '6px',
+              gap: '8px',
               minHeight: '44px'
             }}
           >
-            <span>💬</span>
+            <CustomEmoji name="whatsapp" size={17} color="#fff" />
             <span>Share via WhatsApp</span>
           </button>
         </div>
       </div>
 
-      {/* Core Hardware Cards */}
       {/* Core Hardware Cards */}
       <div className="grid-responsive" style={{ marginBottom: '28px' }}>
         {/* Inverter Card */}
@@ -223,8 +223,14 @@ export default function AppResult({ data }: ResultProps) {
               fontWeight: 700, 
               letterSpacing: '0.1em',
               color: 'var(--color-accent)',
-              marginBottom: '6px'
-            }}>⚡ System Core</p>
+              marginBottom: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <CustomEmoji name="bolt" size={14} color="var(--color-accent)" />
+              <span>System Core</span>
+            </p>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.3rem, 4.5vw, 1.9rem)', fontWeight: 800 }}>
               {data.systemVoltage}V / {((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA
             </h3>
@@ -247,8 +253,14 @@ export default function AppResult({ data }: ResultProps) {
               fontWeight: 700, 
               letterSpacing: '0.1em',
               color: 'var(--color-success)',
-              marginBottom: '6px'
-            }}>🔋 Storage Bank</p>
+              marginBottom: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <CustomEmoji name="battery" size={14} color="var(--color-success)" />
+              <span>Storage Bank</span>
+            </p>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.3rem, 4.5vw, 1.9rem)', fontWeight: 800 }}>
               {data.batteryAh} Ah
             </h3>
@@ -271,8 +283,14 @@ export default function AppResult({ data }: ResultProps) {
               fontWeight: 700, 
               letterSpacing: '0.1em',
               color: 'var(--color-primary)',
-              marginBottom: '6px'
-            }}>☀️ Energy Harvester</p>
+              marginBottom: '6px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <CustomEmoji name="sun" size={14} color="var(--color-primary)" />
+              <span>Energy Harvester</span>
+            </p>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.3rem, 4.5vw, 1.9rem)', fontWeight: 800 }}>
               {data.panelQuantity} Panels
             </h3>
@@ -399,7 +417,7 @@ export default function AppResult({ data }: ResultProps) {
             alignItems: 'center',
             gap: '8px'
           }}>
-            <span style={{ fontSize: '1.2rem' }}>📍</span>
+            <CustomEmoji name="pin" size={16} />
             <span>Tailored installation region: <strong style={{ color: 'var(--color-text-main)' }}>{data.location.address}</strong></span>
           </div>
         )}
@@ -425,12 +443,12 @@ export default function AppResult({ data }: ResultProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
+              gap: '10px',
               flex: '1 1 260px',
               minHeight: '52px'
             }}
           >
-            <span>📄</span>
+            <CustomEmoji name="document" size={20} color="#000" />
             <span>Download Quotation PDF</span>
           </button>
 
@@ -447,13 +465,13 @@ export default function AppResult({ data }: ResultProps) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
+              gap: '10px',
               cursor: 'pointer',
               flex: '1 1 220px',
               minHeight: '52px'
             }}
           >
-            <span>💬</span>
+            <CustomEmoji name="whatsapp" size={20} color="#fff" />
             <span>Share via WhatsApp</span>
           </button>
         </div>

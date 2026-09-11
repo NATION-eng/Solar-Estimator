@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { APPLIANCE_DATABASE, CATEGORIES, searchAppliances, type ApplianceSpec } from '../data/applianceDatabase';
 import type { Appliance } from '../types';
+import CustomEmoji from './CustomEmoji';
 
 interface ApplianceSelectorProps {
   onAdd: (appliance: Appliance) => void;
@@ -123,18 +124,21 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                 flexShrink: 0
               }}
             >
-              <span>{cat.icon}</span>
+              <CustomEmoji name={cat.icon} size={15} color={selectedCategory === key ? '#000' : cat.color} />
               <span>{cat.label}</span>
             </button>
           ))}
         </div>
         
         {/* Search Input */}
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+          <div style={{ position: 'absolute', left: '14px', pointerEvents: 'none', display: 'flex', alignItems: 'center' }}>
+            <CustomEmoji name="search" size={16} color="var(--color-text-muted)" />
+          </div>
           <input
             ref={inputRef}
             type="text"
-            placeholder="🔍 Search appliances... (e.g., 'LED', 'fridge', 'laptop')"
+            placeholder="Search appliances... (e.g. 'LED', 'fridge', 'laptop')"
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -153,11 +157,12 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
               background: 'rgba(255,255,255,0.05)',
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: '8px',
-              padding: '12px 16px',
+              padding: '12px 16px 12px 40px',
               color: '#fff',
               fontSize: '1rem',
               outline: 'none',
               transition: 'all 0.2s',
+              boxSizing: 'border-box'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
@@ -223,7 +228,7 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                           gap: '8px',
                           marginBottom: '4px',
                         }}>
-                          {spec.icon && <span style={{ fontSize: '1.2rem' }}>{spec.icon}</span>}
+                          <CustomEmoji name={spec.icon || 'plug'} size={18} />
                           <span style={{ fontWeight: 600, fontSize: '0.95rem' }}>
                             {spec.name}
                           </span>
@@ -231,6 +236,7 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                         
                         <div style={{ 
                           display: 'flex', 
+                          alignItems: 'center',
                           gap: '12px', 
                           fontSize: '0.75rem',
                           color: 'var(--color-text-muted)',
@@ -238,8 +244,12 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                           <span style={{ color: catColor, fontWeight: 500 }}>
                             {CATEGORIES[spec.category as keyof typeof CATEGORIES]?.label}
                           </span>
-                          <span>⚡ {spec.wattage}W</span>
-                          <span>⏱️ {spec.typicalHours}h/day</span>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <CustomEmoji name="bolt" size={12} /> {spec.wattage}W
+                          </span>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <CustomEmoji name="clock" size={12} /> {spec.typicalHours}h/day
+                          </span>
                         </div>
                         
                         {spec.description && (
@@ -293,7 +303,7 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
         alignItems: 'center',
         gap: '6px',
       }}>
-        <span>💡</span>
+        <CustomEmoji name="lightbulb" size={15} color="var(--color-primary)" />
         <span>
           Browse by category or search by name. Can't find an appliance? Add it manually below.
         </span>

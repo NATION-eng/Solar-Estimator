@@ -1,3 +1,6 @@
+import React from 'react';
+import CustomEmoji from './CustomEmoji';
+
 export interface ValidationErrorProps {
   message: string;
   onDismiss?: () => void;
@@ -22,7 +25,7 @@ export function ValidationError({ message, onDismiss }: ValidationErrorProps) {
         animation: 'slideIn 0.2s ease-out'
       }}
     >
-      <span style={{ fontSize: '1rem' }}>⚠️</span>
+      <CustomEmoji name="alert" size={16} color="#ef4444" />
       <span style={{ flex: 1 }}>{message}</span>
       {onDismiss && (
         <button

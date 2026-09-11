@@ -11,7 +11,7 @@ import type { PropertyType } from "../types";
 import styles from "./Estimator.module.css";
 
 export default function Estimator() {
-  // Check if viewport is mobile or desktop/tablet wide screen
+  // Check if viewport is mobile or desktop/tablet
   const isMobile = useMediaQuery('(max-width: 900px)');
 
   // Stepper state for mobile wizard (1: Location & Site, 2: Energy Audit, 3: Blueprint)
@@ -192,12 +192,15 @@ export default function Estimator() {
     topContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   };
 
-  /* ================= SUB-RENDERERS (REUSABLE ACROSS DESKTOP & MOBILE) ================= */
+  /* ================= REUSABLE RENDER SECTIONS ================= */
 
-  // 1. Site & Location Parameters Section
-  const renderSiteSetupSection = () => (
-    <div>
-      {/* Property Tiles */}
+  // Section 1: Property Types Selection
+  const renderPropertyGrid = () => (
+    <div style={{ marginBottom: '28px' }}>
+      <h3 className={styles.sectionTitle}>
+        <span>🏠</span>
+        <span>1. Select Property Type</span>
+      </h3>
       <div className={styles.propertyGrid}>
         {types.map((t) => (
           <button
@@ -215,135 +218,167 @@ export default function Estimator() {
           </button>
         ))}
       </div>
+    </div>
+  );
 
-      {/* Location Input & City Chips */}
-      <div className={styles.fieldGroup}>
-        <label htmlFor="address-input" className={styles.label}>
-          Installation Location in Nigeria
-        </label>
-        <input
-          id="address-input"
-          type="text"
-          placeholder="Enter city or address (e.g. Lagos, Abuja, Port Harcourt)"
-          value={address}
-          onChange={(e) => {
-            setAddress(e.target.value);
-            if (errors.address) clearError('address');
-          }}
-          className={`${styles.inputField} ${errors.address ? styles.inputFieldError : ''}`}
-        />
-        {errors.address && (
-          <div style={{ marginTop: '8px' }}>
-            <ValidationError message={errors.address} onDismiss={() => clearError('address')} />
-          </div>
-        )}
+  // Section 2: Location, Hours & Battery Parameters
+  const renderParameters = () => (
+    <div style={{ marginBottom: '32px' }}>
+      <h3 className={styles.sectionTitle}>
+        <span>⚙️</span>
+        <span>2. System Parameters & Site Configuration</span>
+      </h3>
 
-        {/* Quick City Presets */}
-        <div className={styles.presetChipsRow}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', alignSelf: 'center' }}>Popular:</span>
-          {['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano', 'Enugu', 'Benin'].map((city) => (
-            <button
-              key={city}
-              type="button"
-              onClick={() => {
-                setAddress(city);
+      <div className={styles.paramsGrid}>
+        {/* Param Box 1: Location */}
+        <div className={styles.paramBox}>
+          <div>
+            <label htmlFor="address-input" className={styles.label}>
+              📍 Installation City / Region
+            </label>
+            <input
+              id="address-input"
+              type="text"
+              placeholder="e.g. Lagos, Abuja, Port Harcourt"
+              value={address}
+              onChange={(e) => {
+                setAddress(e.target.value);
                 if (errors.address) clearError('address');
               }}
-              className={`${styles.presetChip} ${address === city ? styles.presetChipActive : ''}`}
-            >
-              {city}
-            </button>
-          ))}
-        </div>
-      </div>
+              className={`${styles.inputField} ${errors.address ? styles.inputFieldError : ''}`}
+            />
+            {errors.address && (
+              <div style={{ marginTop: '8px' }}>
+                <ValidationError message={errors.address} onDismiss={() => clearError('address')} />
+              </div>
+            )}
+          </div>
 
-      {/* Hours Slider & Presets */}
-      <div className={styles.rangeContainer}>
-        <div className={styles.rangeLabels}>
-          <label className={styles.label} style={{ margin: 0 }}>Daily Target Backup</label>
-          <span className={styles.rangeValue}>{hours} Hours / Day</span>
+          {/* Quick City Presets */}
+          <div className={styles.presetChipsRow} style={{ marginTop: '12px' }}>
+            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', alignSelf: 'center' }}>Popular:</span>
+            {['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano', 'Enugu', 'Benin'].map((city) => (
+              <button
+                key={city}
+                type="button"
+                onClick={() => {
+                  setAddress(city);
+                  if (errors.address) clearError('address');
+                }}
+                className={`${styles.presetChip} ${address === city ? styles.presetChipActive : ''}`}
+              >
+                {city}
+              </button>
+            ))}
+          </div>
         </div>
-        <input
-          type="range"
-          min="1"
-          max="24"
-          value={hours}
-          onChange={(e) => setHours(Number(e.target.value))}
-          className={styles.rangeSlider}
-        />
-        <div className={styles.presetChipsRow}>
-          {[
-            { label: '4h (Night)', val: 4 },
-            { label: '8h (Business)', val: 8 },
-            { label: '12h (Extended)', val: 12 },
-            { label: '18h (Heavy)', val: 18 },
-            { label: '24h (Off-Grid)', val: 24 }
-          ].map((p) => (
+
+        {/* Param Box 2: Target Backup Hours */}
+        <div className={styles.paramBox}>
+          <div>
+            <div className={styles.rangeLabels}>
+              <label className={styles.label} style={{ margin: 0 }}>⏱️ Daily Backup Target</label>
+              <span className={styles.rangeValue}>{hours} Hours / Day</span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="24"
+              value={hours}
+              onChange={(e) => setHours(Number(e.target.value))}
+              className={styles.rangeSlider}
+            />
+          </div>
+
+          <div className={styles.presetChipsRow} style={{ marginTop: '12px' }}>
+            {[
+              { label: '4h Night', val: 4 },
+              { label: '8h Business', val: 8 },
+              { label: '12h Extended', val: 12 },
+              { label: '18h Heavy', val: 18 },
+              { label: '24h Off-Grid', val: 24 }
+            ].map((p) => (
+              <button
+                key={p.val}
+                type="button"
+                onClick={() => setHours(p.val)}
+                className={`${styles.presetChip} ${hours === p.val ? styles.presetChipActive : ''}`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Param Box 3: Battery Storage Technology */}
+        <div className={styles.paramBox}>
+          <label className={styles.label} style={{ marginBottom: '10px' }}>
+            🔋 Storage Technology
+          </label>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', height: '100%' }}>
             <button
-              key={p.val}
               type="button"
-              onClick={() => setHours(p.val)}
-              className={`${styles.presetChip} ${hours === p.val ? styles.presetChipActive : ''}`}
+              onClick={() => setBatteryType('lithium')}
+              style={{
+                padding: '12px 10px',
+                borderRadius: 'var(--radius-sm)',
+                border: batteryType === 'lithium' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
+                background: batteryType === 'lithium' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(0,0,0,0.2)',
+                textAlign: 'left',
+                cursor: 'pointer',
+                color: '#fff',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+              }}
             >
-              {p.label}
+              <div style={{ fontWeight: 800, fontSize: '0.85rem', color: batteryType === 'lithium' ? 'var(--color-primary)' : 'inherit' }}>
+                Lithium LiFePO4
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                80% DOD • 10-15yr
+              </div>
             </button>
-          ))}
-        </div>
-      </div>
 
-      {/* Battery Chemistry */}
-      <div style={{ marginBottom: '20px' }}>
-        <label className={styles.label}>Storage Technology</label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-          <button
-            type="button"
-            onClick={() => setBatteryType('lithium')}
-            style={{
-              padding: '14px 12px',
-              borderRadius: 'var(--radius-sm)',
-              border: batteryType === 'lithium' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
-              background: batteryType === 'lithium' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(0,0,0,0.2)',
-              textAlign: 'left',
-              cursor: 'pointer',
-              color: '#fff'
-            }}
-          >
-            <div style={{ fontWeight: 800, fontSize: '0.9rem', color: batteryType === 'lithium' ? 'var(--color-primary)' : 'inherit' }}>
-              🔋 Lithium LiFePO4
-            </div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-              80% DOD • 10-15yr lifespan
-            </div>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setBatteryType('tubular')}
-            style={{
-              padding: '14px 12px',
-              borderRadius: 'var(--radius-sm)',
-              border: batteryType === 'tubular' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
-              background: batteryType === 'tubular' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(0,0,0,0.2)',
-              textAlign: 'left',
-              cursor: 'pointer',
-              color: '#fff'
-            }}
-          >
-            <div style={{ fontWeight: 800, fontSize: '0.9rem', color: batteryType === 'tubular' ? 'var(--color-primary)' : 'inherit' }}>
-              ⚡ Deep Cycle Tubular
-            </div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-              50% DOD • Cost-effective
-            </div>
-          </button>
+            <button
+              type="button"
+              onClick={() => setBatteryType('tubular')}
+              style={{
+                padding: '12px 10px',
+                borderRadius: 'var(--radius-sm)',
+                border: batteryType === 'tubular' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
+                background: batteryType === 'tubular' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(0,0,0,0.2)',
+                textAlign: 'left',
+                cursor: 'pointer',
+                color: '#fff',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+              }}
+            >
+              <div style={{ fontWeight: 800, fontSize: '0.85rem', color: batteryType === 'tubular' ? 'var(--color-primary)' : 'inherit' }}>
+                Deep Cycle Tubular
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                50% DOD • Economical
+              </div>
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 
-  // 2. Appliances & Energy Audit Section
-  const renderApplianceSection = () => (
-    <div>
+  // Section 3: Appliance Energy Audit Manager
+  const renderAppliances = () => (
+    <div style={{ marginBottom: '32px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+        <h3 className={styles.sectionTitle} style={{ margin: 0 }}>
+          <span>⚡</span>
+          <span>3. Appliance Energy Audit ({appliances.length} Items)</span>
+        </h3>
+      </div>
+
       {/* Quick Catalog Selector */}
       <ApplianceSelector onAdd={addAppliance} />
 
@@ -351,26 +386,19 @@ export default function Estimator() {
       <div className={styles.applianceList}>
         {appliances.map((app, index) => (
           <div key={index} className={styles.applianceCard}>
-            {/* Top Row: Name and Delete */}
-            <div className={styles.applianceCardTop}>
+            {/* Left: Appliance Name */}
+            <div className={styles.applianceCardLeft}>
+              <span style={{ fontSize: '1.1rem' }}>🔌</span>
               <input
                 className={styles.applianceNameInput}
                 placeholder="Appliance name"
                 value={app.name}
                 onChange={(e) => updateAppliance(index, 'name', e.target.value)}
               />
-              <button
-                type="button"
-                onClick={() => removeAppliance(index)}
-                className={styles.deleteBtn}
-                aria-label="Remove appliance"
-              >
-                ×
-              </button>
             </div>
 
-            {/* Bottom Row: Wattage Pill + Touch Stepper Quantity */}
-            <div className={styles.applianceCardBottom}>
+            {/* Right: Wattage, Quantity, Subtotal, Delete */}
+            <div className={styles.applianceCardRight}>
               <div className={styles.wattInputGroup}>
                 <input
                   type="number"
@@ -402,6 +430,19 @@ export default function Estimator() {
                   +
                 </button>
               </div>
+
+              <div style={{ minWidth: '70px', textAlign: 'right', fontWeight: 700, fontSize: '0.88rem', color: 'var(--color-accent)' }}>
+                {(app.watt * app.quantity).toLocaleString()} W
+              </div>
+
+              <button
+                type="button"
+                onClick={() => removeAppliance(index)}
+                className={styles.deleteBtn}
+                aria-label="Remove appliance"
+              >
+                ×
+              </button>
             </div>
           </div>
         ))}
@@ -432,11 +473,11 @@ export default function Estimator() {
       <div className={styles.glassPanel}>
 
         {/* ========================================================================= */}
-        {/* DESKTOP / WIDE VIEW: Comprehensive 2-Column Solar Engineering Workstation */}
+        {/* DESKTOP / TABLET VIEW: Expansive High-End Dashboard Flow                  */}
         {/* ========================================================================= */}
         {!isMobile ? (
           <div>
-            {/* Live Load Status Bar */}
+            {/* Live Load Status HUD */}
             <div className={styles.liveLoadBar}>
               <div className={styles.liveLoadMetric}>
                 <span className={styles.liveLoadLabel}>Total Steady Load</span>
@@ -449,66 +490,56 @@ export default function Estimator() {
               </div>
 
               <div className={styles.liveLoadMetric} style={{ textAlign: 'right' }}>
-                <span className={styles.liveLoadLabel}>Daily Target Backup</span>
+                <span className={styles.liveLoadLabel}>Target Backup Hours</span>
                 <span className={styles.liveLoadValue}>{hours} Hours</span>
               </div>
             </div>
 
-            {/* 2-Column Grid */}
-            <div className={styles.desktopGrid}>
-              {/* Left Column: Property & Location Parameters */}
-              <div className={styles.desktopLeftCol}>
-                <div className={styles.desktopSectionTitle}>
-                  <span>📍</span>
-                  <span>1. Location & Property Infrastructure</span>
-                </div>
-                {renderSiteSetupSection()}
-              </div>
+            {/* 1. Property Type Grid */}
+            {renderPropertyGrid()}
 
-              {/* Right Column: Energy Audit & Appliances */}
-              <div className={styles.desktopRightCol}>
-                <div className={styles.desktopSectionTitle}>
-                  <span>⚡</span>
-                  <span>2. Energy Audit & Consumption Profile ({appliances.length})</span>
-                </div>
-                {renderApplianceSection()}
+            {/* 2. Parameters Grid (3 Columns) */}
+            {renderParameters()}
 
-                {/* Primary Desktop Action Button */}
-                <button
-                  type="button"
-                  onClick={handleEstimate}
-                  disabled={loading}
-                  style={{
-                    width: '100%',
-                    background: 'var(--color-primary)',
-                    color: '#000',
-                    border: 'none',
-                    padding: '16px 24px',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '1.05rem',
-                    fontWeight: 800,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '10px',
-                    boxShadow: 'var(--shadow-glow)',
-                    marginTop: '24px',
-                    minHeight: '52px',
-                    transition: 'all 0.25s ease'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.01)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                >
-                  <span>{loading ? "Analyzing Energy Needs..." : "Calculate Solar Blueprint"}</span>
-                  <span>🚀</span>
-                </button>
-              </div>
+            {/* 3. Appliance Energy Audit */}
+            {renderAppliances()}
+
+            {/* Primary Calculate Button */}
+            <div style={{ marginTop: '32px', textAlign: 'center' }}>
+              <button
+                type="button"
+                onClick={handleEstimate}
+                disabled={loading}
+                style={{
+                  width: '100%',
+                  maxWidth: '560px',
+                  background: 'var(--color-primary)',
+                  color: '#000',
+                  border: 'none',
+                  padding: '18px 36px',
+                  borderRadius: '100px',
+                  fontSize: '1.1rem',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  boxShadow: 'var(--shadow-glow)',
+                  minHeight: '56px',
+                  transition: 'all 0.25s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <span>{loading ? "Analyzing Energy Profile..." : "Calculate Solar Blueprint"}</span>
+                <span>🚀</span>
+              </button>
             </div>
 
-            {/* Desktop Blueprint Section (Renders smoothly below) */}
+            {/* Desktop Blueprint Section (Unfolds below) */}
             {(loading || result) && (
-              <div ref={resultsRef} style={{ marginTop: '48px', paddingTop: '36px', borderTop: '1px solid rgba(251, 191, 36, 0.25)' }}>
+              <div ref={resultsRef} style={{ marginTop: '54px', paddingTop: '40px', borderTop: '1px solid rgba(251, 191, 36, 0.25)' }}>
                 {loading && (
                   <div style={{ padding: '40px 0' }}>
                     <LoadingSpinner message="Calculating your exact solar and storage requirements..." />
@@ -561,7 +592,7 @@ export default function Estimator() {
             {/* Live Load Status Bar */}
             <div className={styles.liveLoadBar}>
               <div className={styles.liveLoadMetric}>
-                <span className={styles.liveLoadLabel}>Total Steady Load</span>
+                <span className={styles.liveLoadLabel}>Steady Load</span>
                 <span className={styles.liveLoadValue}>{totalSteadyWatts.toLocaleString()} W</span>
               </div>
 
@@ -571,21 +602,17 @@ export default function Estimator() {
               </div>
 
               <div className={styles.liveLoadMetric} style={{ textAlign: 'right' }}>
-                <span className={styles.liveLoadLabel}>Backup Hours</span>
+                <span className={styles.liveLoadLabel}>Backup</span>
                 <span className={styles.liveLoadValue}>{hours} hrs</span>
               </div>
             </div>
 
-            {/* Mobile Step 1: Property & Location */}
+            {/* Mobile Step 1: Site & Parameters */}
             {currentStep === 1 && (
               <div>
-                <h3 style={{ fontWeight: 800, fontSize: '1.25rem', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>📍</span>
-                  <span>Select Property & Target Location</span>
-                </h3>
-                {renderSiteSetupSection()}
+                {renderPropertyGrid()}
+                {renderParameters()}
 
-                {/* Step 1 Actions */}
                 <div className={styles.stepActions}>
                   <div></div>
                   <button 
@@ -603,22 +630,15 @@ export default function Estimator() {
             {/* Mobile Step 2: Energy Audit */}
             {currentStep === 2 && (
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <h3 style={{ fontWeight: 800, fontSize: '1.25rem', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span>⚡</span>
-                    <span>Energy Audit ({appliances.length} Appliances)</span>
-                  </h3>
-                </div>
-                {renderApplianceSection()}
+                {renderAppliances()}
 
-                {/* Step 2 Actions */}
                 <div className={styles.stepActions}>
                   <button 
                     type="button" 
                     onClick={() => goToStep(1)}
                     className={styles.backBtn}
                   >
-                    ← Back to Location
+                    ← Back to Site
                   </button>
 
                   <button 
@@ -627,14 +647,14 @@ export default function Estimator() {
                     disabled={loading}
                     className={styles.nextBtn}
                   >
-                    <span>{loading ? "Analyzing Energy Needs..." : "Calculate Solar Blueprint"}</span>
+                    <span>{loading ? "Analyzing Energy..." : "Calculate Blueprint"}</span>
                     <span>🚀</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Mobile Step 3: Results / Blueprint */}
+            {/* Mobile Step 3: Solar Blueprint */}
             {currentStep === 3 && (
               <div ref={resultsRef}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>

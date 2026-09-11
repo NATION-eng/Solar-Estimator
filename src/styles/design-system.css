@@ -290,17 +290,23 @@ button:active, .clickable:active {
   }
 
   .pwa-install-banner-wrapper {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
     bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+    max-width: 440px;
   }
 }
 
+/* Desktop default: Sleek toast in bottom-right corner, never blocks main CTA */
 .pwa-install-banner-wrapper {
   position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 24px;
+  right: 24px;
+  left: auto;
+  transform: none;
   width: calc(100% - 32px);
-  max-width: 480px;
+  max-width: 380px;
   z-index: 9999;
 }
 

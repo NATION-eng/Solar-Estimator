@@ -1,9 +1,16 @@
 import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 import { db } from "./database.js";
 import { solarService } from "./services/solarService.js";
 import { energyModel } from "./services/energyModel_enhanced.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, "../dist");
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -126,6 +133,14 @@ app.post("/estimate", async (req, res) => {
 
 /* ================= START SERVER ================= */
 app.get("/health", (req, res) => res.json({ status: "ok", message: "Solar API is reaching the internet" }));
+
+// Serve frontend static build if dist exists
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+}
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Exquisite Solar API running on http://127.0.0.1:${PORT}`);

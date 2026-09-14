@@ -4,6 +4,44 @@ import type { Appliance, EstimationResult } from '../types';
 import { calculateEnvironmentalImpact, calculateCableSizing } from '../utils/helpers';
 
 /**
+ * Realistic duty cycle helper matching real home and commercial operation
+ */
+const getDutyCycle = (nameLower: string, appHours?: number, dailyHours: number = 8) => {
+  const rawHours = Number(appHours) || Number(dailyHours) || 8;
+  
+  if (nameLower.includes('ac') || nameLower.includes('air con') || nameLower.includes('conditioner')) {
+    const hours = Math.min(rawHours, 12);
+    return { hours, cycle: 0.55 };
+  }
+  if (nameLower.includes('fridge') || nameLower.includes('freezer') || nameLower.includes('refrigerator')) {
+    const hours = Math.max(rawHours, 24);
+    return { hours, cycle: 0.38 };
+  }
+  if (nameLower.includes('light') || nameLower.includes('lamp') || nameLower.includes('led') || nameLower.includes('bulb')) {
+    const hours = Math.min(rawHours, 8);
+    return { hours, cycle: 1.0 };
+  }
+  if (nameLower.includes('pump') || nameLower.includes('borehole')) {
+    const hours = Math.min(rawHours, 2);
+    return { hours, cycle: 1.0 };
+  }
+  if (nameLower.includes('fan')) {
+    const hours = Math.min(rawHours, 18);
+    return { hours, cycle: 1.0 };
+  }
+  if (nameLower.includes('tv') || nameLower.includes('television') || nameLower.includes('decoder')) {
+    const hours = Math.min(rawHours, 12);
+    return { hours, cycle: 0.9 };
+  }
+  if (nameLower.includes('iron') || nameLower.includes('kettle') || nameLower.includes('microwave') || nameLower.includes('cooker')) {
+    const hours = Math.min(rawHours, 1.5);
+    return { hours, cycle: 0.8 };
+  }
+  const hours = Math.min(rawHours, 24);
+  return { hours, cycle: 0.85 };
+};
+
+/**
  * Realistic offline fallback estimation when backend server is unavailable
  */
 const mockEstimate = (
@@ -15,61 +53,88 @@ const mockEstimate = (
 ): EstimationResult => {
   let totalSteadyWatts = 0;
   let maxSurgeWatts = 0;
+  let dailyEnergyWh = 0;
+  let hasHeavyLoadOrAC = false;
 
   appliances.forEach(app => {
     const steady = (Number(app.watt) || 0) * (Number(app.quantity) || 1);
     const nameLower = (app.name || '').toLowerCase();
     const isMotor = nameLower.includes('pump') || nameLower.includes('fan') || nameLower.includes('machine');
     const isCompressor = nameLower.includes('fridge') || nameLower.includes('ac') || nameLower.includes('freezer');
-    const factor = isMotor ? 4.5 : (isCompressor ? 3.0 : 1.2);
+    const factor = isMotor ? 4.0 : (isCompressor ? 3.5 : 1.2);
     const surge = steady * factor;
 
     totalSteadyWatts += steady;
     if (surge > maxSurgeWatts) maxSurgeWatts = surge;
+
+    const duty = getDutyCycle(nameLower, app.hours, hours);
+    if (nameLower.includes('ac') || nameLower.includes('air con') || app.watt >= 800) {
+      hasHeavyLoadOrAC = true;
+    }
+    dailyEnergyWh += (steady * duty.hours * duty.cycle);
   });
 
-  const dailyEnergyWh = totalSteadyWatts * hours;
-  
+  dailyEnergyWh = Math.round(dailyEnergyWh);
+
   // Standard inverter sizing
-  const rawInverter = Math.max(totalSteadyWatts * 1.25, maxSurgeWatts * 0.6);
-  const standardInverters = [1000, 1500, 2500, 3500, 5000, 7500, 10000, 15000];
+  let rawInverter = Math.max(totalSteadyWatts * 1.25, maxSurgeWatts * 0.55);
+  if (hasHeavyLoadOrAC && rawInverter < 3500) {
+    rawInverter = 3500;
+  }
+  const standardInverters = [1000, 1500, 2000, 2500, 3500, 5000, 7500, 10000, 15000];
   const recommendedInverterW = standardInverters.find(s => s >= rawInverter) || Math.ceil(rawInverter / 1000) * 1000;
 
-  // System Voltage
+  // System Voltage: Auto-select 48V for >= 3kVA or AC loads
   let systemVoltage = 12;
-  if (recommendedInverterW > 1500) systemVoltage = 24;
-  if (recommendedInverterW > 3500) systemVoltage = 48;
+  if (recommendedInverterW >= 1500 || dailyEnergyWh >= 4000) systemVoltage = 24;
+  if (recommendedInverterW >= 3000 || dailyEnergyWh >= 7500 || hasHeavyLoadOrAC) systemVoltage = 48;
 
-  // Solar Panels (450W Monocrystalline)
+  // Solar Panels (450W Monocrystalline Tier-1)
   const psh = 4.8;
   const panelWattage = 450;
-  const systemEfficiency = 0.78;
+  const systemEfficiency = 0.82;
   const requiredPanelWatts = dailyEnergyWh / (psh * systemEfficiency);
-  const panelQuantity = Math.max(2, Math.ceil(requiredPanelWatts / panelWattage));
+  let panelQuantity = Math.max(2, Math.ceil(requiredPanelWatts / panelWattage));
+  if (panelQuantity > 2 && panelQuantity % 2 !== 0) panelQuantity += 1; // Balance strings
 
   // Charge controller
   const chargeControllerAmps = Math.ceil(((panelQuantity * panelWattage) / systemVoltage) * 1.25);
 
-  // Battery bank (80% DOD for Lithium, 50% for tubular/gel)
-  const dod = batteryType === 'lithium' ? 0.8 : 0.5;
-  const batteryCapacityWh = Math.round((dailyEnergyWh * 1.2) / dod);
+  // Battery bank sizing (Daytime direct PV coverage ~35%, night/backup ~65%)
+  const dod = batteryType === 'lithium' ? 0.85 : 0.50;
+  const nightAndBackupEnergyWh = dailyEnergyWh * 0.65;
+  const batteryCapacityWh = Math.round(nightAndBackupEnergyWh / dod / 0.90);
   const batteryAh = Math.ceil(batteryCapacityWh / systemVoltage);
 
   // Electrical Cabling & BoS Sizing
   const cableSpec = calculateCableSizing(panelQuantity, panelWattage, distanceMeters, systemVoltage);
 
-  // 2026 Nigerian market pricing
-  const batteryCost = (batteryAh / 100) * (systemVoltage === 48 ? 1250000 : 480000);
-  const panelsCost = panelQuantity * 240000;
-  const inverterCost = recommendedInverterW * 520;
-  const controllerCost = chargeControllerAmps * 2400;
-  const cablingCost = cableSpec.bosBreakdown.solarCableMeters * 3200 + 45000;
-  const installationCost = (panelQuantity * 22000) + 180000;
+  // 2026 Nigerian market turnkey pricing
+  const batteryCapacityKwh = (batteryAh * systemVoltage) / 1000;
+  const batteryCost = batteryType === 'lithium' 
+    ? Math.round(batteryCapacityKwh * 290000) 
+    : Math.round(batteryCapacityKwh * 145000);
+  const panelsCost = panelQuantity * 140000;
+
+  let inverterCost = 450000;
+  if (recommendedInverterW <= 1200) inverterCost = 300000;
+  else if (recommendedInverterW <= 1800) inverterCost = 420000;
+  else if (recommendedInverterW <= 2600) inverterCost = 620000;
+  else if (recommendedInverterW <= 3800) inverterCost = 880000;
+  else if (recommendedInverterW <= 5500) inverterCost = 1250000;
+  else inverterCost = Math.round(recommendedInverterW * 240);
+
+  const controllerCost = recommendedInverterW >= 2500 ? 0 : Math.round(chargeControllerAmps * 1200);
+  const cablingCost = Math.round((cableSpec.bosBreakdown.solarCableMeters * 2800) + 160000);
+  const installationCost = Math.round((panelQuantity * 16000) + 180000);
+
   const estimatedPriceNaira = Math.round(batteryCost + panelsCost + inverterCost + controllerCost + cablingCost + installationCost);
 
   const gridTariff = 280; // NGN/kWh
   const annualGridCost = (dailyEnergyWh / 1000) * gridTariff * 365;
-  const paybackYears = parseFloat((estimatedPriceNaira / Math.max(annualGridCost, 1)).toFixed(1));
+  const annualMaintenanceCost = estimatedPriceNaira * 0.015;
+  const annualSavings = Math.max(annualGridCost - annualMaintenanceCost, 1);
+  const paybackYears = parseFloat((estimatedPriceNaira / annualSavings).toFixed(1));
 
   const environmental = calculateEnvironmentalImpact(dailyEnergyWh);
 

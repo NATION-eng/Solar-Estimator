@@ -116,9 +116,9 @@ export default function AppResult({ data }: ResultProps) {
       `*🌞 MasterviewCEL Solar Blueprint*`,
       `📍 Location: ${data.location?.address || 'Nigeria'}`,
       `⚡ Daily Energy: ${((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh/day`,
-      `🔌 Inverter: ${((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA Pure Sine`,
-      `🔋 Battery: ${data.batteryAh || 0} Ah @ ${data.systemVoltage || 24}V (${data.batteryType || 'Lithium'})`,
-      `☀️ Solar Array: ${data.panelQuantity || 0} x 450W Panels`,
+      `🔌 Inverter: ${((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA (${data.systemVoltage || 48}V Pure Sine)`,
+      `🔋 Battery: ${((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh (${data.batteryAh || 0} Ah @ ${data.systemVoltage || 48}V ${data.batteryType === 'lithium' ? 'Lithium' : 'Deep Cycle'})`,
+      `☀️ Solar Array: ${data.panelQuantity || 0} Panels (${((data.panelQuantity * (data.panelWattage || 450)) / 1000).toFixed(1)} kW)`,
       `📏 DC Cable: ${data.cableGaugeMm2 || 6}mm² PV Cable (${data.cableDistanceMeters || 20}m run, ${data.voltageDropPct || 1.8}% drop)`,
       `💰 Investment: ${formatCurrency(data.estimatedPriceNaira || 0)}`,
       `⏳ Payback: ${data.paybackYears ? `${data.paybackYears.toFixed(1)} Years` : '3.5 Years'}`,
@@ -230,17 +230,17 @@ export default function AppResult({ data }: ResultProps) {
               gap: '6px'
             }}>
               <CustomEmoji name="bolt" size={14} color="var(--color-accent)" />
-              <span>System Core</span>
+              <span>Inverter Capacity</span>
             </p>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.3rem, 4.5vw, 1.9rem)', fontWeight: 800 }}>
-              {data.systemVoltage}V / {((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA
+              {((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA
             </h3>
             <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-              Pure Sine Wave Inverter (Surge: {(data.maxSurgeWatts || 0).toLocaleString()}W)
+              {data.systemVoltage}V Pure Sine Wave (Surge: {(data.maxSurgeWatts || 0).toLocaleString()}W)
             </p>
           </div>
 
-          {/* Battery Card */}
+          {/* Battery Card - Highlight kWh for homeowners with Ah engineering detail */}
           <div style={{ 
             background: 'rgba(16, 185, 129, 0.08)', 
             padding: 'clamp(14px, 3.5vw, 22px)', 
@@ -260,13 +260,13 @@ export default function AppResult({ data }: ResultProps) {
               gap: '6px'
             }}>
               <CustomEmoji name="battery" size={14} color="var(--color-success)" />
-              <span>Storage Bank</span>
+              <span>Battery Storage</span>
             </p>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.3rem, 4.5vw, 1.9rem)', fontWeight: 800 }}>
-              {data.batteryAh} Ah
+              {((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh
             </h3>
             <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-              @ {data.systemVoltage}V ({((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh {data.batteryType === 'lithium' ? 'Lithium LiFePO4' : 'Deep Cycle'})
+              {data.batteryAh} Ah @ {data.systemVoltage}V ({data.batteryType === 'lithium' ? 'Lithium LiFePO4' : 'Deep Cycle Tubular'})
             </p>
           </div>
 
@@ -290,13 +290,13 @@ export default function AppResult({ data }: ResultProps) {
               gap: '6px'
             }}>
               <CustomEmoji name="sun" size={14} color="var(--color-primary)" />
-              <span>Energy Harvester</span>
+              <span>Solar Array</span>
             </p>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.3rem, 4.5vw, 1.9rem)', fontWeight: 800 }}>
               {data.panelQuantity} Panels
             </h3>
             <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-              450W Mono PV + {data.chargeControllerAmps}A MPPT Controller
+              {((data.panelQuantity * (data.panelWattage || 450)) / 1000).toFixed(2)} kW PV Array ({data.chargeControllerAmps}A MPPT)
             </p>
           </div>
         </div>
@@ -306,7 +306,7 @@ export default function AppResult({ data }: ResultProps) {
           background: 'rgba(0,0,0,0.3)', 
           padding: 'clamp(16px, 4vw, 24px)', 
           borderRadius: 'var(--radius-md)',
-          marginBottom: '24px',
+          marginBottom: '16px',
           border: '1px solid rgba(255,255,255,0.06)'
         }}>
           <h4 style={{ color: 'var(--color-primary)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '16px', letterSpacing: '0.1em' }}>
@@ -330,6 +330,25 @@ export default function AppResult({ data }: ResultProps) {
               <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{data.systemVoltage}V DC Pure Sine</span>
             </div>
           </div>
+        </div>
+
+        {/* Client-Friendly Smart Optimization Banner */}
+        <div style={{
+          background: 'rgba(251, 191, 36, 0.05)',
+          border: '1px solid rgba(251, 191, 36, 0.2)',
+          borderRadius: 'var(--radius-md)',
+          padding: '12px 16px',
+          marginBottom: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <div style={{ flexShrink: 0 }}>
+            <CustomEmoji name="bulb" size={20} color="var(--color-primary)" />
+          </div>
+          <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
+            <strong style={{ color: '#fff' }}>Smart Energy Optimization Applied:</strong> Sizing automatically factors in cooling thermostat cycles (for ACs and refrigerators) and nighttime lighting hours, ensuring you get guaranteed 24/7 power without overpaying for unnecessary hardware.
+          </p>
         </div>
 
         {/* Cable Sizing & Field Safety Card (Audio Feedback Implementation) */}

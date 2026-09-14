@@ -78,6 +78,87 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
   return (
     <div style={{ marginBottom: '24px' }}>
       <div style={{ marginBottom: '16px' }}>
+        {/* Room Presets Quick-Add Row (Client-Friendly 1-Tap Add) */}
+        <div style={{ marginBottom: '16px', background: 'rgba(255, 255, 255, 0.02)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+              <CustomEmoji name="sparkles" size={13} color="var(--color-primary)" />
+              <span>1-Tap Room Quick-Add</span>
+            </span>
+            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Tap to add common items</span>
+          </div>
+
+          <div className="scroll-touch-x" style={{ gap: '6px' }}>
+            {[
+              {
+                label: '🛋️ Living Room Pack',
+                icon: 'tv',
+                items: [
+                  { name: 'LED TV (43")', watt: 65, quantity: 1, hours: 6, category: 'entertainment' },
+                  { name: 'Standing Fan 16"', watt: 55, quantity: 2, hours: 8, category: 'cooling' },
+                  { name: 'LED Bulb (9W)', watt: 9, quantity: 4, hours: 6, category: 'lighting' },
+                  { name: 'Decoder / Soundbar', watt: 30, quantity: 1, hours: 6, category: 'entertainment' },
+                ]
+              },
+              {
+                label: '🍳 Kitchen Basics',
+                icon: 'utensils',
+                items: [
+                  { name: 'Small Refrigerator (Inverter)', watt: 120, quantity: 1, hours: 24, category: 'kitchen' },
+                  { name: 'Microwave Oven (800W)', watt: 800, quantity: 1, hours: 0.5, category: 'kitchen' },
+                  { name: 'Blender', watt: 350, quantity: 1, hours: 0.2, category: 'kitchen' },
+                ]
+              },
+              {
+                label: '❄️ Bedroom Comfort',
+                icon: 'cooling',
+                items: [
+                  { name: 'AC 1HP Inverter', watt: 746, quantity: 1, hours: 6, category: 'cooling' },
+                  { name: 'Ceiling Fan (Standard)', watt: 75, quantity: 1, hours: 8, category: 'cooling' },
+                  { name: 'Phone / Tablet Charger', watt: 18, quantity: 2, hours: 4, category: 'computing' },
+                ]
+              },
+              {
+                label: '💼 Home Office / Study',
+                icon: 'laptop',
+                items: [
+                  { name: 'Laptop Computer', watt: 65, quantity: 2, hours: 8, category: 'computing' },
+                  { name: 'WiFi Router', watt: 15, quantity: 1, hours: 24, category: 'computing' },
+                  { name: 'Desk Lamp LED', watt: 10, quantity: 1, hours: 5, category: 'lighting' },
+                ]
+              }
+            ].map((room) => (
+              <button
+                key={room.label}
+                type="button"
+                onClick={() => {
+                  room.items.forEach(item => onAdd(item));
+                }}
+                style={{
+                  padding: '6px 12px',
+                  background: 'rgba(251, 191, 36, 0.08)',
+                  border: '1px solid rgba(251, 191, 36, 0.25)',
+                  borderRadius: '100px',
+                  color: '#fff',
+                  fontSize: '0.76rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
+                }}
+                title={`Add ${room.items.length} appliances at once`}
+              >
+                <CustomEmoji name={room.icon} size={14} color="var(--color-primary)" />
+                <span>{room.label}</span>
+                <span style={{ fontSize: '0.68rem', opacity: 0.7 }}>+{room.items.length}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         <label style={{
           display: 'block',
           marginBottom: '8px',

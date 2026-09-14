@@ -23,6 +23,8 @@ export default function Estimator() {
   const [address, setAddress] = useState("Lagos");
   const [hours, setHours] = useState(8);
   const [batteryType, setBatteryType] = useState<'lithium' | 'gel' | 'tubular'>('lithium');
+  const [cableDistance, setCableDistance] = useState<number>(20);
+  const [isProMode, setIsProMode] = useState<boolean>(false);
   
   // Custom hooks
   const { errors, validateEstimation, clearError } = useFormValidation();
@@ -178,7 +180,7 @@ export default function Estimator() {
       return;
     }
 
-    await runEstimate(property, address, hours, appliances, batteryType);
+    await runEstimate(property, address, hours, appliances, batteryType, cableDistance);
     if (isMobile) {
       setCurrentStep(3);
     }
@@ -373,6 +375,70 @@ export default function Estimator() {
                 50% DOD • Economical
               </div>
             </button>
+          </div>
+        </div>
+
+        {/* Param Box 4: Roof-to-Inverter Cable Distance (Client-Friendly Building Visuals) */}
+        <div className={styles.paramBox}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <label className={styles.label} style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <CustomEmoji name="cable" size={15} color="var(--color-accent)" />
+              <span>Roof to Inverter Distance</span>
+            </label>
+            <span className={styles.rangeValue}>{cableDistance} Meters</span>
+          </div>
+
+          <p style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', marginBottom: '10px', lineHeight: 1.3 }}>
+            Tap your building height to calculate precise DC cable gauge and prevent power loss:
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '10px' }}>
+            {[
+              { label: 'Bungalow', sub: '1-Story (~15m)', val: 15, icon: 'home' },
+              { label: 'Duplex', sub: '2-Story (~25m)', val: 25, icon: 'office' },
+              { label: 'Detached', sub: '3-Story (~40m)', val: 40, icon: 'factory' },
+            ].map((preset) => (
+              <button
+                key={preset.val}
+                type="button"
+                onClick={() => setCableDistance(preset.val)}
+                style={{
+                  padding: '8px 6px',
+                  borderRadius: 'var(--radius-sm)',
+                  border: cableDistance === preset.val ? '2px solid var(--color-accent)' : '1px solid rgba(255,255,255,0.08)',
+                  background: cableDistance === preset.val ? 'rgba(56, 189, 248, 0.12)' : 'rgba(0,0,0,0.2)',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <span style={{ fontWeight: 700, fontSize: '0.78rem', color: cableDistance === preset.val ? 'var(--color-accent)' : '#fff' }}>
+                  {preset.label}
+                </span>
+                <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>
+                  {preset.sub}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <input
+              type="range"
+              min="5"
+              max="70"
+              step="5"
+              value={cableDistance}
+              onChange={(e) => setCableDistance(Number(e.target.value))}
+              className={styles.rangeSlider}
+            />
+            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+              Custom
+            </span>
           </div>
         </div>
       </div>
@@ -829,7 +895,7 @@ export default function Estimator() {
                 type="button"
                 onClick={() => {
                   if (result) {
-                    const summary = `*🌞 MasterviewCEL Solar Blueprint*\n📍 Location: ${result.location?.address || 'Nigeria'}\n⚡ Daily Energy: ${((result.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh/day\n🔌 Inverter: ${((result.recommendedInverterW || 0) / 1000).toFixed(1)} kVA\n🔋 Battery: ${result.batteryAh || 0} Ah\n☀️ Solar Array: ${result.panelQuantity || 0} Panels\n💰 Investment: ₦${(result.estimatedPriceNaira || 0).toLocaleString()}`;
+                    const summary = `*🌞 MasterviewCEL Solar Blueprint*\n📍 Location: ${result.location?.address || 'Nigeria'}\n⚡ Daily Energy: ${((result.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh/day\n🔌 Inverter: ${((result.recommendedInverterW || 0) / 1000).toFixed(1)} kVA\n🔋 Battery: ${result.batteryAh || 0} Ah\n☀️ Solar Array: ${result.panelQuantity || 0} Panels\n📏 DC Cable: ${result.cableGaugeMm2 || 6}mm² (${result.cableDistanceMeters || 20}m run, ${result.voltageDropPct || 1.8}% drop)\n💰 Investment: ₦${(result.estimatedPriceNaira || 0).toLocaleString()}`;
                     window.open(`https://wa.me/?text=${encodeURIComponent(summary)}`, '_blank');
                   }
                 }}

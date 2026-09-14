@@ -61,6 +61,19 @@ export interface EstimationResult {
     address: string;
     psh: number;
   };
+  cableDistanceMeters?: number;
+  cableGaugeMm2?: number;
+  voltageDropPct?: number;
+  pvArchitecture?: 'high-voltage' | 'low-voltage';
+  recommendedStringVoc?: number;
+  bosBreakdown?: {
+    solarCableMeters: number;
+    solarCableGauge: string;
+    batteryCableGauge: string;
+    dcBreakers: string;
+    acSurgeProtection: string;
+    dcSurgeProtection: string;
+  };
 }
 
 export interface PropertyType {

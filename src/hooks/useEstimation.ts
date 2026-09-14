@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { API_ENDPOINTS, apiClient } from '../config/api';
 import type { Appliance, EstimationResult } from '../types';
-import { calculateEnvironmentalImpact } from '../utils/helpers';
+import { calculateEnvironmentalImpact, calculateCableSizing } from '../utils/helpers';
 
 /**
  * Realistic offline fallback estimation when backend server is unavailable
@@ -10,7 +10,8 @@ const mockEstimate = (
   appliances: Appliance[], 
   hours: number, 
   address: string = 'Nigeria',
-  batteryType: 'lithium' | 'gel' | 'tubular' = 'lithium'
+  batteryType: 'lithium' | 'gel' | 'tubular' = 'lithium',
+  distanceMeters: number = 20
 ): EstimationResult => {
   let totalSteadyWatts = 0;
   let maxSurgeWatts = 0;
@@ -54,13 +55,17 @@ const mockEstimate = (
   const batteryCapacityWh = Math.round((dailyEnergyWh * 1.2) / dod);
   const batteryAh = Math.ceil(batteryCapacityWh / systemVoltage);
 
+  // Electrical Cabling & BoS Sizing
+  const cableSpec = calculateCableSizing(panelQuantity, panelWattage, distanceMeters, systemVoltage);
+
   // 2026 Nigerian market pricing
   const batteryCost = (batteryAh / 100) * (systemVoltage === 48 ? 1250000 : 480000);
   const panelsCost = panelQuantity * 240000;
   const inverterCost = recommendedInverterW * 520;
   const controllerCost = chargeControllerAmps * 2400;
+  const cablingCost = cableSpec.bosBreakdown.solarCableMeters * 3200 + 45000;
   const installationCost = (panelQuantity * 22000) + 180000;
-  const estimatedPriceNaira = Math.round(batteryCost + panelsCost + inverterCost + controllerCost + installationCost);
+  const estimatedPriceNaira = Math.round(batteryCost + panelsCost + inverterCost + controllerCost + cablingCost + installationCost);
 
   const gridTariff = 280; // NGN/kWh
   const annualGridCost = (dailyEnergyWh / 1000) * gridTariff * 365;
@@ -90,7 +95,13 @@ const mockEstimate = (
     },
     environmental,
     appliances,
-    dailyHours: hours
+    dailyHours: hours,
+    cableDistanceMeters: distanceMeters,
+    cableGaugeMm2: cableSpec.recommendedGaugeMm2,
+    voltageDropPct: cableSpec.voltageDropPct,
+    pvArchitecture: cableSpec.architecture,
+    recommendedStringVoc: cableSpec.recommendedStringVoc,
+    bosBreakdown: cableSpec.bosBreakdown
   };
 };
 
@@ -112,7 +123,8 @@ export function useEstimation() {
     address: string,
     hours: number,
     appliances: Appliance[],
-    batteryType: 'lithium' | 'gel' | 'tubular' = 'lithium'
+    batteryType: 'lithium' | 'gel' | 'tubular' = 'lithium',
+    distanceMeters: number = 20
   ) => {
     setLoading(true);
     setError(null);
@@ -123,6 +135,7 @@ export function useEstimation() {
         address: address,
         hours: Number(hours),
         batteryType,
+        distanceMeters: Number(distanceMeters) || 20,
         appliances: appliances.map((a) => ({
           name: a.name,
           watt: Number(a.watt),
@@ -141,12 +154,22 @@ export function useEstimation() {
         payload
       );
 
-      // Attach client-side appliances and hours so charts and models render properly
+      const panelQty = data.panelQuantity || Math.ceil((data.dailyEnergyWh || 5000) / (4.8 * 450 * 0.78));
+      const sysVolt = data.systemVoltage || 24;
+      const cableSpec = calculateCableSizing(panelQty, data.panelWattage || 450, distanceMeters, sysVolt);
+
+      // Attach client-side appliances, hours, cable specs so charts and models render properly
       const enrichedResult: EstimationResult = {
         ...data,
         appliances,
         dailyHours: hours,
         batteryType: data.batteryType || batteryType,
+        cableDistanceMeters: distanceMeters,
+        cableGaugeMm2: data.cableGaugeMm2 || cableSpec.recommendedGaugeMm2,
+        voltageDropPct: data.voltageDropPct || cableSpec.voltageDropPct,
+        pvArchitecture: data.pvArchitecture || cableSpec.architecture,
+        recommendedStringVoc: data.recommendedStringVoc || cableSpec.recommendedStringVoc,
+        bosBreakdown: data.bosBreakdown || cableSpec.bosBreakdown,
         environmental: data.environmental || calculateEnvironmentalImpact(data.dailyEnergyWh || (appliances.reduce((s, a) => s + (a.watt * a.quantity), 0) * hours))
       };
 
@@ -155,7 +178,7 @@ export function useEstimation() {
     } catch (err: any) {
       console.warn("API request fallback:", err.message);
       // Seamlessly fall back to engineering calculation model
-      const fallback = mockEstimate(appliances, hours, address, batteryType);
+      const fallback = mockEstimate(appliances, hours, address, batteryType, distanceMeters);
       setResult(fallback);
     } finally {
       setLoading(false);

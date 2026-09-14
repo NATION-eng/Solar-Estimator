@@ -150,6 +150,106 @@ export function calculateDailyEnergy(appliances: Appliance[], hours: number): nu
   }, 0);
 }
 
+// ==================== DC CABLE SIZING & ELECTRICAL ARCHITECTURE ====================
+
+export interface CableSizingResult {
+  distanceMeters: number;
+  recommendedGaugeMm2: number;
+  voltageDropPct: number;
+  architecture: 'high-voltage' | 'low-voltage';
+  recommendedStringVoc: number;
+  operatingCurrentAmps: number;
+  safetyRating: 'optimal' | 'acceptable' | 'warning';
+  explanation: string;
+  bosBreakdown: {
+    solarCableMeters: number;
+    solarCableGauge: string;
+    batteryCableGauge: string;
+    dcBreakers: string;
+    acSurgeProtection: string;
+    dcSurgeProtection: string;
+  };
+}
+
+/**
+ * Calculates DC cable gauge and voltage drop based on:
+ * ΔV = (2 * L * I * ρ) / A
+ * ρ (copper) = 0.0175 Ω·mm²/m
+ */
+export function calculateCableSizing(
+  panelCount: number,
+  panelWattage: number = 450,
+  distanceMeters: number = 20,
+  systemVoltage: number = 24
+): CableSizingResult {
+  const totalArrayWatts = panelCount * panelWattage;
+  const COPPER_RESISTIVITY = 0.0175; // Ohm * mm^2 / meter
+  const roundTripDistance = 2 * distanceMeters;
+
+  // Decide PV architecture: High Voltage (Series String) vs Low Voltage
+  // Panels > 4 or arrays >= 1500W should use High Voltage MPPT stringing
+  const isHighVoltage = totalArrayWatts >= 1500 || panelCount >= 4;
+  const architecture: 'high-voltage' | 'low-voltage' = isHighVoltage ? 'high-voltage' : 'low-voltage';
+
+  // High Voltage: 3-8 panels in series (~150V - 400V DC Voc, ~10A Imp)
+  // Low Voltage: 2-3 panels parallel/series-parallel (~40V - 80V DC, ~18-35A Imp)
+  const stringVoltage = isHighVoltage 
+    ? Math.min(panelCount * 42, 380) 
+    : Math.max(systemVoltage * 1.5, 42);
+
+  const operatingCurrent = isHighVoltage 
+    ? Math.max(totalArrayWatts / stringVoltage, 10.5) 
+    : Math.max(totalArrayWatts / stringVoltage, 18.0);
+
+  // Standard solar cable gauges (mm2)
+  const standardGauges = [4, 6, 10, 16, 25];
+  let selectedGauge = 4;
+  let voltageDropPct = 5.0;
+
+  for (const gauge of standardGauges) {
+    const resistance = (COPPER_RESISTIVITY * roundTripDistance) / gauge;
+    const voltageDrop = operatingCurrent * resistance;
+    const dropPct = (voltageDrop / stringVoltage) * 100;
+    
+    selectedGauge = gauge;
+    voltageDropPct = parseFloat(dropPct.toFixed(1));
+
+    // Target voltage drop <= 2.5% for industry standard efficiency
+    if (voltageDropPct <= 2.5) {
+      break;
+    }
+  }
+
+  // Battery interconnect cable specification
+  const batteryCableGauge = systemVoltage >= 48 ? '35 mm² Flexible Copper' : (systemVoltage >= 24 ? '50 mm² Flexible Copper' : '70 mm² Flexible Copper');
+
+  const safetyRating: 'optimal' | 'acceptable' | 'warning' = 
+    voltageDropPct <= 2.0 ? 'optimal' : (voltageDropPct <= 3.0 ? 'acceptable' : 'warning');
+
+  const explanation = isHighVoltage 
+    ? `High-voltage stringing keeps current at ~${operatingCurrent.toFixed(1)}A, keeping cables cool and allowing efficient ${selectedGauge}mm² solar wire over ${distanceMeters}m with only ${voltageDropPct}% voltage drop.`
+    : `Low-voltage parallel array produces ~${operatingCurrent.toFixed(1)}A current. A heavy ${selectedGauge}mm² cable is mandatory to avoid thermal losses and cable heating over ${distanceMeters}m.`;
+
+  return {
+    distanceMeters,
+    recommendedGaugeMm2: selectedGauge,
+    voltageDropPct,
+    architecture,
+    recommendedStringVoc: Math.round(stringVoltage * 1.18),
+    operatingCurrentAmps: parseFloat(operatingCurrent.toFixed(1)),
+    safetyRating,
+    explanation,
+    bosBreakdown: {
+      solarCableMeters: Math.round(distanceMeters * 2 * 1.15), // +15% routing slack
+      solarCableGauge: `${selectedGauge} mm² Double-Insulated PV Cable`,
+      batteryCableGauge,
+      dcBreakers: `${Math.ceil(operatingCurrent * 1.25)}A DC Breaker & Isolator`,
+      acSurgeProtection: 'Type II AC Surge Protection Device (SPD)',
+      dcSurgeProtection: `${Math.round(stringVoltage * 1.3)}V DC Surge Protection Device (SPD)`
+    }
+  };
+}
+
 // ==================== ENVIRONMENTAL IMPACT ====================
 
 export function calculateEnvironmentalImpact(dailyEnergyWh: number): EnvironmentalImpact {

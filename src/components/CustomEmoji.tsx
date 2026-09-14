@@ -44,7 +44,12 @@ import {
   Plus,
   AlertTriangle,
   Smartphone,
-  Coins
+  Coins,
+  ShieldCheck,
+  Activity,
+  Cable,
+  Ruler,
+  Cpu
 } from 'lucide-react';
 
 export type EmojiName =
@@ -269,6 +274,12 @@ const EMOJI_MAP: Record<string, { icon: React.ComponentType<any>; defaultColor?:
   'arrow-left': { icon: ArrowLeft, defaultColor: 'currentColor' },
   'close': { icon: X, defaultColor: 'currentColor' },
   'plus': { icon: Plus, defaultColor: 'currentColor' },
+  'shield': { icon: ShieldCheck, defaultColor: 'var(--color-success)' },
+  'safety': { icon: ShieldCheck, defaultColor: 'var(--color-success)' },
+  'activity': { icon: Activity, defaultColor: 'var(--color-primary)' },
+  'cable': { icon: Cable, defaultColor: 'var(--color-accent)' },
+  'ruler': { icon: Ruler, defaultColor: 'var(--color-primary)' },
+  'cpu': { icon: Cpu, defaultColor: 'var(--color-accent)' },
 };
 
 export default function CustomEmoji({

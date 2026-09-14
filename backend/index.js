@@ -65,7 +65,7 @@ app.use(limiter);
  */
 app.post("/estimate", async (req, res) => {
   try {
-    const { propertyType, appliances, hours, contact, address, batteryType = 'lithium' } = req.body;
+    const { propertyType, appliances, hours, contact, address, batteryType = 'lithium', distanceMeters = 20 } = req.body;
 
     if (!appliances || !hours || !address) {
       return res.status(400).json({ error: "Missing required inputs (appliances, hours, address)" });
@@ -84,7 +84,8 @@ app.post("/estimate", async (req, res) => {
       appliances, 
       Number(hours), 
       solarData.peakSunHours,
-      batteryType
+      batteryType,
+      Number(distanceMeters) || 20
     );
 
     // 3. Persist Lead & Estimation (CRM Logic)

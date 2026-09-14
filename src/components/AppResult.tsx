@@ -119,6 +119,7 @@ export default function AppResult({ data }: ResultProps) {
       `🔌 Inverter: ${((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA Pure Sine`,
       `🔋 Battery: ${data.batteryAh || 0} Ah @ ${data.systemVoltage || 24}V (${data.batteryType || 'Lithium'})`,
       `☀️ Solar Array: ${data.panelQuantity || 0} x 450W Panels`,
+      `📏 DC Cable: ${data.cableGaugeMm2 || 6}mm² PV Cable (${data.cableDistanceMeters || 20}m run, ${data.voltageDropPct || 1.8}% drop)`,
       `💰 Investment: ${formatCurrency(data.estimatedPriceNaira || 0)}`,
       `⏳ Payback: ${data.paybackYears ? `${data.paybackYears.toFixed(1)} Years` : '3.5 Years'}`,
       `🌱 Annual CO2 Saved: ${environmentalImpact.co2SavedAnnually.toLocaleString()} kg`
@@ -305,7 +306,7 @@ export default function AppResult({ data }: ResultProps) {
           background: 'rgba(0,0,0,0.3)', 
           padding: 'clamp(16px, 4vw, 24px)', 
           borderRadius: 'var(--radius-md)',
-          marginBottom: '32px',
+          marginBottom: '24px',
           border: '1px solid rgba(255,255,255,0.06)'
         }}>
           <h4 style={{ color: 'var(--color-primary)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '16px', letterSpacing: '0.1em' }}>
@@ -328,6 +329,102 @@ export default function AppResult({ data }: ResultProps) {
               <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Architecture</span>
               <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{data.systemVoltage}V DC Pure Sine</span>
             </div>
+          </div>
+        </div>
+
+        {/* Cable Sizing & Field Safety Card (Audio Feedback Implementation) */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%)',
+          border: '1px solid rgba(56, 189, 248, 0.25)',
+          borderRadius: 'var(--radius-md)',
+          padding: 'clamp(16px, 4vw, 24px)',
+          marginBottom: '32px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CustomEmoji name="cable" size={20} color="var(--color-accent)" />
+              <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                DC Cable Sizing & Thermal Safety
+              </h4>
+            </div>
+
+            <span style={{
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              padding: '4px 10px',
+              borderRadius: '100px',
+              background: data.pvArchitecture === 'high-voltage' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(251, 191, 36, 0.15)',
+              color: data.pvArchitecture === 'high-voltage' ? 'var(--color-success)' : 'var(--color-primary)',
+              border: '1px solid currentColor',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px'
+            }}>
+              <CustomEmoji name={data.pvArchitecture === 'high-voltage' ? 'shield' : 'alert'} size={13} color="currentColor" />
+              <span>{data.pvArchitecture === 'high-voltage' ? 'High Voltage Array (Optimal)' : 'Low Voltage Array'}</span>
+            </span>
+          </div>
+
+          <p style={{ fontSize: '0.84rem', color: 'var(--color-text-muted)', lineHeight: 1.5, marginBottom: '16px' }}>
+            {data.pvArchitecture === 'high-voltage'
+              ? `High-voltage series configuration keeps current low, preventing cables from heating up over your ${data.cableDistanceMeters || 20}m run and reducing electrical resistance.`
+              : `Low-voltage parallel arrays generate heavy current. Heavy-duty copper cables are specified below to prevent thermal cable warming.`}
+          </p>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Solar DC Cable</div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-accent)' }}>
+                {data.cableGaugeMm2 || 6} mm²
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                {data.bosBreakdown?.solarCableMeters || 45}m total length
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Voltage Drop</div>
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: (data.voltageDropPct || 1.8) <= 2.5 ? 'var(--color-success)' : 'var(--color-primary)' }}>
+                {data.voltageDropPct || 1.8}%
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                Industry target &le; 3.0%
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Battery Interconnect</div>
+              <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#fff' }}>
+                {data.bosBreakdown?.batteryCableGauge || '35 mm² Flexible'}
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                Heavy current link
+              </div>
+            </div>
+
+            <div style={{ background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Surge & DC Protection</div>
+              <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-primary)' }}>
+                SPD + DC Isolator
+              </div>
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
+                Lightning & arc arrestor
+              </div>
+            </div>
+          </div>
+
+          <div style={{
+            fontSize: '0.74rem',
+            color: 'var(--color-text-muted)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'rgba(0,0,0,0.2)',
+            padding: '8px 12px',
+            borderRadius: '6px'
+          }}>
+            <CustomEmoji name="pin" size={13} color="var(--color-primary)" />
+            <span><strong>Site Survey Note:</strong> Final conduit pathways, roof clamp types, and breaker sizes will be confirmed during the physical site survey.</span>
           </div>
         </div>
 

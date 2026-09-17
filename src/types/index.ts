@@ -74,6 +74,8 @@ export interface EstimationResult {
     acSurgeProtection: string;
     dcSurgeProtection: string;
   };
+  inverterBrand?: string;
+  overrides?: any;
 }
 
 export interface PropertyType {

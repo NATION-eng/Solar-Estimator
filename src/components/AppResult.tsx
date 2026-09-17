@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { 
@@ -10,13 +11,16 @@ import {
   AlertCircle, 
   Cable, 
   MapPin, 
-  Sparkles 
+  Sparkles,
+  Wrench,
+  Download
 } from 'lucide-react';
 import type { EstimationResult } from '../types';
 import LoadProfileChart from './LoadProfileChart';
 import SavingsCalculator from './SavingsCalculator';
 import EnvironmentalImpactCard from './EnvironmentalImpactCard';
 import DayNightRuntimeMatrix from './DayNightRuntimeMatrix';
+import EngineerOverrideDrawer, { type HardwareOverrides } from './EngineerOverrideDrawer';
 import { calculateEnvironmentalImpact } from '../utils/helpers';
 
 type ResultProps = {
@@ -25,6 +29,13 @@ type ResultProps = {
 };
 
 export default function AppResult({ data, userMode = 'client' }: ResultProps) {
+  const [activeData, setActiveData] = useState<EstimationResult>(data);
+  const [isOverrideOpen, setIsOverrideOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    setActiveData(data);
+  }, [data]);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
@@ -33,91 +44,233 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
     }).format(amount);
   };
 
-  const environmentalImpact = data.environmental || calculateEnvironmentalImpact(data.dailyEnergyWh);
+  const environmentalImpact = activeData.environmental || calculateEnvironmentalImpact(activeData.dailyEnergyWh);
 
-  const handleDownloadPDF = () => {
+  const handleApplyOverrides = (overrides: HardwareOverrides) => {
+    const panelWatt = overrides.panelWattage || activeData.panelWattage || 450;
+    const sysVolt = overrides.systemVoltage || activeData.systemVoltage || 48;
+    const battType = overrides.batteryType || activeData.batteryType || 'lithium';
+    const invBrand = overrides.inverterBrand || activeData.inverterBrand || 'Deye Hybrid';
+    const cableDist = overrides.cableDistanceMeters || activeData.cableDistanceMeters || 20;
+
+    // Recalculate panel quantity
+    const psh = activeData.location?.psh || 4.8;
+    const reqPanelWatts = (activeData.dailyEnergyWh || 12000) / (psh * 0.82);
+    let panelQty = Math.max(2, Math.ceil(reqPanelWatts / panelWatt));
+    if (panelQty > 2 && panelQty % 2 !== 0) panelQty += 1;
+
+    // Recalculate battery Ah
+    const dod = battType === 'lithium' ? 0.85 : 0.50;
+    const battWh = Math.round(((activeData.dailyEnergyWh || 12000) * 0.65) / dod / 0.90);
+    const battAh = Math.ceil(battWh / sysVolt);
+
+    // Recalculate price
+    const batteryCapacityKwh = (battAh * sysVolt) / 1000;
+    const batteryCost = battType === 'lithium' ? Math.round(batteryCapacityKwh * 290000) : Math.round(batteryCapacityKwh * 145000);
+    const panelsCost = panelQty * (panelWatt >= 550 ? 175000 : 140000);
+    const inverterCost = activeData.recommendedInverterW ? Math.round(activeData.recommendedInverterW * 250) : 800000;
+    const newPrice = Math.round(batteryCost + panelsCost + inverterCost + 350000);
+
+    setActiveData(prev => ({
+      ...prev,
+      panelWattage: panelWatt,
+      panelQuantity: panelQty,
+      systemVoltage: sysVolt,
+      batteryType: battType,
+      batteryCapacityWh: battWh,
+      batteryAh: battAh,
+      inverterBrand: invBrand,
+      cableDistanceMeters: cableDist,
+      estimatedPriceNaira: newPrice,
+      overrides
+    }));
+  };
+
+  const handleDownloadPDF = (targetMode: 'client' | 'engineer' = userMode) => {
     try {
       const jsPDFConstructor = (jsPDF as any).default || jsPDF;
       const doc = new jsPDFConstructor();
-      
-      // Header overlay
-      doc.setFillColor(5, 5, 5); 
-      doc.rect(0, 0, 210, 42, 'F');
-      
-      doc.setTextColor(251, 191, 36); 
-      doc.setFontSize(22);
-      doc.setFont('helvetica', 'bold');
-      doc.text("MasterviewCEL Energy Solutions", 14, 18);
-      
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'normal');
-      doc.text("Engineered Solar Quotation & Technical Blueprint", 14, 28);
-      
-      doc.setFontSize(9);
-      doc.setTextColor(180, 180, 180);
-      doc.text(`Ref Date: ${new Date().toLocaleDateString()} | Location: ${data.location?.address || 'Nigeria'}`, 14, 36);
-
-      // Section Title
-      doc.setTextColor(20, 20, 20);
-      doc.setFontSize(13);
-      doc.setFont('helvetica', 'bold');
-      doc.text("Technical Sizing & Hardware Configuration", 14, 52);
-
-      const tableData = [
-        ['System Voltage', `${data.systemVoltage || '24'}V DC Architecture`],
-        ['Recommended Inverter', `${((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA Pure Sine Wave`],
-        ['Peak Surge Capacity', `${(data.maxSurgeWatts || 0).toLocaleString()} Watts`],
-        ['Battery Storage Bank', `${data.batteryAh || '--'} Ah @ ${data.systemVoltage || '24'}V (${data.batteryType || 'Lithium'})`],
-        ['Battery Storage Energy', `${((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh Reserve`],
-        ['Solar PV Array', `${data.panelQuantity || '--'} x 450W Monocrystalline Panels`],
-        ['Estimated Daily Yield', `${((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh / day`],
-        ['Charge Controller', `${data.chargeControllerAmps || '--'}A MPPT Controller`]
-      ];
-
       const autoTableFunc = (autoTable as any).default || autoTable;
-      if (typeof autoTableFunc === 'function') {
-        autoTableFunc(doc, {
-          startY: 56,
-          head: [['Engineering Parameter', 'Recommended Specification']],
-          body: tableData,
-          theme: 'grid',
-          headStyles: { fillColor: [15, 23, 42], textColor: [251, 191, 36] },
-          styles: { fontSize: 9, cellPadding: 4 }
-        });
+
+      if (targetMode === 'client') {
+        // CLIENT INVESTMENT PROPOSAL
+        doc.setFillColor(10, 14, 23); 
+        doc.rect(0, 0, 210, 42, 'F');
+        
+        doc.setTextColor(245, 158, 11); 
+        doc.setFontSize(22);
+        doc.setFont('helvetica', 'bold');
+        doc.text("MasterviewCEL Energy Solutions", 14, 18);
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text("Turnkey Solar Investment Proposal & Runtime Guarantee", 14, 28);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(180, 180, 180);
+        doc.text(`Date: ${new Date().toLocaleDateString()} | Installation Site: ${activeData.location?.address || 'Nigeria'}`, 14, 36);
+
+        // Section Title
+        doc.setTextColor(20, 20, 20);
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.text("Recommended System & Performance Guarantees", 14, 52);
+
+        const clientTableData = [
+          ['Inverter Continuous Capacity', `${((activeData.recommendedInverterW || 0) / 1000).toFixed(1)} kVA Pure Sine Wave (Powers AC, fridge & electronics)`],
+          ['Battery Storage Reserve', `${((activeData.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh LiFePO4 Lithium (10+ Year Lifespan)`],
+          ['Night-time Runtime', '12+ Hours continuous power for lighting, fans, fridge & TV'],
+          ['Solar PV Generator Array', `${activeData.panelQuantity || '--'} x ${activeData.panelWattage || 450}W High-Yield Monocrystalline Panels`],
+          ['Daytime Energy Cost', '₦0 / day (100% Free Solar Generation)'],
+          ['Local Daily Irradiance', `${activeData.location?.psh ? activeData.location.psh.toFixed(1) : '4.8'} Peak Sun Hours`],
+          ['Protection & Wiring', 'Included (Fire-retardant DC cabling, Surge Arrestors, DC Breakers)']
+        ];
+
+        if (typeof autoTableFunc === 'function') {
+          autoTableFunc(doc, {
+            startY: 56,
+            head: [['System Feature', 'Homeowner Guarantee']],
+            body: clientTableData,
+            theme: 'grid',
+            headStyles: { fillColor: [15, 23, 42], textColor: [245, 158, 11] },
+            styles: { fontSize: 9, cellPadding: 4 }
+          });
+        }
+
+        const lastTable = (doc as any).lastAutoTable;
+        const finalY = (lastTable && lastTable.finalY) ? lastTable.finalY : 145;
+        
+        // Turnkey Investment Box
+        doc.setFillColor(248, 250, 252);
+        doc.setDrawColor(245, 158, 11);
+        doc.rect(14, finalY + 8, 182, 36, 'FD');
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100, 116, 139);
+        doc.text("Total Turnkey System Investment (Hardware, Cabling & Certified Installation)", 20, finalY + 18);
+        
+        doc.setFontSize(20);
+        doc.setTextColor(15, 23, 42); 
+        doc.setFont('helvetica', 'bold');
+        
+        const priceText = activeData.estimatedPriceNaira ? formatCurrency(activeData.estimatedPriceNaira) : "Consultation Required";
+        doc.text(priceText, 20, finalY + 32);
+
+        // Warranty & ROI Highlights
+        doc.setFontSize(9.5);
+        doc.setTextColor(30, 41, 59);
+        doc.setFont('helvetica', 'bold');
+        doc.text("Commercial Warranty & Assurances:", 14, finalY + 54);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.text("• Inverter Unit: 5-Year Replacement Warranty\n• Lithium Storage: 10-Year Operational Life Guarantee (6,000 Cycles @ 80% DoD)\n• Solar PV Panels: 25-Year Linear Power Output Guarantee\n• Payback Period: Estimated ~3.5 Years against grid inflation & generator diesel expenses", 14, finalY + 62);
+
+        // Environmental
+        doc.setFontSize(8.5);
+        doc.setTextColor(16, 185, 129);
+        doc.text(`Environmental Benefit: Offsets ${environmentalImpact.co2SavedAnnually.toLocaleString()} kg CO2 annually (~${environmentalImpact.treesEquivalent} Trees Equivalent).`, 14, finalY + 86);
+
+        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text("MasterviewCEL Energy Solutions | www.masterviewcel.com | support@masterviewcel.com", 14, 282);
+        doc.save(`Solar_Proposal_${activeData.id || 'Client'}.pdf`);
+
+      } else {
+        // ENGINEER TECHNICAL WORK ORDER & BOM
+        doc.setFillColor(15, 23, 42); 
+        doc.rect(0, 0, 210, 42, 'F');
+        
+        doc.setTextColor(56, 189, 248); 
+        doc.setFontSize(20);
+        doc.setFont('helvetica', 'bold');
+        doc.text("MasterviewCEL Field Engineering", 14, 18);
+        
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.text("Technical Work Order & Bill of Materials (BOM)", 14, 28);
+        
+        doc.setFontSize(9);
+        doc.setTextColor(180, 180, 180);
+        doc.text(`Ref Date: ${new Date().toLocaleDateString()} | Site: ${activeData.location?.address || 'Nigeria'} | Bus: ${activeData.systemVoltage || 48}V DC`, 14, 36);
+
+        // Section Title: Hardware BOM
+        doc.setTextColor(20, 20, 20);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text("1. Core Hardware Specifications & Electrical Sizing", 14, 50);
+
+        const engHardwareTable = [
+          ['Inverter Unit', `${activeData.inverterBrand || 'Deye Hybrid'} ${((activeData.recommendedInverterW || 0) / 1000).toFixed(1)} kVA (${activeData.systemVoltage}V Pure Sine, Surge: ${(activeData.maxSurgeWatts || 0).toLocaleString()}W)`],
+          ['Battery Bank', `${activeData.batteryAh} Ah @ ${activeData.systemVoltage}V (${((activeData.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh ${activeData.batteryType?.toUpperCase()})`],
+          ['PV Array Generator', `${activeData.panelQuantity} x ${activeData.panelWattage || 450}W (${((activeData.panelQuantity * (activeData.panelWattage || 450)) / 1000).toFixed(2)} kWp)`],
+          ['MPPT Charge Controller', `${activeData.chargeControllerAmps || 60}A MPPT Controller`],
+          ['Daily Design Yield', `${((activeData.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh / day @ ${activeData.location?.psh || 4.8} PSH`]
+        ];
+
+        if (typeof autoTableFunc === 'function') {
+          autoTableFunc(doc, {
+            startY: 54,
+            head: [['Sub-System', 'Engineering Rating & Model']],
+            body: engHardwareTable,
+            theme: 'grid',
+            headStyles: { fillColor: [15, 23, 42], textColor: [56, 189, 248] },
+            styles: { fontSize: 8.5, cellPadding: 3.5 }
+          });
+        }
+
+        const table1 = (doc as any).lastAutoTable;
+        const y2 = (table1 && table1.finalY) ? table1.finalY + 8 : 110;
+
+        // Section Title: Protection & Cabling Cut-List
+        doc.setFontSize(12);
+        doc.setTextColor(20, 20, 20);
+        doc.text("2. Electrical Protection, Switchgear & Cabling Cut-List", 14, y2);
+
+        const engCableTable = [
+          ['DC Solar PV Cable', `${activeData.cableGaugeMm2 || 6} mm² Double-Insulated Solar PV Cable (${activeData.cableDistanceMeters || 20}m run, ${activeData.voltageDropPct || 1.8}% drop)`],
+          ['Battery Interconnect Cable', '35 mm² / 50 mm² Ultra-Flexible Copper Cable with heavy-duty crimped eyelet lugs'],
+          ['DC Circuit Protection', '63A 2-Pole 1000V DC Breaker + Type II DC SPD (Surge Protection Device)'],
+          ['AC Distribution & Bypass', '32A 2-Pole AC Breaker + 63A Rotary Manual Bypass Changeover Switch'],
+          ['Earthing & Lightning Rod', '16 mm² Bare Copper Earthing Conductor bonded to 5ft Solid Copper Earth Rod (< 5Ω)']
+        ];
+
+        if (typeof autoTableFunc === 'function') {
+          autoTableFunc(doc, {
+            startY: y2 + 4,
+            head: [['Component', 'Installation Specification & Cut Schedule']],
+            body: engCableTable,
+            theme: 'grid',
+            headStyles: { fillColor: [15, 23, 42], textColor: [56, 189, 248] },
+            styles: { fontSize: 8.5, cellPadding: 3.5 }
+          });
+        }
+
+        const table2 = (doc as any).lastAutoTable;
+        const y3 = (table2 && table2.finalY) ? table2.finalY + 8 : 190;
+
+        // Pre-Commissioning Checklist
+        doc.setFontSize(11);
+        doc.setTextColor(20, 20, 20);
+        doc.text("3. Field Pre-Commissioning & QA Checklist", 14, y3);
+
+        doc.setFontSize(8);
+        doc.setTextColor(80, 80, 80);
+        doc.text("[  ] PV String Open-Circuit Voltage (Voc) verified under irradiance within inverter MPPT window\n[  ] Correct polarity verified (+ to +, - to -) prior to closing DC isolator\n[  ] Battery terminal torque verified to manufacturer specification (8 - 10 Nm)\n[  ] AC phase-neutral-earth bonding & loop impedance confirmed < 5 Ohms\n[  ] High-voltage surge protection arrestor (SPD) operational indicator green", 14, y3 + 6);
+
+        // Signatures
+        doc.setFontSize(9);
+        doc.setTextColor(20, 20, 20);
+        doc.text("Commissioning Lead Signature: _______________________      Date: ______________", 14, y3 + 32);
+
+        // Footer
+        doc.setFontSize(8);
+        doc.setTextColor(120, 120, 120);
+        doc.text("MasterviewCEL Field Engineering Division | support@masterviewcel.com", 14, 282);
+        doc.save(`Solar_WorkOrder_BOM_${activeData.id || 'Field'}.pdf`);
       }
-
-      const lastTable = (doc as any).lastAutoTable;
-      const finalY = (lastTable && lastTable.finalY) ? lastTable.finalY : 145;
-      
-      // Pricing Highlight
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(251, 191, 36);
-      doc.rect(14, finalY + 8, 182, 34, 'FD');
-      
-      doc.setFontSize(10);
-      doc.setTextColor(100, 116, 139);
-      doc.text("Turnkey System Investment (Inclusive of Hardware & Installation)", 20, finalY + 18);
-      
-      doc.setFontSize(20);
-      doc.setTextColor(15, 23, 42); 
-      doc.setFont('helvetica', 'bold');
-      
-      const priceText = data.estimatedPriceNaira ? formatCurrency(data.estimatedPriceNaira) : "Consultation Required";
-      doc.text(priceText, 20, finalY + 31);
-
-      // Environmental metrics
-      doc.setFontSize(10);
-      doc.setTextColor(20, 20, 20);
-      doc.text(`Estimated Annual CO2 Avoided: ${environmentalImpact.co2SavedAnnually.toLocaleString()} kg (~${environmentalImpact.treesEquivalent} Trees Equivalent)`, 14, finalY + 52);
-
-      // Disclaimer & Footer
-      doc.setFontSize(8);
-      doc.setTextColor(120, 120, 120);
-      doc.text("Disclaimer: Sizing based on provided load and geo-irradiance metrics. Final quote subject to physical site inspection.", 14, 275);
-      doc.text("MasterviewCEL Energy Solutions | www.masterviewcel.com | support@masterviewcel.com", 14, 282);
-
-      doc.save(`Solar_Quotation_${data.id || 'Masterview'}.pdf`);
     } catch (err: any) {
       console.error("PDF Component Failure:", err);
       alert(`Export Error: ${err.message || "Contact Support"}`);
@@ -126,15 +279,15 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
 
   const handleShareWhatsApp = () => {
     const summary = [
-      `*MasterviewCEL Solar Blueprint - Technical Specification*`,
-      `Location: ${data.location?.address || 'Nigeria'}`,
-      `Daily Energy: ${((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh/day`,
-      `Inverter: ${((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA (${data.systemVoltage || 48}V Pure Sine)`,
-      `Battery: ${((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh (${data.batteryAh || 0} Ah @ ${data.systemVoltage || 48}V ${data.batteryType === 'lithium' ? 'Lithium' : 'Deep Cycle'})`,
-      `Solar Array: ${data.panelQuantity || 0} Panels (${((data.panelQuantity * (data.panelWattage || 450)) / 1000).toFixed(1)} kW)`,
-      `DC Cable: ${data.cableGaugeMm2 || 6}mm² PV Cable (${data.cableDistanceMeters || 20}m run, ${data.voltageDropPct || 1.8}% drop)`,
-      `Investment: ${formatCurrency(data.estimatedPriceNaira || 0)}`,
-      `Payback: ${data.paybackYears ? `${data.paybackYears.toFixed(1)} Years` : '3.5 Years'}`,
+      `*MasterviewCEL Solar Blueprint - ${userMode === 'client' ? 'Guaranteed Quotation' : 'Technical Specification'}*`,
+      `Location: ${activeData.location?.address || 'Nigeria'}`,
+      `Daily Energy: ${((activeData.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh/day`,
+      `Inverter: ${((activeData.recommendedInverterW || 0) / 1000).toFixed(1)} kVA (${activeData.systemVoltage || 48}V Pure Sine - ${activeData.inverterBrand || 'Deye'})`,
+      `Battery: ${((activeData.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh (${activeData.batteryAh || 0} Ah @ ${activeData.systemVoltage || 48}V ${activeData.batteryType === 'lithium' ? 'Lithium LiFePO4' : 'Deep Cycle'})`,
+      `Solar Array: ${activeData.panelQuantity || 0} Panels (${((activeData.panelQuantity * (activeData.panelWattage || 450)) / 1000).toFixed(1)} kWp)`,
+      `DC Cable: ${activeData.cableGaugeMm2 || 6}mm² PV Cable (${activeData.cableDistanceMeters || 20}m run, ${activeData.voltageDropPct || 1.8}% drop)`,
+      `Investment: ${formatCurrency(activeData.estimatedPriceNaira || 0)}`,
+      `Payback: ${activeData.paybackYears ? `${activeData.paybackYears.toFixed(1)} Years` : '3.5 Years'}`,
       `Annual CO2 Avoided: ${environmentalImpact.co2SavedAnnually.toLocaleString()} kg`
     ].join('\n');
 
@@ -169,7 +322,7 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
         </h2>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', maxWidth: '580px', margin: '0 auto 20px', lineHeight: 1.5 }}>
           {userMode === 'client'
-            ? `Calibrated for ${data.location?.address || 'Nigeria'} to power your home seamlessly and eliminate generator fueling costs.`
+            ? `Calibrated for ${activeData.location?.address || 'Nigeria'} to power your home seamlessly and eliminate generator fueling costs.`
             : `Engineered DC bus architecture matching peak surge kW, MPPT charge ampacity, and thermal safety tolerances.`}
         </p>
 
@@ -181,49 +334,143 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
           flexWrap: 'wrap',
           marginBottom: '28px'
         }}>
-          <button 
-            onClick={handleDownloadPDF}
-            style={{
-              background: 'var(--color-primary)',
-              color: '#0a0e17',
-              padding: '10px 18px',
-              borderRadius: 'var(--radius-sm)',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'background 0.15s ease',
-              minHeight: '42px'
-            }}
-          >
-            <FileText size={16} />
-            <span>Download Engineering PDF</span>
-          </button>
+          {userMode === 'client' ? (
+            <>
+              <button 
+                onClick={() => handleDownloadPDF('client')}
+                style={{
+                  background: 'var(--color-primary)',
+                  color: '#0a0e17',
+                  padding: '10px 18px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'background 0.15s ease',
+                  minHeight: '42px'
+                }}
+              >
+                <FileText size={16} />
+                <span>Download Proposal PDF</span>
+              </button>
 
-          <button 
-            onClick={handleShareWhatsApp}
-            style={{
-              background: 'rgba(255, 255, 255, 0.06)',
-              color: 'var(--color-text-main)',
-              border: '1px solid var(--border-hairline)',
-              padding: '10px 18px',
-              borderRadius: 'var(--radius-sm)',
-              fontWeight: 600,
-              fontSize: '0.85rem',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              transition: 'all 0.15s ease',
-              minHeight: '42px'
-            }}
-          >
-            <Share2 size={16} />
-            <span>Share Specification</span>
-          </button>
+              <button 
+                onClick={handleShareWhatsApp}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  color: 'var(--color-text-main)',
+                  border: '1px solid var(--border-hairline)',
+                  padding: '10px 18px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.15s ease',
+                  minHeight: '42px'
+                }}
+              >
+                <Share2 size={16} />
+                <span>Share Blueprint</span>
+              </button>
+            </>
+          ) : (
+            <>
+              <button 
+                onClick={() => handleDownloadPDF('engineer')}
+                style={{
+                  background: 'var(--color-accent)',
+                  color: '#0a0e17',
+                  padding: '10px 18px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.15s ease',
+                  minHeight: '42px'
+                }}
+              >
+                <FileText size={16} />
+                <span>Download Technical BOM PDF</span>
+              </button>
+
+              <button 
+                onClick={() => setIsOverrideOpen(true)}
+                style={{
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  color: 'var(--color-accent)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  padding: '10px 18px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.15s ease',
+                  minHeight: '42px'
+                }}
+              >
+                <Wrench size={16} />
+                <span>Hardware & Stock Override</span>
+              </button>
+
+              <button 
+                onClick={() => handleDownloadPDF('client')}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  color: 'var(--color-text-main)',
+                  border: '1px solid var(--border-hairline)',
+                  padding: '10px 18px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.15s ease',
+                  minHeight: '42px'
+                }}
+              >
+                <Download size={16} />
+                <span>Client Proposal</span>
+              </button>
+
+              <button 
+                onClick={handleShareWhatsApp}
+                style={{
+                  background: 'rgba(255, 255, 255, 0.06)',
+                  color: 'var(--color-text-main)',
+                  border: '1px solid var(--border-hairline)',
+                  padding: '10px 18px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.15s ease',
+                  minHeight: '42px'
+                }}
+              >
+                <Share2 size={16} />
+                <span>Share Spec</span>
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -256,13 +503,13 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
               <span>{userMode === 'client' ? 'Inverter Capacity' : 'Inverter Continuous Rating'}</span>
             </div>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
-              {((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA
+              {((activeData.recommendedInverterW || 0) / 1000).toFixed(1)} kVA
             </h3>
           </div>
           <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '8px', lineHeight: 1.4 }}>
             {userMode === 'client'
               ? `Pure Sine Wave &bull; Effortlessly starts ACs, fridge compressors & domestic surges without flickering.`
-              : `${data.systemVoltage}V Pure Sine Wave &bull; Surge: ${(data.maxSurgeWatts || 0).toLocaleString()}W &bull; PF: 0.85`}
+              : `${activeData.systemVoltage}V Pure Sine Wave &bull; Surge: ${(activeData.maxSurgeWatts || 0).toLocaleString()}W &bull; PF: 0.85`}
           </p>
         </div>
 
@@ -294,14 +541,14 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
             </div>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
               {userMode === 'client' 
-                ? `${((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh`
-                : `${data.batteryAh} Ah @ ${data.systemVoltage}V`}
+                ? `${((activeData.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh`
+                : `${activeData.batteryAh} Ah @ ${activeData.systemVoltage}V`}
             </h3>
           </div>
           <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '8px', lineHeight: 1.4 }}>
             {userMode === 'client'
-              ? `${data.batteryType === 'lithium' ? '10+ Year LiFePO4 Lithium (Zero Maintenance)' : 'Deep Cycle Tubular Bank'} &bull; Sustains full night loads.`
-              : `${((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh Reserve &bull; DoD: ${data.batteryType === 'lithium' ? '80%' : '50%'} &bull; ${data.batteryType === 'lithium' ? 'LiFePO4' : 'Lead-Acid'}`}
+              ? `${activeData.batteryType === 'lithium' ? '10+ Year LiFePO4 Lithium (Zero Maintenance)' : 'Deep Cycle Tubular Bank'} &bull; Sustains full night loads.`
+              : `${((activeData.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh Reserve &bull; DoD: ${activeData.batteryType === 'lithium' ? '80%' : '50%'} &bull; ${activeData.batteryType === 'lithium' ? 'LiFePO4' : 'Lead-Acid'}`}
           </p>
         </div>
 
@@ -332,13 +579,13 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
               <span>{userMode === 'client' ? 'Solar Array Generation' : 'PV Generator Array'}</span>
             </div>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
-              {data.panelQuantity} Panels
+              {activeData.panelQuantity} Panels
             </h3>
           </div>
           <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '8px', lineHeight: 1.4 }}>
             {userMode === 'client'
-              ? `${((data.panelQuantity * (data.panelWattage || 450)) / 1000).toFixed(2)} kW High-Yield Monocrystalline &bull; Powers heavy appliances in direct sun.`
-              : `${((data.panelQuantity * (data.panelWattage || 450)) / 1000).toFixed(2)} kWp (${data.panelQuantity}x${data.panelWattage || 450}W) &bull; ${data.chargeControllerAmps}A MPPT`}
+              ? `${((activeData.panelQuantity * (activeData.panelWattage || 450)) / 1000).toFixed(2)} kW High-Yield Monocrystalline &bull; Powers heavy appliances in direct sun.`
+              : `${((activeData.panelQuantity * (activeData.panelWattage || 450)) / 1000).toFixed(2)} kWp (${activeData.panelQuantity}x${activeData.panelWattage || 450}W) &bull; ${activeData.chargeControllerAmps}A MPPT`}
           </p>
         </div>
       </div>
@@ -357,19 +604,19 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
           <div className="grid-responsive-narrow" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>{userMode === 'client' ? 'Simultaneous Peak Load' : 'Peak Surge Load'}</span>
-              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{(data.maxSurgeWatts || 0).toLocaleString()} W</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{(activeData.maxSurgeWatts || 0).toLocaleString()} W</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Daily Energy Usage</span>
-              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{((activeData.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>{userMode === 'client' ? 'Local Sunlight Hours' : 'Peak Sun Hours (PSH)'}</span>
-              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{data.location?.psh ? `${data.location.psh.toFixed(2)} hrs/day` : '4.80 hrs/day'}</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{activeData.location?.psh ? `${activeData.location.psh.toFixed(2)} hrs/day` : '4.80 hrs/day'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
               <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>System Architecture</span>
-              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{data.systemVoltage}V DC Pure Sine</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{activeData.systemVoltage}V DC Pure Sine</span>
             </div>
           </div>
         </div>
@@ -394,12 +641,12 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
         </div>
 
         {/* Day vs Night Runtime Simulation Matrix */}
-        {data.appliances && data.appliances.length > 0 && (
+        {activeData.appliances && activeData.appliances.length > 0 && (
           <DayNightRuntimeMatrix
-            appliances={data.appliances}
-            batteryCapacityWh={data.batteryCapacityWh || 0}
-            batteryType={data.batteryType || 'lithium'}
-            systemVoltage={data.systemVoltage || 48}
+            appliances={activeData.appliances}
+            batteryCapacityWh={activeData.batteryCapacityWh || 0}
+            batteryType={activeData.batteryType || 'lithium'}
+            systemVoltage={activeData.systemVoltage || 48}
             userMode={userMode}
           />
         )}
@@ -426,23 +673,23 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
               fontWeight: 700,
               padding: '4px 10px',
               borderRadius: 'var(--radius-sm)',
-              background: data.pvArchitecture === 'high-voltage' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-              color: data.pvArchitecture === 'high-voltage' ? 'var(--color-success)' : 'var(--color-primary)',
+              background: activeData.pvArchitecture === 'high-voltage' ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+              color: activeData.pvArchitecture === 'high-voltage' ? 'var(--color-success)' : 'var(--color-primary)',
               border: '1px solid currentColor',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '5px'
             }}>
-              {data.pvArchitecture === 'high-voltage' ? <ShieldCheck size={13} /> : <AlertCircle size={13} />}
-              <span>{data.pvArchitecture === 'high-voltage' ? 'High Voltage Array (Optimal Efficiency)' : 'Low Voltage Array'}</span>
+              {activeData.pvArchitecture === 'high-voltage' ? <ShieldCheck size={13} /> : <AlertCircle size={13} />}
+              <span>{activeData.pvArchitecture === 'high-voltage' ? 'High Voltage Array (Optimal Efficiency)' : 'Low Voltage Array'}</span>
             </span>
           </div>
 
           <p style={{ fontSize: '0.84rem', color: 'var(--color-text-muted)', lineHeight: 1.5, marginBottom: '16px' }}>
             {userMode === 'client'
               ? `Your system includes fire-retardant DC cabling, lightning surge arrestors (SPD), and high-efficiency circuit breakers to safeguard your appliances and roof installation.`
-              : data.pvArchitecture === 'high-voltage'
-                ? `High-voltage series configuration keeps current low, preventing cables from heating up over your ${data.cableDistanceMeters || 20}m run and reducing electrical resistance.`
+              : activeData.pvArchitecture === 'high-voltage'
+                ? `High-voltage series configuration keeps current low, preventing cables from heating up over your ${activeData.cableDistanceMeters || 20}m run and reducing electrical resistance.`
                 : `Low-voltage parallel arrays generate heavy current. Heavy-duty copper cables are specified below to prevent thermal cable warming.`}
           </p>
 
@@ -450,17 +697,17 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
             <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-hairline)' }}>
               <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Solar DC Cable</div>
               <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--color-accent)' }}>
-                {data.cableGaugeMm2 || 6} mm²
+                {activeData.cableGaugeMm2 || 6} mm²
               </div>
               <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
-                {data.bosBreakdown?.solarCableMeters || 45}m total length
+                {activeData.bosBreakdown?.solarCableMeters || 45}m total length
               </div>
             </div>
 
             <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-hairline)' }}>
               <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Voltage Drop</div>
-              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: (data.voltageDropPct || 1.8) <= 2.5 ? 'var(--color-success)' : 'var(--color-primary)' }}>
-                {data.voltageDropPct || 1.8}%
+              <div style={{ fontSize: '1.05rem', fontWeight: 800, color: (activeData.voltageDropPct || 1.8) <= 2.5 ? 'var(--color-success)' : 'var(--color-primary)' }}>
+                {activeData.voltageDropPct || 1.8}%
               </div>
               <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                 Industry target &le; 3.0%
@@ -470,7 +717,7 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
             <div style={{ background: 'rgba(0,0,0,0.2)', padding: '12px', borderRadius: '6px', border: '1px solid var(--border-hairline)' }}>
               <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>Battery Interconnect</div>
               <div style={{ fontSize: '0.92rem', fontWeight: 700, color: '#fff' }}>
-                {data.bosBreakdown?.batteryCableGauge || '35 mm² Flexible'}
+                {activeData.bosBreakdown?.batteryCableGauge || '35 mm² Flexible'}
               </div>
               <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '2px' }}>
                 Heavy current link
@@ -504,11 +751,11 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
         </div>
 
         {/* 24-Hour Load Profile Chart */}
-        {data.appliances && data.appliances.length > 0 && (
+        {activeData.appliances && activeData.appliances.length > 0 && (
           <div style={{ marginBottom: '32px' }}>
             <LoadProfileChart 
-              appliances={data.appliances} 
-              hours={data.dailyHours || 6} 
+              appliances={activeData.appliances} 
+              hours={activeData.dailyHours || 6} 
             />
           </div>
         )}
@@ -537,7 +784,7 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
               fontVariantNumeric: 'tabular-nums',
               wordBreak: 'break-word'
             }}>
-              {formatCurrency(data.estimatedPriceNaira || 0)}
+              {formatCurrency(activeData.estimatedPriceNaira || 0)}
             </div>
             <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '8px', lineHeight: 1.4 }}>
               Includes solar PV modules, pure sine inverter, storage bank, MPPT controller, cabling & installation.
@@ -558,7 +805,7 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
           }}>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.82rem', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>Estimated Payback</p>
             <div style={{ fontSize: 'clamp(1.6rem, 5vw, 2.2rem)', fontWeight: 800, color: 'var(--color-success)', fontVariantNumeric: 'tabular-nums' }}>
-              {data.paybackYears ? `${data.paybackYears.toFixed(1)} Years` : '3.5 Years'}
+              {activeData.paybackYears ? `${activeData.paybackYears.toFixed(1)} Years` : '3.5 Years'}
             </div>
             <p style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)', marginTop: '6px', lineHeight: 1.35 }}>
               Based on Nigerian grid tariff parity & generator diesel replacement
@@ -569,9 +816,9 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
         {/* Interactive Savings & Tariff Sensitivity Calculator */}
         <div style={{ marginBottom: '32px' }}>
           <SavingsCalculator 
-            systemCost={data.estimatedPriceNaira || 0} 
-            dailyEnergyWh={data.dailyEnergyWh} 
-            paybackYears={data.paybackYears || 3.5} 
+            systemCost={activeData.estimatedPriceNaira || 0} 
+            dailyEnergyWh={activeData.dailyEnergyWh} 
+            paybackYears={activeData.paybackYears || 3.5} 
           />
         </div>
 
@@ -580,7 +827,7 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
           <EnvironmentalImpactCard impact={environmentalImpact} />
         </div>
 
-        {data.location?.address && (
+        {activeData.location?.address && (
           <div style={{ 
             marginBottom: '32px', 
             padding: '12px 16px', 
@@ -594,7 +841,7 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
             gap: '8px'
           }}>
             <MapPin size={16} color="var(--color-primary)" />
-            <span>Tailored installation region: <strong style={{ color: 'var(--color-text-main)' }}>{data.location.address}</strong></span>
+            <span>Tailored installation region: <strong style={{ color: 'var(--color-text-main)' }}>{activeData.location.address}</strong></span>
           </div>
         )}
 
@@ -607,9 +854,9 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
           paddingTop: '16px'
         }}>
           <button 
-            onClick={handleDownloadPDF}
+            onClick={() => handleDownloadPDF(userMode)}
             style={{
-              background: 'var(--color-primary)',
+              background: userMode === 'client' ? 'var(--color-primary)' : 'var(--color-accent)',
               color: '#0a0e17',
               padding: '14px 28px',
               borderRadius: 'var(--radius-sm)',
@@ -626,8 +873,33 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
             }}
           >
             <FileText size={18} />
-            <span>Download Quotation PDF</span>
+            <span>{userMode === 'client' ? 'Download Proposal PDF' : 'Download Technical BOM PDF'}</span>
           </button>
+
+          {userMode === 'engineer' && (
+            <button 
+              onClick={() => setIsOverrideOpen(true)}
+              style={{
+                background: 'rgba(56, 189, 248, 0.12)',
+                color: 'var(--color-accent)',
+                border: '1px solid rgba(56, 189, 248, 0.35)',
+                padding: '14px 24px',
+                borderRadius: 'var(--radius-sm)',
+                fontWeight: 700,
+                fontSize: '0.95rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                flex: '1 1 220px',
+                minHeight: '48px'
+              }}
+            >
+              <Wrench size={18} />
+              <span>Hardware & Stock Override</span>
+            </button>
+          )}
 
           <button 
             onClick={handleShareWhatsApp}
@@ -649,9 +921,17 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
             }}
           >
             <Share2 size={18} />
-            <span>Share Specification</span>
+            <span>Share {userMode === 'client' ? 'Blueprint' : 'Specification'}</span>
           </button>
         </div>
+
+      {/* Engineer Hardware & Stock Override Drawer */}
+      <EngineerOverrideDrawer
+        isOpen={isOverrideOpen}
+        onClose={() => setIsOverrideOpen(false)}
+        currentResult={activeData}
+        onApplyOverrides={handleApplyOverrides}
+      />
     </div>
   );
 }

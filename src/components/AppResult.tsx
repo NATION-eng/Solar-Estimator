@@ -929,7 +929,7 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
       <EngineerOverrideDrawer
         isOpen={isOverrideOpen}
         onClose={() => setIsOverrideOpen(false)}
-        currentResult={activeData}
+        currentResult={activeData || data}
         onApplyOverrides={handleApplyOverrides}
       />
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { MapPin, Info, Sparkles } from 'lucide-react';
+import { MapPin, Info, Sparkles, Navigation, Loader2 } from 'lucide-react';
 
 interface LocationAutocompleteProps {
   value: string;
@@ -17,6 +17,37 @@ interface LocationData {
   lng?: number;
 }
 
+function matchNigerianCoordinates(lat: number, lng: number) {
+  const hubs = [
+    { name: "Port Harcourt, Rivers", psh: 4.1, lat: 4.8156, lng: 7.0498, city: "Port Harcourt", state: "Rivers" },
+    { name: "Lagos (Ikeja / Lekki)", psh: 4.4, lat: 6.5244, lng: 3.3792, city: "Lagos", state: "Lagos" },
+    { name: "Ibadan, Oyo", psh: 4.6, lat: 7.3775, lng: 3.9470, city: "Ibadan", state: "Oyo" },
+    { name: "Enugu, Enugu", psh: 4.5, lat: 6.4584, lng: 7.5464, city: "Enugu", state: "Enugu" },
+    { name: "Warri, Delta", psh: 4.2, lat: 5.5167, lng: 5.7500, city: "Warri", state: "Delta" },
+    { name: "Benin City, Edo", psh: 4.3, lat: 6.3350, lng: 5.6037, city: "Benin City", state: "Edo" },
+    { name: "Abuja, FCT", psh: 5.1, lat: 9.0765, lng: 7.3986, city: "Abuja", state: "FCT" },
+    { name: "Jos, Plateau", psh: 5.3, lat: 9.8965, lng: 8.8583, city: "Jos", state: "Plateau" },
+    { name: "Ilorin, Kwara", psh: 4.9, lat: 8.4799, lng: 4.5418, city: "Ilorin", state: "Kwara" },
+    { name: "Kaduna, Kaduna", psh: 5.6, lat: 10.5105, lng: 7.4165, city: "Kaduna", state: "Kaduna" },
+    { name: "Kano, Kano", psh: 6.2, lat: 12.0022, lng: 8.5920, city: "Kano", state: "Kano" },
+    { name: "Sokoto, Sokoto", psh: 6.3, lat: 13.0059, lng: 5.2476, city: "Sokoto", state: "Sokoto" },
+    { name: "Maiduguri, Borno", psh: 6.4, lat: 11.8311, lng: 13.1510, city: "Maiduguri", state: "Borno" },
+  ];
+
+  let closest = hubs[0];
+  let minDistance = Infinity;
+
+  hubs.forEach(h => {
+    const d = Math.hypot(lat - h.lat, lng - h.lng);
+    if (d < minDistance) {
+      minDistance = d;
+      closest = h;
+    }
+  });
+
+  return closest;
+}
+
 export default function LocationAutocomplete({ 
   value, 
   onChange, 
@@ -27,6 +58,7 @@ export default function LocationAutocomplete({
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLocating, setIsLocating] = useState<boolean>(false);
 
   useEffect(() => {
     // Check if Google Maps API is loaded
@@ -121,6 +153,37 @@ export default function LocationAutocomplete({
     onChange(e.target.value);
   };
 
+  const handleGpsLocate = () => {
+    if (!navigator.geolocation) {
+      setError('Geolocation not supported by this browser.');
+      return;
+    }
+    setIsLocating(true);
+    setError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setIsLocating(false);
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        const hub = matchNigerianCoordinates(lat, lng);
+        onChange(hub.name, {
+          address: hub.name,
+          city: hub.city,
+          state: hub.state,
+          country: 'Nigeria',
+          lat,
+          lng
+        });
+      },
+      (err) => {
+        setIsLocating(false);
+        setError('Could not access GPS. Please type your city manually.');
+      },
+      { timeout: 8000, enableHighAccuracy: true }
+    );
+  };
+
   return (
     <div style={{ position: 'relative', width: '100%' }}>
       <div style={{ position: 'relative' }}>
@@ -133,7 +196,7 @@ export default function LocationAutocomplete({
           disabled={disabled}
           style={{
             width: '100%',
-            padding: '12px 16px 12px 42px',
+            padding: '12px 105px 12px 42px',
             background: 'var(--color-bg-surface)',
             border: '1px solid var(--border-hairline)',
             borderRadius: 'var(--radius-sm)',
@@ -164,19 +227,34 @@ export default function LocationAutocomplete({
           <MapPin size={16} />
         </div>
 
-        {/* Loading/Status Indicator */}
-        {!isLoaded && !error && (
-          <div style={{
+        {/* GPS Locate Button */}
+        <button
+          type="button"
+          onClick={handleGpsLocate}
+          disabled={isLocating}
+          title="Use Rooftop GPS (Auto-detect Nigerian Solar Irradiance)"
+          style={{
             position: 'absolute',
-            right: '12px',
+            right: '8px',
             top: '50%',
             transform: 'translateY(-50%)',
-            fontSize: '0.75rem',
-            color: 'var(--color-text-muted)',
-          }}>
-            Loading...
-          </div>
-        )}
+            background: 'rgba(245, 158, 11, 0.12)',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            color: 'var(--color-primary)',
+            borderRadius: '4px',
+            padding: '5px 8px',
+            fontSize: '0.72rem',
+            fontWeight: 700,
+            cursor: isLocating ? 'wait' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            transition: 'all 0.15s ease'
+          }}
+        >
+          {isLocating ? <Loader2 size={12} style={{ animation: 'spin 1s linear infinite' }} /> : <Navigation size={12} />}
+          <span>{isLocating ? 'Locating...' : 'GPS Audit'}</span>
+        </button>
       </div>
 
       {/* Error Message */}

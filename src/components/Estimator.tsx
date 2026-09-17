@@ -28,7 +28,10 @@ import {
   User,
   Wrench,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Send,
+  Copy,
+  CheckCircle2
 } from "lucide-react";
 import AppResult from "./AppResult";
 import ApplianceSelector from "./ApplianceSelector";
@@ -76,6 +79,8 @@ export default function Estimator() {
   const [batteryType, setBatteryType] = useState<'lithium' | 'gel' | 'tubular'>('lithium');
   const [cableDistance, setCableDistance] = useState<number>(20);
   const [isProMode, setIsProMode] = useState<boolean>(false);
+  const [incomingAudit, setIncomingAudit] = useState<{ clientAddress: string; count: number } | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Synchronize high-contrast direct-sunlight mode to root HTML element
   useEffect(() => {
@@ -101,6 +106,45 @@ export default function Estimator() {
     { name: "Standing Fan", watt: 55, quantity: 2 },
     { name: "LED Bulbs", watt: 9, quantity: 8 },
   ]);
+
+  // Decode incoming shareable blueprint URL if present
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const blueprintParam = params.get('blueprint');
+      if (blueprintParam) {
+        const decodedStr = decodeURIComponent(escape(atob(blueprintParam)));
+        const data = JSON.parse(decodedStr);
+        if (data && Array.isArray(data.appliances)) {
+          if (data.property) setProperty(data.property);
+          if (data.address) setAddress(data.address);
+          if (data.hours) setHours(Number(data.hours));
+          if (data.batteryType) setBatteryType(data.batteryType);
+          if (data.cableDistance) setCableDistance(Number(data.cableDistance));
+          loadPresets(data.appliances);
+          setUserMode('engineer');
+          setIncomingAudit({
+            clientAddress: data.address || 'Client Site',
+            count: data.appliances.length
+          });
+
+          // Auto-trigger calculation for immediate audit inspection
+          setTimeout(() => {
+            runEstimate(
+              data.property || 'home',
+              data.address || 'Nigeria',
+              Number(data.hours) || 8,
+              data.appliances,
+              data.batteryType || 'lithium',
+              Number(data.cableDistance) || 20
+            );
+          }, 350);
+        }
+      }
+    } catch (e) {
+      console.warn("Could not parse shared blueprint parameter:", e);
+    }
+  }, []);
 
   const resultsRef = useRef<HTMLDivElement>(null);
   const topContainerRef = useRef<HTMLDivElement>(null);
@@ -253,6 +297,42 @@ export default function Estimator() {
   const goToStep = (step: 1 | 2 | 3) => {
     setCurrentStep(step);
     topContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  };
+
+  const handleShareBlueprintToEngineer = () => {
+    try {
+      const payload = {
+        property,
+        address,
+        hours,
+        batteryType,
+        cableDistance,
+        appliances
+      };
+      const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      const shareUrl = `${window.location.origin}${window.location.pathname}?blueprint=${encoded}`;
+
+      const summaryText = [
+        `*MasterviewCEL Solar Blueprint - Client Submission for Review*`,
+        `📍 Location: ${address}`,
+        `⚡ Daily Load: ${dailyEnergyKwh} kWh/day (${totalSteadyWatts}W continuous)`,
+        `🔋 Backup Preference: ${hours} Hours (${batteryType.toUpperCase()})`,
+        ``,
+        `Hello Engineer, please inspect and audit my solar sizing blueprint on your field dashboard:`,
+        shareUrl
+      ].join('\n');
+
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(summaryText)}`;
+      window.open(whatsappUrl, '_blank');
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(shareUrl);
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 3000);
+      }
+    } catch (e) {
+      console.error("Error generating share link:", e);
+    }
   };
 
   /* ================= REUSABLE RENDER SECTIONS ================= */
@@ -668,6 +748,51 @@ export default function Estimator() {
     <div className={styles.container} ref={topContainerRef}>
       <div className={styles.glassPanel}>
 
+        {/* Incoming Client Blueprint Audit Banner */}
+        {incomingAudit && (
+          <div style={{
+            background: 'rgba(56, 189, 248, 0.1)',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
+            borderRadius: 'var(--radius-md)',
+            padding: '14px 18px',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '12px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                background: 'rgba(56, 189, 248, 0.2)',
+                color: 'var(--color-accent)',
+                padding: '6px',
+                borderRadius: '6px'
+              }}>
+                <Wrench size={18} />
+              </div>
+              <div>
+                <div style={{ fontWeight: 800, fontSize: '0.88rem', color: '#fff' }}>
+                  Field Engineering Audit Mode Active
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>
+                  Preloaded client blueprint for <strong style={{ color: 'var(--color-accent)' }}>{incomingAudit.clientAddress}</strong> ({incomingAudit.count} appliance groups). All parameters and warehouse overrides are unlocked.
+                </div>
+              </div>
+            </div>
+            <span style={{
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              background: 'var(--color-accent)',
+              color: '#0a0e17',
+              padding: '4px 10px',
+              borderRadius: 'var(--radius-sm)'
+            }}>
+              Client Audit Sizing
+            </span>
+          </div>
+        )}
+
         {/* Dual-Persona Bar: Homeowner vs. Field Engineer & Sunlight Mode */}
         <div className={styles.personaBar}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
@@ -770,6 +895,30 @@ export default function Estimator() {
                 <span>{loading ? "Analyzing Energy Profile..." : "Calculate Solar Blueprint"}</span>
                 <ArrowRight size={18} />
               </button>
+
+              <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  onClick={handleShareBlueprintToEngineer}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid var(--border-hairline)',
+                    color: 'var(--color-text-main)',
+                    padding: '8px 16px',
+                    borderRadius: 'var(--radius-sm)',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  {copiedLink ? <CheckCircle2 size={14} color="var(--color-success)" /> : <Send size={14} color="var(--color-accent)" />}
+                  <span>{copiedLink ? 'Link Copied to Clipboard!' : 'Send Blueprint to My Installer for Review'}</span>
+                </button>
+              </div>
             </div>
 
             {/* Desktop Blueprint Section (Unfolds below) */}
@@ -886,6 +1035,29 @@ export default function Estimator() {
                   >
                     <span>{loading ? "Analyzing Energy..." : "Calculate Blueprint"}</span>
                     <Zap size={16} />
+                  </button>
+                </div>
+
+                <div style={{ marginTop: '12px', textAlign: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={handleShareBlueprintToEngineer}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid var(--border-hairline)',
+                      color: 'var(--color-text-main)',
+                      padding: '8px 16px',
+                      borderRadius: 'var(--radius-sm)',
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    {copiedLink ? <CheckCircle2 size={13} color="var(--color-success)" /> : <Send size={13} color="var(--color-accent)" />}
+                    <span>{copiedLink ? 'Link Copied!' : 'Send Blueprint to Installer for Review'}</span>
                   </button>
                 </div>
               </div>

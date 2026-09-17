@@ -16,6 +16,7 @@ import type { EstimationResult } from '../types';
 import LoadProfileChart from './LoadProfileChart';
 import SavingsCalculator from './SavingsCalculator';
 import EnvironmentalImpactCard from './EnvironmentalImpactCard';
+import DayNightRuntimeMatrix from './DayNightRuntimeMatrix';
 import { calculateEnvironmentalImpact } from '../utils/helpers';
 
 type ResultProps = {
@@ -391,6 +392,17 @@ export default function AppResult({ data, userMode = 'client' }: ResultProps) {
             <strong style={{ color: '#fff' }}>24/7 Power Assurance:</strong> Sizing automatically factors in compressor duty cycles (for air conditioners and refrigerators) and nighttime battery autonomy, ensuring your home or facility stays uninterrupted without overpaying for oversized hardware.
           </p>
         </div>
+
+        {/* Day vs Night Runtime Simulation Matrix */}
+        {data.appliances && data.appliances.length > 0 && (
+          <DayNightRuntimeMatrix
+            appliances={data.appliances}
+            batteryCapacityWh={data.batteryCapacityWh || 0}
+            batteryType={data.batteryType || 'lithium'}
+            systemVoltage={data.systemVoltage || 48}
+            userMode={userMode}
+          />
+        )}
 
         {/* Cable Sizing & Field Safety Card */}
         <div style={{

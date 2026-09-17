@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { MapPin, Info, Sparkles } from 'lucide-react';
 
 interface LocationAutocompleteProps {
   value: string;
@@ -58,48 +59,55 @@ export default function LocationAutocomplete({
       // Initialize Google Places Autocomplete
       const autocomplete = new google.maps.places.Autocomplete(inputRef.current, {
         componentRestrictions: { country: 'ng' }, // Restrict to Nigeria
-        fields: ['formatted_address', 'address_components', 'geometry', 'name'],
-        types: ['geocode'], // Only return geocoding results
+        fields: ['address_components', 'formatted_address', 'geometry'],
+        types: ['geocode', 'establishment'],
       });
 
-      // Listen for place selection
       autocomplete.addListener('place_changed', () => {
         const place = autocomplete.getPlace();
-
-        if (!place.formatted_address) {
-          setError('Please select a valid location from the suggestions');
+        
+        if (!place.geometry || !place.geometry.location) {
+          // User entered name of a place that was not suggested
+          onChange(inputRef.current?.value || '');
           return;
         }
 
-        // Extract location data
-        const locationData: LocationData = {
-          address: place.formatted_address,
-          lat: place.geometry?.location?.lat(),
-          lng: place.geometry?.location?.lng(),
-        };
+        const address = place.formatted_address || inputRef.current?.value || '';
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
 
-        // Parse address components
+        // Extract city and state
+        let city = '';
+        let state = '';
+        let country = 'Nigeria';
+
         if (place.address_components) {
-          place.address_components.forEach((component: google.maps.GeocoderAddressComponent) => {
+          for (const component of place.address_components) {
             const types = component.types;
-            
             if (types.includes('locality')) {
-              locationData.city = component.long_name;
+              city = component.long_name;
             } else if (types.includes('administrative_area_level_1')) {
-              locationData.state = component.long_name;
+              state = component.long_name;
             } else if (types.includes('country')) {
-              locationData.country = component.long_name;
+              country = component.long_name;
             }
-          });
+          }
         }
 
-        onChange(place.formatted_address, locationData);
+        onChange(address, {
+          address,
+          city,
+          state,
+          country,
+          lat,
+          lng,
+        });
       });
 
       autocompleteRef.current = autocomplete;
     } catch (err) {
-      console.error('Error initializing autocomplete:', err);
-      setError('Autocomplete unavailable. You can still enter your address manually.');
+      console.error('Failed to initialize Google Places Autocomplete:', err);
+      setError('Autocomplete unavailable. Please type your location manually.');
     }
 
     return () => {
@@ -109,48 +117,51 @@ export default function LocationAutocomplete({
     };
   }, [isLoaded, onChange]);
 
+  const handleManualChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(e.target.value);
+  };
+
   return (
     <div style={{ position: 'relative', width: '100%' }}>
       <div style={{ position: 'relative' }}>
         <input
           ref={inputRef}
           type="text"
-          placeholder={placeholder}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={handleManualChange}
+          placeholder={placeholder}
           disabled={disabled}
           style={{
             width: '100%',
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '12px 16px 12px 42px',
+            background: 'var(--color-bg-surface)',
+            border: '1px solid var(--border-hairline)',
             borderRadius: 'var(--radius-sm)',
-            padding: '12px 16px',
-            paddingLeft: '40px', // Space for icon
-            color: '#fff',
-            fontSize: '1rem',
+            color: 'var(--color-text-main)',
+            fontSize: '0.95rem',
             outline: 'none',
-            transition: 'all 0.2s',
+            transition: 'border-color 0.2s ease',
           }}
           onFocus={(e) => {
             e.currentTarget.style.borderColor = 'var(--color-primary)';
-            e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
           }}
           onBlur={(e) => {
-            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-            e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+            e.currentTarget.style.borderColor = 'var(--border-hairline)';
           }}
         />
         
         {/* Location Icon */}
         <div style={{
           position: 'absolute',
-          left: '12px',
+          left: '14px',
           top: '50%',
           transform: 'translateY(-50%)',
-          fontSize: '1.2rem',
-          opacity: 0.6,
+          color: 'var(--color-text-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          pointerEvents: 'none'
         }}>
-          📍
+          <MapPin size={16} />
         </div>
 
         {/* Loading/Status Indicator */}
@@ -176,9 +187,9 @@ export default function LocationAutocomplete({
           color: 'var(--color-accent)',
           display: 'flex',
           alignItems: 'center',
-          gap: '4px',
+          gap: '5px',
         }}>
-          <span>ℹ️</span>
+          <Info size={13} />
           <span>{error}</span>
         </div>
       )}
@@ -191,9 +202,9 @@ export default function LocationAutocomplete({
           color: 'var(--color-text-muted)',
           display: 'flex',
           alignItems: 'center',
-          gap: '4px',
+          gap: '5px',
         }}>
-          <span>💡</span>
+          <Sparkles size={12} color="var(--color-primary)" />
           <span>Start typing your city or address in Nigeria for suggestions</span>
         </div>
       )}

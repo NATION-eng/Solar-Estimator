@@ -1,5 +1,5 @@
 import React from 'react';
-import CustomEmoji from './CustomEmoji';
+import { AlertCircle, X } from 'lucide-react';
 
 export interface ValidationErrorProps {
   message: string;
@@ -12,20 +12,20 @@ export function ValidationError({ message, onDismiss }: ValidationErrorProps) {
       role="alert"
       aria-live="polite"
       style={{
-        color: '#ef4444',
-        fontSize: '0.85rem',
+        color: '#f87171',
+        fontSize: '0.82rem',
         marginTop: '6px',
         padding: '10px 14px',
-        background: 'rgba(239, 68, 68, 0.1)',
-        borderRadius: '6px',
-        border: '1px solid rgba(239, 68, 68, 0.3)',
+        background: 'rgba(239, 68, 68, 0.08)',
+        borderRadius: 'var(--radius-sm)',
+        border: '1px solid rgba(239, 68, 68, 0.25)',
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
         animation: 'slideIn 0.2s ease-out'
       }}
     >
-      <CustomEmoji name="alert" size={16} color="#ef4444" />
+      <AlertCircle size={15} color="#f87171" style={{ flexShrink: 0 }} />
       <span style={{ flex: 1 }}>{message}</span>
       {onDismiss && (
         <button
@@ -34,18 +34,18 @@ export function ValidationError({ message, onDismiss }: ValidationErrorProps) {
           style={{
             background: 'none',
             border: 'none',
-            color: '#ef4444',
+            color: '#f87171',
             cursor: 'pointer',
-            padding: '4px',
-            fontSize: '1.2rem',
-            lineHeight: 1,
-            opacity: 0.7,
+            padding: '2px',
+            display: 'flex',
+            alignItems: 'center',
+            opacity: 0.8,
             transition: 'opacity 0.2s'
           }}
           onMouseOver={(e) => e.currentTarget.style.opacity = '1'}
-          onMouseOut={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseOut={(e) => e.currentTarget.style.opacity = '0.8'}
         >
-          ×
+          <X size={14} />
         </button>
       )}
     </div>

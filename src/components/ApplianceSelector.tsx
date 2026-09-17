@@ -1,7 +1,20 @@
 import { useState, useRef, useEffect } from 'react';
+import { 
+  Tv, 
+  Utensils, 
+  Wind, 
+  Laptop, 
+  Search, 
+  Plus, 
+  Layers, 
+  Sparkles,
+  Zap,
+  Clock,
+  Plug,
+  Info
+} from 'lucide-react';
 import { APPLIANCE_DATABASE, CATEGORIES, searchAppliances, type ApplianceSpec } from '../data/applianceDatabase';
 import type { Appliance } from '../types';
-import CustomEmoji from './CustomEmoji';
 
 interface ApplianceSelectorProps {
   onAdd: (appliance: Appliance) => void;
@@ -78,21 +91,36 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
   return (
     <div style={{ marginBottom: '24px' }}>
       <div style={{ marginBottom: '16px' }}>
-        {/* Room Presets Quick-Add Row (Client-Friendly 1-Tap Add) */}
-        <div style={{ marginBottom: '16px', background: 'rgba(255, 255, 255, 0.02)', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-              <CustomEmoji name="sparkles" size={13} color="var(--color-primary)" />
-              <span>1-Tap Room Quick-Add</span>
+        {/* Room Presets Quick-Add Row */}
+        <div style={{ 
+          marginBottom: '16px', 
+          background: 'var(--color-bg-surface)', 
+          padding: '12px 14px', 
+          borderRadius: 'var(--radius-md)', 
+          border: 'var(--border-subtle)' 
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+            <span style={{ 
+              fontSize: '0.74rem', 
+              fontWeight: 600, 
+              color: 'var(--color-primary)', 
+              textTransform: 'uppercase', 
+              letterSpacing: '0.06em', 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '6px' 
+            }}>
+              <Sparkles size={13} color="var(--color-primary)" />
+              <span>1-Tap Room Load Templates</span>
             </span>
-            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>Tap to add common items</span>
+            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)' }}>Select template to populate appliances</span>
           </div>
 
-          <div className="scroll-touch-x" style={{ gap: '6px' }}>
+          <div className="scroll-touch-x" style={{ gap: '8px' }}>
             {[
               {
-                label: '🛋️ Living Room Pack',
-                icon: 'tv',
+                label: 'Living Room Suite',
+                IconComponent: Tv,
                 items: [
                   { name: 'LED TV (43")', watt: 65, quantity: 1, hours: 6, category: 'entertainment' },
                   { name: 'Standing Fan 16"', watt: 55, quantity: 2, hours: 8, category: 'cooling' },
@@ -101,8 +129,8 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                 ]
               },
               {
-                label: '🍳 Kitchen Basics',
-                icon: 'utensils',
+                label: 'Kitchen Core',
+                IconComponent: Utensils,
                 items: [
                   { name: 'Small Refrigerator (Inverter)', watt: 120, quantity: 1, hours: 24, category: 'kitchen' },
                   { name: 'Microwave Oven (800W)', watt: 800, quantity: 1, hours: 0.5, category: 'kitchen' },
@@ -110,8 +138,8 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                 ]
               },
               {
-                label: '❄️ Bedroom Comfort',
-                icon: 'cooling',
+                label: 'Bedroom & HVAC',
+                IconComponent: Wind,
                 items: [
                   { name: 'AC 1HP Inverter', watt: 746, quantity: 1, hours: 6, category: 'cooling' },
                   { name: 'Ceiling Fan (Standard)', watt: 75, quantity: 1, hours: 8, category: 'cooling' },
@@ -119,43 +147,55 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                 ]
               },
               {
-                label: '💼 Home Office / Study',
-                icon: 'laptop',
+                label: 'Office & Workstation',
+                IconComponent: Laptop,
                 items: [
                   { name: 'Laptop Computer', watt: 65, quantity: 2, hours: 8, category: 'computing' },
                   { name: 'WiFi Router', watt: 15, quantity: 1, hours: 24, category: 'computing' },
                   { name: 'Desk Lamp LED', watt: 10, quantity: 1, hours: 5, category: 'lighting' },
                 ]
               }
-            ].map((room) => (
-              <button
-                key={room.label}
-                type="button"
-                onClick={() => {
-                  room.items.forEach(item => onAdd(item));
-                }}
-                style={{
-                  padding: '6px 12px',
-                  background: 'rgba(251, 191, 36, 0.08)',
-                  border: '1px solid rgba(251, 191, 36, 0.25)',
-                  borderRadius: '100px',
-                  color: '#fff',
-                  fontSize: '0.76rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0
-                }}
-                title={`Add ${room.items.length} appliances at once`}
-              >
-                <CustomEmoji name={room.icon} size={14} color="var(--color-primary)" />
-                <span>{room.label}</span>
-                <span style={{ fontSize: '0.68rem', opacity: 0.7 }}>+{room.items.length}</span>
-              </button>
-            ))}
+            ].map((room) => {
+              const Icon = room.IconComponent;
+              return (
+                <button
+                  key={room.label}
+                  type="button"
+                  onClick={() => {
+                    room.items.forEach(item => onAdd(item));
+                  }}
+                  style={{
+                    padding: '7px 12px',
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: 'var(--radius-sm)',
+                    color: '#fff',
+                    fontSize: '0.78rem',
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0,
+                    transition: 'all 0.15s ease'
+                  }}
+                  title={`Add ${room.items.length} appliances at once`}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-primary-border)';
+                    e.currentTarget.style.background = 'var(--color-primary-subtle)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.04)';
+                  }}
+                >
+                  <Icon size={14} color="var(--color-primary)" />
+                  <span>{room.label}</span>
+                  <span style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)' }}>+{room.items.length}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -163,9 +203,10 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
           display: 'block',
           marginBottom: '8px',
           fontWeight: 600,
-          color: 'var(--color-text-main)',
+          fontSize: '0.85rem',
+          color: 'var(--color-text-body)',
         }}>
-          Quick Add from Database
+          Search Appliance Catalog
         </label>
         
         {/* Category Pills */}
@@ -185,27 +226,26 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                 setShowSuggestions(true);
               }}
               style={{
-                padding: '7px 14px',
+                padding: '6px 12px',
                 background: selectedCategory === key 
-                  ? 'var(--color-primary)' 
-                  : 'rgba(255,255,255,0.05)',
+                  ? 'var(--color-primary-subtle)' 
+                  : 'rgba(255,255,255,0.03)',
                 border: selectedCategory === key
-                  ? '1px solid var(--color-primary)'
-                  : '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '20px',
-                color: selectedCategory === key ? '#000' : '#fff',
-                fontSize: '0.8rem',
+                  ? '1.5px solid var(--color-primary)'
+                  : '1px solid rgba(255,255,255,0.08)',
+                borderRadius: 'var(--radius-sm)',
+                color: selectedCategory === key ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                fontSize: '0.78rem',
                 cursor: 'pointer',
-                transition: 'all 0.2s',
+                transition: 'all 0.15s ease',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                fontWeight: selectedCategory === key ? 700 : 500,
+                fontWeight: selectedCategory === key ? 600 : 500,
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}
             >
-              <CustomEmoji name={cat.icon} size={15} color={selectedCategory === key ? '#000' : cat.color} />
               <span>{cat.label}</span>
             </button>
           ))}
@@ -214,7 +254,7 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
         {/* Search Input */}
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <div style={{ position: 'absolute', left: '14px', pointerEvents: 'none', display: 'flex', alignItems: 'center' }}>
-            <CustomEmoji name="search" size={16} color="var(--color-text-muted)" />
+            <Search size={16} color="var(--color-text-muted)" />
           </div>
           <input
             ref={inputRef}
@@ -309,8 +349,8 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                           gap: '8px',
                           marginBottom: '4px',
                         }}>
-                          <CustomEmoji name={spec.icon || 'plug'} size={18} />
-                          <span style={{ fontWeight: 600, fontSize: '0.95rem' }}>
+                          <Plug size={15} color="var(--color-primary)" />
+                          <span style={{ fontWeight: 600, fontSize: '0.92rem' }}>
                             {spec.name}
                           </span>
                         </div>
@@ -326,10 +366,10 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
                             {CATEGORIES[spec.category as keyof typeof CATEGORIES]?.label}
                           </span>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                            <CustomEmoji name="bolt" size={12} /> {spec.wattage}W
+                            <Zap size={11} /> {spec.wattage}W
                           </span>
                           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                            <CustomEmoji name="clock" size={12} /> {spec.typicalHours}h/day
+                            <Clock size={11} /> {spec.typicalHours}h/day
                           </span>
                         </div>
                         
@@ -384,7 +424,7 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
         alignItems: 'center',
         gap: '6px',
       }}>
-        <CustomEmoji name="lightbulb" size={15} color="var(--color-primary)" />
+        <Info size={14} color="var(--color-primary)" />
         <span>
           Browse by category or search by name. Can't find an appliance? Add it manually below.
         </span>

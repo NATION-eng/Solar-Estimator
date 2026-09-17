@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { TrendingUp, CheckCircle2, Clock, Coins } from 'lucide-react';
 import { formatCurrency } from '../utils/helpers';
-import CustomEmoji from './CustomEmoji';
 
 interface SavingsCalculatorProps {
   systemCost: number;
@@ -26,25 +26,27 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
   
   return (
     <div style={{
-      background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%)',
-      padding: 'clamp(16px, 4vw, 28px)',
+      background: 'var(--color-bg-surface)',
+      padding: 'clamp(16px, 4vw, 24px)',
       borderRadius: 'var(--radius-md)',
-      border: '1px solid rgba(251, 191, 36, 0.2)',
+      border: '1px solid var(--border-hairline)',
+      borderTop: '2px solid var(--color-primary)',
       marginTop: '24px',
     }}>
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
+        gap: '10px',
         marginBottom: '18px',
       }}>
-        <CustomEmoji name="coins" size={26} color="var(--color-primary)" />
+        <TrendingUp size={20} color="var(--color-primary)" />
         <h4 style={{
           color: 'var(--color-primary)',
-          fontSize: '1.05rem',
+          fontSize: '0.95rem',
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
+          margin: 0,
         }}>
           Financial Savings & Tariff Sensitivity
         </h4>
@@ -60,7 +62,7 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         <div>
           <label style={{
             display: 'block',
-            fontSize: '0.85rem',
+            fontSize: '0.82rem',
             color: 'var(--color-text-muted)',
             marginBottom: '8px',
             fontWeight: 500,
@@ -74,11 +76,11 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
             style={{
               width: '100%',
               background: 'rgba(0,0,0,0.3)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              borderRadius: '8px',
-              padding: '12px',
+              border: '1px solid var(--border-hairline)',
+              borderRadius: 'var(--radius-sm)',
+              padding: '10px 12px',
               color: '#fff',
-              fontSize: '1rem',
+              fontSize: '0.95rem',
             }}
           />
         </div>
@@ -86,7 +88,7 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         <div>
           <label style={{
             display: 'block',
-            fontSize: '0.85rem',
+            fontSize: '0.82rem',
             color: 'var(--color-text-muted)',
             marginBottom: '8px',
             fontWeight: 500,
@@ -101,15 +103,16 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
             onChange={(e) => setYears(Number(e.target.value))}
             style={{
               width: '100%',
-              accentColor: 'var(--color-accent)',
+              accentColor: 'var(--color-primary)',
               marginTop: '8px',
             }}
           />
           <div style={{
             textAlign: 'center',
-            marginTop: '8px',
-            color: 'var(--color-accent)',
+            marginTop: '6px',
+            color: 'var(--color-primary)',
             fontWeight: 700,
+            fontSize: '0.85rem'
           }}>
             {years} Years
           </div>
@@ -120,20 +123,20 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
       <div style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: '16px',
-        marginBottom: '24px',
+        gap: '14px',
+        marginBottom: '20px',
       }}>
         {/* Grid Cost */}
         <div style={{
-          background: 'rgba(239, 68, 68, 0.1)',
-          padding: 'clamp(12px, 3vw, 20px)',
-          borderRadius: '12px',
+          background: 'rgba(239, 68, 68, 0.06)',
+          padding: '14px 16px',
+          borderRadius: 'var(--radius-sm)',
           border: '1px solid rgba(239, 68, 68, 0.2)',
         }}>
-          <div style={{ fontSize: '0.72rem', color: 'rgba(239, 68, 68, 0.8)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ fontSize: '0.72rem', color: 'rgba(239, 68, 68, 0.85)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
             Grid Electricity
           </div>
-          <div style={{ fontSize: 'clamp(0.95rem, 3.2vw, 1.3rem)', fontWeight: 700, color: '#ef4444', marginBottom: '6px' }}>
+          <div style={{ fontSize: 'clamp(0.95rem, 3.2vw, 1.25rem)', fontWeight: 800, color: '#f87171', marginBottom: '4px', fontVariantNumeric: 'tabular-nums' }}>
             {formatCurrency(monthlyGridCost)}/mo
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
@@ -143,15 +146,15 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         
         {/* Solar Cost */}
         <div style={{
-          background: 'rgba(16, 185, 129, 0.1)',
-          padding: 'clamp(12px, 3vw, 20px)',
-          borderRadius: '12px',
+          background: 'rgba(16, 185, 129, 0.06)',
+          padding: '14px 16px',
+          borderRadius: 'var(--radius-sm)',
           border: '1px solid rgba(16, 185, 129, 0.2)',
         }}>
-          <div style={{ fontSize: '0.72rem', color: 'rgba(16, 185, 129, 0.8)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ fontSize: '0.72rem', color: 'rgba(16, 185, 129, 0.85)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
             Solar Energy
           </div>
-          <div style={{ fontSize: 'clamp(0.95rem, 3.2vw, 1.3rem)', fontWeight: 700, color: '#10b981', marginBottom: '6px' }}>
+          <div style={{ fontSize: 'clamp(0.95rem, 3.2vw, 1.25rem)', fontWeight: 800, color: '#34d399', marginBottom: '4px', fontVariantNumeric: 'tabular-nums' }}>
             {formatCurrency(annualSolarCost / 12)}/mo
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
@@ -162,28 +165,29 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
       
       {/* Savings Highlight */}
       <div style={{
-        background: 'rgba(251, 191, 36, 0.15)',
-        padding: 'clamp(16px, 4vw, 24px)',
-        borderRadius: '12px',
+        background: 'rgba(0, 0, 0, 0.25)',
+        padding: 'clamp(16px, 4vw, 22px)',
+        borderRadius: 'var(--radius-sm)',
+        border: '1px solid var(--border-hairline)',
         textAlign: 'center',
-        marginBottom: '24px',
+        marginBottom: '22px',
       }}>
-        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '6px' }}>
-          Total Savings Over {years} Years
+        <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          Estimated Net Savings Over {years} Years
         </div>
         <div style={{
-          fontSize: 'clamp(1.5rem, 5.5vw, 2.4rem)',
+          fontSize: 'clamp(1.5rem, 5.5vw, 2.2rem)',
           fontWeight: 800,
           color: totalSavings > 0 ? 'var(--color-success)' : '#ef4444',
-          marginBottom: '10px',
-          textShadow: '0 0 20px rgba(251, 191, 36, 0.3)',
+          marginBottom: '8px',
+          fontVariantNumeric: 'tabular-nums',
           lineHeight: 1.15,
           wordBreak: 'break-word'
         }}>
           {formatCurrency(Math.abs(totalSavings))}
         </div>
         <div style={{
-          fontSize: '0.85rem',
+          fontSize: '0.82rem',
           color: 'var(--color-text-muted)',
           display: 'flex',
           alignItems: 'center',
@@ -192,38 +196,38 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         }}>
           {totalSavings > 0 ? (
             <>
-              <CustomEmoji name="check" size={14} color="var(--color-success)" />
-              <span>Net Profit</span>
+              <CheckCircle2 size={14} color="var(--color-success)" />
+              <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>Net Capital Return Realized</span>
             </>
           ) : (
             <>
-              <CustomEmoji name="clock" size={14} color="var(--color-text-muted)" />
-              <span>Break-even not yet reached</span>
+              <Clock size={14} color="var(--color-text-muted)" />
+              <span>Break-even projection in progress</span>
             </>
           )}
         </div>
       </div>
       
       {/* Timeline Visualization */}
-      <div style={{ marginBottom: '24px' }}>
+      <div style={{ marginBottom: '22px' }}>
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '8px',
         }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
             Payback Timeline
           </div>
-          <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-primary)' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary)' }}>
             {paybackYears.toFixed(1)} years to break-even
           </div>
         </div>
         
         <div style={{
-          height: '8px',
-          background: 'rgba(255,255,255,0.05)',
-          borderRadius: '10px',
+          height: '6px',
+          background: 'rgba(255,255,255,0.06)',
+          borderRadius: '4px',
           overflow: 'hidden',
           position: 'relative',
         }}>
@@ -231,8 +235,8 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
           <div style={{
             height: '100%',
             width: `${Math.min((paybackYears / years) * 100, 100)}%`,
-            background: 'linear-gradient(to right, #ef4444, var(--color-accent))',
-            borderRadius: '10px',
+            background: '#ef4444',
+            borderRadius: '4px',
             transition: 'width 0.5s ease',
           }} />
           
@@ -244,8 +248,8 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
               right: 0,
               top: 0,
               bottom: 0,
-              background: 'linear-gradient(to right, var(--color-success), #22c55e)',
-              borderRadius: '0 10px 10px 0',
+              background: 'var(--color-success)',
+              borderRadius: '0 4px 4px 0',
             }} />
           )}
         </div>
@@ -253,13 +257,13 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          marginTop: '8px',
+          marginTop: '6px',
           fontSize: '0.7rem',
           color: 'var(--color-text-muted)',
         }}>
-          <span>Today</span>
-          <span>Year {Math.round(paybackYears)}</span>
-          <span>Year {years}</span>
+          <span>Commissioning</span>
+          <span>Break-Even ({Math.round(paybackYears)}y)</span>
+          <span>Horizon ({years}y)</span>
         </div>
       </div>
       
@@ -267,46 +271,49 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '12px',
+        gap: '10px',
       }}>
         <div style={{
           background: 'rgba(0,0,0,0.2)',
-          padding: '12px',
-          borderRadius: '8px',
+          padding: '12px 8px',
+          borderRadius: 'var(--radius-sm)',
+          border: '1px solid var(--border-hairline)',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
+          <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>
             Monthly Savings
           </div>
-          <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-success)' }}>
+          <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-success)', fontVariantNumeric: 'tabular-nums' }}>
             {formatCurrency(annualSavings / 12)}
           </div>
         </div>
         
         <div style={{
           background: 'rgba(0,0,0,0.2)',
-          padding: '12px',
-          borderRadius: '8px',
+          padding: '12px 8px',
+          borderRadius: 'var(--radius-sm)',
+          border: '1px solid var(--border-hairline)',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
+          <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>
             Annual Savings
           </div>
-          <div style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-success)' }}>
+          <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--color-success)', fontVariantNumeric: 'tabular-nums' }}>
             {formatCurrency(annualSavings)}
           </div>
         </div>
         
         <div style={{
           background: 'rgba(0,0,0,0.2)',
-          padding: '12px',
-          borderRadius: '8px',
+          padding: '12px 8px',
+          borderRadius: 'var(--radius-sm)',
+          border: '1px solid var(--border-hairline)',
           textAlign: 'center',
         }}>
-          <div style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '4px' }}>
-            ROI
+          <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginBottom: '4px', textTransform: 'uppercase' }}>
+            Projected ROI
           </div>
-          <div style={{ fontSize: '1rem', fontWeight: 700, color: totalSavings > 0 ? 'var(--color-success)' : '#ef4444' }}>
+          <div style={{ fontSize: '0.95rem', fontWeight: 800, color: totalSavings > 0 ? 'var(--color-success)' : '#ef4444', fontVariantNumeric: 'tabular-nums' }}>
             {roi > 0 ? '+' : ''}{roi.toFixed(0)}%
           </div>
         </div>
@@ -314,17 +321,16 @@ export default function SavingsCalculator({ systemCost, dailyEnergyWh, paybackYe
       
       {/* Info Note */}
       <div style={{
-        marginTop: '20px',
-        padding: '12px 16px',
-        background: 'rgba(59, 130, 246, 0.05)',
-        borderLeft: '3px solid var(--color-primary)',
-        borderRadius: '4px',
-        fontSize: '0.8rem',
+        marginTop: '16px',
+        padding: '10px 14px',
+        background: 'rgba(255, 255, 255, 0.02)',
+        borderLeft: '2px solid var(--color-primary)',
+        borderRadius: '0 var(--radius-sm) var(--radius-sm) 0',
+        fontSize: '0.78rem',
         color: 'var(--color-text-muted)',
-        lineHeight: 1.5,
+        lineHeight: 1.4,
       }}>
-        <strong style={{ color: 'var(--color-primary)' }}>Note:</strong> Calculations assume {gridTariff} ₦/kWh grid tariff. 
-        Your actual savings may vary based on tariff changes, system maintenance, and usage patterns.
+        <strong style={{ color: 'var(--color-primary)' }}>Tariff Context:</strong> Model calculated at {gridTariff} ₦/kWh. Actual savings increase as utility grid tariffs or diesel generator fuel costs escalate.
       </div>
     </div>
   );

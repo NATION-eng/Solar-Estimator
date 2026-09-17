@@ -51,11 +51,11 @@
 /* Stepper Navigation */
 .stepperBar {
   display: flex;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 100px;
+  background: var(--color-bg-surface);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
   padding: 4px;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   gap: 4px;
 }
 
@@ -65,45 +65,48 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 16px;
-  border-radius: 100px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
   border: none;
   background: transparent;
   color: var(--color-text-muted);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--transition-fast);
   white-space: nowrap;
 }
 
 .stepperTab:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .stepperTabActive {
-  background: var(--color-primary) !important;
-  color: #000 !important;
-  font-weight: 700;
-  box-shadow: 0 0 15px var(--color-primary-glow);
+  background: var(--color-bg-elevated) !important;
+  color: #fff !important;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .stepNumber {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .stepperTabActive .stepNumber {
-  background: #000;
-  color: var(--color-primary);
-  font-weight: 800;
+  background: var(--color-primary);
+  color: #080c14;
+  font-weight: 700;
 }
 
 /* Live Load Stat Bar */
@@ -111,11 +114,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(56, 189, 248, 0.05) 100%);
-  border: 1px solid rgba(251, 191, 36, 0.25);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-primary-border);
   border-radius: var(--radius-md);
   padding: 14px 20px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-subtle);
 }
 
 .liveLoadMetric {
@@ -124,27 +128,30 @@
 }
 
 .liveLoadLabel {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+  color: var(--color-text-dim);
+  font-weight: 600;
 }
 
 .liveLoadValue {
   font-size: 1.15rem;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Section Headers */
 .sectionTitle {
-  font-size: 1.18rem;
-  font-weight: 800;
+  font-size: 1.1rem;
+  font-weight: 700;
   color: #fff;
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 16px;
+  letter-spacing: -0.01em;
 }
 
 /* Parameters 3-Column Grid on Desktop */
@@ -157,8 +164,8 @@
 }
 
 .paramBox {
-  background: rgba(0, 0, 0, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-surface);
+  border: var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 20px 18px;
   display: flex;
@@ -181,42 +188,49 @@
 }
 
 .propertyCard {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--color-bg-surface);
+  border: var(--border-subtle);
   color: var(--color-text-muted);
-  padding: 18px 14px;
+  padding: 16px 14px;
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 8px;
-  transition: all 0.25s ease;
+  transition: all var(--transition-fast);
   cursor: pointer;
   position: relative;
   outline: none;
 }
 
 .propertyCard:hover {
-  border-color: rgba(251, 191, 36, 0.4);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .propertyCardActive {
-  background: rgba(251, 191, 36, 0.12) !important;
+  background: var(--color-primary-subtle) !important;
   border: 1.5px solid var(--color-primary) !important;
   color: #fff !important;
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+  box-shadow: 0 0 0 1px var(--color-primary);
 }
 
 .propertyIcon {
-  font-size: 1.8rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-primary);
+  margin-bottom: 2px;
 }
 
 .propertyLabel {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 600;
   color: #fff;
 }
 
@@ -230,14 +244,14 @@
   top: 8px;
   right: 8px;
   background: var(--color-primary);
-  color: #000;
-  width: 20px;
-  height: 20px;
+  color: #080c14;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 800;
 }
 

@@ -1,4 +1,5 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
+import { AlertTriangle } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
@@ -40,21 +41,25 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="glass-panel p-responsive" style={{ 
+        <div style={{ 
           textAlign: 'center', 
           padding: '60px 20px',
-          maxWidth: '600px',
-          margin: '100px auto',
-          borderRadius: 'var(--radius-lg)'
+          maxWidth: '560px',
+          margin: '80px auto',
+          background: 'var(--color-bg-surface)',
+          border: '1px solid var(--border-hairline)',
+          borderRadius: 'var(--radius-md)'
         }}>
-          <div style={{ fontSize: '4rem', marginBottom: '24px' }}>⚠️</div>
+          <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'center' }}>
+            <AlertTriangle size={48} color="var(--color-primary)" />
+          </div>
           <h2 style={{ 
-            color: 'var(--color-primary)', 
-            marginBottom: '16px',
-            fontSize: '1.8rem',
+            color: 'var(--color-text-main)', 
+            marginBottom: '12px',
+            fontSize: '1.6rem',
             fontWeight: 700
           }}>
-            Something went wrong
+            Application Error
           </h2>
           <p style={{ 
             marginBottom: '24px',

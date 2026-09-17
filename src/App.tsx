@@ -1,9 +1,9 @@
-import { useRef, RefObject } from "react";
+import { useRef } from "react";
+import { Sun } from "lucide-react";
 import Hero from "./components/Hero";
 import Estimator from "./components/Estimator";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import PWAInstallBanner from "./components/PWAInstallBanner";
-import CustomEmoji from "./components/CustomEmoji";
 import "./styles/design-system.css"; 
 
 function App() {
@@ -19,8 +19,8 @@ function App() {
         {/* Modern Top App Header with iOS Safe Area Inset */}
         <header style={{
           width: '100%',
-          borderBottom: '1px solid var(--border-glass)',
-          background: 'rgba(2, 6, 23, 0.88)',
+          borderBottom: '1px solid var(--border-hairline)',
+          background: 'rgba(8, 12, 20, 0.92)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           position: 'sticky',
@@ -31,37 +31,37 @@ function App() {
         }}>
           <div className="container-wide" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <CustomEmoji name="sun" size={24} />
-              <span style={{ fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.02em', color: '#fff' }}>
+              <Sun size={20} color="var(--color-primary)" />
+              <span style={{ fontWeight: 800, fontSize: '1.05rem', letterSpacing: '-0.02em', color: '#fff' }}>
                 Masterview<span style={{ color: 'var(--color-primary)' }}>CEL</span>
               </span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{
-                fontSize: '0.72rem',
+                fontSize: '0.7rem',
                 fontWeight: 700,
                 color: 'var(--color-primary)',
-                background: 'rgba(251, 191, 36, 0.1)',
-                border: '1px solid rgba(251, 191, 36, 0.25)',
-                padding: '4px 10px',
-                borderRadius: '100px',
+                background: 'rgba(245, 158, 11, 0.08)',
+                border: '1px solid rgba(245, 158, 11, 0.2)',
+                padding: '4px 8px',
+                borderRadius: 'var(--radius-sm)',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '5px'
               }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--color-primary)', display: 'inline-block' }}></span>
-                PWA v2.1
+                <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: 'var(--color-primary)', display: 'inline-block' }}></span>
+                PWA v2.2
               </span>
 
               <button
                 onClick={scrollToEstimator}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.08)',
+                  background: 'rgba(255, 255, 255, 0.06)',
                   color: '#fff',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  border: '1px solid var(--border-hairline)',
                   padding: '6px 14px',
-                  borderRadius: '100px',
+                  borderRadius: 'var(--radius-sm)',
                   fontSize: '0.8rem',
                   fontWeight: 600,
                   cursor: 'pointer'

@@ -1,15 +1,56 @@
 import { useState, useRef } from "react";
+import { 
+  Home, 
+  Building2, 
+  ShoppingBag, 
+  Utensils, 
+  Stethoscope, 
+  GraduationCap, 
+  Factory, 
+  Church, 
+  Hotel,
+  Check, 
+  Layers, 
+  MapPin, 
+  Clock, 
+  BatteryCharging, 
+  Cable, 
+  Zap, 
+  Plug, 
+  Plus, 
+  ArrowRight, 
+  ArrowLeft,
+  Share2,
+  BarChart3,
+  Sliders,
+  Sun
+} from "lucide-react";
 import AppResult from "./AppResult";
 import ApplianceSelector from "./ApplianceSelector";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ValidationError } from "./ValidationError";
-import CustomEmoji from "./CustomEmoji";
 import { useFormValidation } from "../hooks/useFormValidation";
 import { useEstimation } from "../hooks/useEstimation";
 import { useAppliances } from "../hooks/useAppliances";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import type { PropertyType } from "../types";
 import styles from "./Estimator.module.css";
+
+const renderPropertyIcon = (typeId: string) => {
+  const size = 18;
+  switch (typeId) {
+    case "home": return <Home size={size} />;
+    case "office": return <Building2 size={size} />;
+    case "retail": return <ShoppingBag size={size} />;
+    case "restaurant": return <Utensils size={size} />;
+    case "hospital": return <Stethoscope size={size} />;
+    case "school": return <GraduationCap size={size} />;
+    case "hotel": return <Hotel size={size} />;
+    case "industrial": return <Factory size={size} />;
+    case "worship": return <Church size={size} />;
+    default: return <Building2 size={size} />;
+  }
+};
 
 export default function Estimator() {
   // Check if viewport is mobile or desktop/tablet (matching 768px CSS breakpoint)
@@ -49,7 +90,7 @@ export default function Estimator() {
     { 
       id: "home", 
       label: "Residential", 
-      icon: "🏠", 
+      icon: "home", 
       desc: "Homes & Flats",
       presets: [
         { name: "LED TV (43\")", watt: 65, quantity: 1 },
@@ -61,7 +102,7 @@ export default function Estimator() {
     { 
       id: "office", 
       label: "Corporate", 
-      icon: "🏢", 
+      icon: "office", 
       desc: "Offices & Studios",
       presets: [
         { name: "Workstation / Laptop", watt: 85, quantity: 4 },
@@ -73,7 +114,7 @@ export default function Estimator() {
     { 
       id: "retail", 
       label: "Retail", 
-      icon: "🛒", 
+      icon: "retail", 
       desc: "Shops & Stores",
       presets: [
         { name: "Display Chiller", watt: 400, quantity: 1 },
@@ -85,7 +126,7 @@ export default function Estimator() {
     { 
       id: "restaurant", 
       label: "Food Service", 
-      icon: "🍽️", 
+      icon: "restaurant", 
       desc: "Cafes & Dining",
       presets: [
         { name: "Commercial Freezer", watt: 600, quantity: 2 },
@@ -97,7 +138,7 @@ export default function Estimator() {
     { 
       id: "hospital", 
       label: "Medical", 
-      icon: "🏥", 
+      icon: "hospital", 
       desc: "Clinics & Labs",
       presets: [
         { name: "Vaccine Fridge", watt: 250, quantity: 1 },
@@ -109,7 +150,7 @@ export default function Estimator() {
     { 
       id: "school", 
       label: "Education", 
-      icon: "🏫", 
+      icon: "school", 
       desc: "Schools & Tech",
       presets: [
         { name: "Smart Projector", watt: 250, quantity: 2 },
@@ -121,7 +162,7 @@ export default function Estimator() {
     { 
       id: "hotel", 
       label: "Hospitality", 
-      icon: "🏨", 
+      icon: "hotel", 
       desc: "Hotels & Lodges",
       presets: [
         { name: "Room Mini Fridge", watt: 80, quantity: 6 },
@@ -133,7 +174,7 @@ export default function Estimator() {
     { 
       id: "industrial", 
       label: "Industrial", 
-      icon: "🏭", 
+      icon: "industrial", 
       desc: "Workshops",
       presets: [
         { name: "Drill Press / Lathe", watt: 1200, quantity: 1 },
@@ -144,7 +185,7 @@ export default function Estimator() {
     { 
       id: "worship", 
       label: "Worship", 
-      icon: "🕌", 
+      icon: "worship", 
       desc: "Churches & Mosques",
       presets: [
         { name: "Audio Amplifier", watt: 800, quantity: 1 },
@@ -201,7 +242,7 @@ export default function Estimator() {
   const renderPropertyGrid = () => (
     <div style={{ marginBottom: '28px' }}>
       <h3 className={styles.sectionTitle}>
-        <CustomEmoji name="home" size={20} />
+        <Home size={18} color="var(--color-primary)" />
         <span>1. Select Property Type</span>
       </h3>
       <div className={styles.propertyGrid}>
@@ -213,13 +254,13 @@ export default function Estimator() {
             className={`${styles.propertyCard} ${property === t.id ? styles.propertyCardActive : ''}`}
           >
             <span className={styles.propertyIcon}>
-              <CustomEmoji name={t.id} size={28} />
+              {renderPropertyIcon(t.id)}
             </span>
             <span className={styles.propertyLabel}>{t.label}</span>
             <span className={styles.propertyDesc}>{t.desc}</span>
             {property === t.id && (
               <span className={styles.propertyCheckmark}>
-                <CustomEmoji name="check" size={14} color="var(--color-primary)" />
+                <Check size={12} strokeWidth={3} />
               </span>
             )}
           </button>
@@ -232,7 +273,7 @@ export default function Estimator() {
   const renderParameters = () => (
     <div style={{ marginBottom: '32px' }}>
       <h3 className={styles.sectionTitle}>
-        <CustomEmoji name="layers" size={20} />
+        <Layers size={18} color="var(--color-primary)" />
         <span>2. System Parameters & Site Configuration</span>
       </h3>
 
@@ -241,7 +282,7 @@ export default function Estimator() {
         <div className={styles.paramBox}>
           <div>
             <label htmlFor="address-input" className={styles.label} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <CustomEmoji name="pin" size={14} />
+              <MapPin size={15} color="var(--color-accent)" />
               <span>Installation City / Region</span>
             </label>
             <input
@@ -286,7 +327,7 @@ export default function Estimator() {
           <div>
             <div className={styles.rangeLabels}>
               <label className={styles.label} style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <CustomEmoji name="clock" size={15} />
+                <Clock size={15} color="var(--color-primary)" />
                 <span>Daily Backup Target</span>
               </label>
               <span className={styles.rangeValue}>{hours} Hours / Day</span>
@@ -324,7 +365,7 @@ export default function Estimator() {
         {/* Param Box 3: Battery Storage Technology */}
         <div className={styles.paramBox}>
           <label className={styles.label} style={{ marginBottom: '10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <CustomEmoji name="battery" size={15} />
+            <BatteryCharging size={15} color="var(--color-success)" />
             <span>Storage Technology</span>
           </label>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', height: '100%' }}>
@@ -334,21 +375,22 @@ export default function Estimator() {
               style={{
                 padding: '12px 10px',
                 borderRadius: 'var(--radius-sm)',
-                border: batteryType === 'lithium' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
-                background: batteryType === 'lithium' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(0,0,0,0.2)',
+                border: batteryType === 'lithium' ? '1.5px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.08)',
+                background: batteryType === 'lithium' ? 'var(--color-primary-subtle)' : 'var(--color-bg-surface)',
                 textAlign: 'left',
                 cursor: 'pointer',
                 color: '#fff',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'all 0.15s ease'
               }}
             >
-              <div style={{ fontWeight: 800, fontSize: '0.85rem', color: batteryType === 'lithium' ? 'var(--color-primary)' : 'inherit' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.85rem', color: batteryType === 'lithium' ? 'var(--color-primary)' : '#fff' }}>
                 Lithium LiFePO4
               </div>
               <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                80% DOD • 10-15yr
+                85% DoD • 6,000+ Cycles
               </div>
             </button>
 
@@ -358,31 +400,32 @@ export default function Estimator() {
               style={{
                 padding: '12px 10px',
                 borderRadius: 'var(--radius-sm)',
-                border: batteryType === 'tubular' ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.1)',
-                background: batteryType === 'tubular' ? 'rgba(251, 191, 36, 0.12)' : 'rgba(0,0,0,0.2)',
+                border: batteryType === 'tubular' ? '1.5px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.08)',
+                background: batteryType === 'tubular' ? 'var(--color-primary-subtle)' : 'var(--color-bg-surface)',
                 textAlign: 'left',
                 cursor: 'pointer',
                 color: '#fff',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'all 0.15s ease'
               }}
             >
-              <div style={{ fontWeight: 800, fontSize: '0.85rem', color: batteryType === 'tubular' ? 'var(--color-primary)' : 'inherit' }}>
+              <div style={{ fontWeight: 600, fontSize: '0.85rem', color: batteryType === 'tubular' ? 'var(--color-primary)' : '#fff' }}>
                 Deep Cycle Tubular
               </div>
               <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                50% DOD • Economical
+                50% DoD • Economical
               </div>
             </button>
           </div>
         </div>
 
-        {/* Param Box 4: Roof-to-Inverter Cable Distance (Client-Friendly Building Visuals) */}
+        {/* Param Box 4: Roof-to-Inverter Cable Distance */}
         <div className={styles.paramBox}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
             <label className={styles.label} style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <CustomEmoji name="cable" size={15} color="var(--color-accent)" />
+              <Cable size={15} color="var(--color-accent)" />
               <span>Roof to Inverter Distance</span>
             </label>
             <span className={styles.rangeValue}>{cableDistance} Meters</span>
@@ -394,9 +437,9 @@ export default function Estimator() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '10px' }}>
             {[
-              { label: 'Bungalow', sub: '1-Story (~15m)', val: 15, icon: 'home' },
-              { label: 'Duplex', sub: '2-Story (~25m)', val: 25, icon: 'office' },
-              { label: 'Detached', sub: '3-Story (~40m)', val: 40, icon: 'factory' },
+              { label: 'Bungalow', sub: '1-Story (~15m)', val: 15 },
+              { label: 'Duplex', sub: '2-Story (~25m)', val: 25 },
+              { label: 'Detached', sub: '3-Story (~40m)', val: 40 },
             ].map((preset) => (
               <button
                 key={preset.val}
@@ -405,18 +448,19 @@ export default function Estimator() {
                 style={{
                   padding: '8px 6px',
                   borderRadius: 'var(--radius-sm)',
-                  border: cableDistance === preset.val ? '2px solid var(--color-accent)' : '1px solid rgba(255,255,255,0.08)',
-                  background: cableDistance === preset.val ? 'rgba(56, 189, 248, 0.12)' : 'rgba(0,0,0,0.2)',
+                  border: cableDistance === preset.val ? '1.5px solid var(--color-accent)' : '1px solid rgba(255,255,255,0.08)',
+                  background: cableDistance === preset.val ? 'var(--color-accent-subtle)' : 'var(--color-bg-surface)',
                   color: '#fff',
                   cursor: 'pointer',
                   textAlign: 'center',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '4px'
+                  gap: '4px',
+                  transition: 'all 0.15s ease'
                 }}
               >
-                <span style={{ fontWeight: 700, fontSize: '0.78rem', color: cableDistance === preset.val ? 'var(--color-accent)' : '#fff' }}>
+                <span style={{ fontWeight: 600, fontSize: '0.78rem', color: cableDistance === preset.val ? 'var(--color-accent)' : '#fff' }}>
                   {preset.label}
                 </span>
                 <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>
@@ -450,7 +494,7 @@ export default function Estimator() {
     <div style={{ marginBottom: '32px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
         <h3 className={styles.sectionTitle} style={{ margin: 0 }}>
-          <CustomEmoji name="bolt" size={18} />
+          <Zap size={18} color="var(--color-primary)" />
           <span>{isMobile ? `Appliance Energy Audit (${appliances.length} Items)` : `3. Appliance Energy Audit (${appliances.length} Items)`}</span>
         </h3>
       </div>
@@ -466,7 +510,7 @@ export default function Estimator() {
             <div className={styles.applianceHeader}>
               <div className={styles.applianceNameWrap}>
                 <span className={styles.applianceIcon}>
-                  <CustomEmoji name="plug" size={16} />
+                  <Plug size={15} />
                 </span>
                 <input
                   className={styles.applianceNameInput}
@@ -601,28 +645,26 @@ export default function Estimator() {
                 disabled={loading}
                 style={{
                   width: '100%',
-                  maxWidth: '560px',
+                  maxWidth: '480px',
                   background: 'var(--color-primary)',
-                  color: '#000',
+                  color: '#080c14',
                   border: 'none',
-                  padding: '18px 36px',
-                  borderRadius: '100px',
-                  fontSize: '1.1rem',
-                  fontWeight: 800,
+                  padding: '16px 32px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '1rem',
+                  fontWeight: 700,
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '10px',
-                  boxShadow: 'var(--shadow-glow)',
-                  minHeight: '56px',
-                  transition: 'all 0.25s ease'
+                  boxShadow: 'var(--shadow-subtle)',
+                  minHeight: '52px',
+                  transition: 'background 0.15s ease'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >
                 <span>{loading ? "Analyzing Energy Profile..." : "Calculate Solar Blueprint"}</span>
-                <CustomEmoji name="rocket" size={20} color="#000" />
+                <ArrowRight size={18} />
               </button>
             </div>
 
@@ -710,7 +752,7 @@ export default function Estimator() {
                     className={styles.nextBtn}
                   >
                     <span>Continue to Energy Audit</span>
-                    <CustomEmoji name="arrow-right" size={16} />
+                    <ArrowRight size={16} />
                   </button>
                 </div>
               </div>
@@ -728,7 +770,7 @@ export default function Estimator() {
                     className={styles.backBtn}
                     style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                   >
-                    <CustomEmoji name="arrow-left" size={16} />
+                    <ArrowLeft size={16} />
                     <span>Back to Site</span>
                   </button>
 
@@ -739,7 +781,7 @@ export default function Estimator() {
                     className={styles.nextBtn}
                   >
                     <span>{loading ? "Analyzing Energy..." : "Calculate Blueprint"}</span>
-                    <CustomEmoji name="rocket" size={16} />
+                    <Zap size={16} />
                   </button>
                 </div>
               </div>
@@ -763,9 +805,9 @@ export default function Estimator() {
                       style={{
                         background: 'rgba(255, 255, 255, 0.06)',
                         color: 'var(--color-text-muted)',
-                        border: '1px solid rgba(255, 255, 255, 0.12)',
+                        border: '1px solid var(--border-hairline)',
                         padding: '6px 14px',
-                        borderRadius: '100px',
+                        borderRadius: 'var(--radius-sm)',
                         fontSize: '0.8rem',
                         fontWeight: 600,
                         cursor: 'pointer',
@@ -774,7 +816,7 @@ export default function Estimator() {
                         gap: '6px'
                       }}
                     >
-                      <CustomEmoji name="arrow-left" size={14} />
+                      <ArrowLeft size={14} />
                       <span>Edit Loads ({appliances.length})</span>
                     </button>
 
@@ -783,11 +825,11 @@ export default function Estimator() {
                       onClick={handleEstimate}
                       disabled={loading}
                       style={{
-                        background: 'rgba(251, 191, 36, 0.1)',
+                        background: 'rgba(245, 158, 11, 0.08)',
                         color: 'var(--color-primary)',
-                        border: '1px solid rgba(251, 191, 36, 0.3)',
+                        border: '1px solid rgba(245, 158, 11, 0.25)',
                         padding: '6px 14px',
-                        borderRadius: '100px',
+                        borderRadius: 'var(--radius-sm)',
                         fontSize: '0.8rem',
                         fontWeight: 700,
                         cursor: 'pointer',
@@ -796,7 +838,7 @@ export default function Estimator() {
                         gap: '6px'
                       }}
                     >
-                      <CustomEmoji name="bolt" size={14} />
+                      <Zap size={14} />
                       <span>Recalculate</span>
                     </button>
                   </div>
@@ -818,7 +860,7 @@ export default function Estimator() {
                     marginTop: '12px'
                   }}>
                     <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-                      <CustomEmoji name="sun" size={48} color="var(--color-primary)" />
+                      <Sun size={40} color="var(--color-primary)" />
                     </div>
                     <h3 style={{ fontSize: '1.3rem', fontWeight: 800, marginBottom: '8px' }}>
                       Ready to Generate Your Solar Blueprint?
@@ -830,10 +872,10 @@ export default function Estimator() {
                       type="button"
                       onClick={handleEstimate}
                       className={styles.nextBtn}
-                      style={{ maxWidth: '280px', margin: '0 auto', display: 'flex', justifyContent: 'center', width: '100%' }}
+                      style={{ maxWidth: '280px', margin: '0 auto', display: 'flex', justifyContent: 'center', width: '100%', gap: '8px' }}
                     >
                       <span>Calculate Solar Blueprint</span>
-                      <CustomEmoji name="rocket" size={16} />
+                      <ArrowRight size={16} />
                     </button>
                   </div>
                 )}
@@ -860,7 +902,7 @@ export default function Estimator() {
                   `₦${(result.estimatedPriceNaira || 0).toLocaleString()}`
                 ) : (
                   <>
-                    <CustomEmoji name="bolt" size={12} />
+                    <Zap size={12} color="var(--color-primary)" />
                     <span>{totalSteadyWatts.toLocaleString()}W • {dailyEnergyKwh} kWh/d</span>
                   </>
                 )}
@@ -874,7 +916,7 @@ export default function Estimator() {
                 className="mobile-action-btn"
               >
                 <span>Audit Items ({appliances.length})</span>
-                <CustomEmoji name="arrow-right" size={14} />
+                <ArrowRight size={14} />
               </button>
             )}
 
@@ -886,7 +928,7 @@ export default function Estimator() {
                 className="mobile-action-btn"
               >
                 <span>{loading ? 'Analyzing...' : 'Calculate Blueprint'}</span>
-                <CustomEmoji name="rocket" size={15} />
+                <ArrowRight size={15} />
               </button>
             )}
 
@@ -903,7 +945,7 @@ export default function Estimator() {
                 style={{ background: '#25D366', color: '#fff' }}
               >
                 <span>Share Quote</span>
-                <CustomEmoji name="whatsapp" size={15} color="#fff" />
+                <Share2 size={15} color="#fff" />
               </button>
             )}
           </div>
@@ -916,7 +958,7 @@ export default function Estimator() {
               className={`mobile-tab-btn ${currentStep === 1 ? 'active' : ''}`}
             >
               <span className="mobile-tab-icon">
-                <CustomEmoji name="pin" size={18} />
+                <MapPin size={17} />
               </span>
               <span>Site</span>
             </button>
@@ -927,7 +969,7 @@ export default function Estimator() {
               className={`mobile-tab-btn ${currentStep === 2 ? 'active' : ''}`}
             >
               <span className="mobile-tab-icon">
-                <CustomEmoji name="bolt" size={18} />
+                <Zap size={17} />
               </span>
               <span>Audit</span>
               <span className="mobile-tab-badge">{appliances.length}</span>
@@ -942,7 +984,7 @@ export default function Estimator() {
               className={`mobile-tab-btn ${currentStep === 3 ? 'active' : ''}`}
             >
               <span className="mobile-tab-icon">
-                <CustomEmoji name="chart" size={18} />
+                <BarChart3 size={17} />
               </span>
               <span>Blueprint</span>
             </button>

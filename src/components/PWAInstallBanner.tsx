@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import CustomEmoji from './CustomEmoji';
+import { Smartphone, Download, X } from 'lucide-react';
 
 export default function PWAInstallBanner() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -67,10 +67,10 @@ export default function PWAInstallBanner() {
 
   return (
     <div className="pwa-install-banner-wrapper" style={{
-      background: 'rgba(15, 23, 42, 0.95)',
+      background: 'rgba(14, 20, 34, 0.96)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      border: '1px solid var(--border-glass)',
+      border: '1px solid var(--border-hairline)',
       borderRadius: 'var(--radius-md)',
       padding: '12px 16px',
       boxShadow: '0 12px 30px rgba(0,0,0,0.6)',
@@ -84,14 +84,14 @@ export default function PWAInstallBanner() {
         <img 
           src="/icons/icon-192.png" 
           alt="Solar Estimator" 
-          style={{ width: '40px', height: '40px', borderRadius: '10px', objectFit: 'cover' }} 
+          style={{ width: '38px', height: '38px', borderRadius: '6px', objectFit: 'cover' }} 
         />
         <div>
-          <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#fff', lineHeight: 1.2 }}>
+          <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#fff', lineHeight: 1.2 }}>
             Install Solar App
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-            Instant offline access & fast assessment
+            Instant offline access & technical calculations
           </div>
         </div>
       </div>
@@ -101,17 +101,21 @@ export default function PWAInstallBanner() {
           onClick={handleInstallClick}
           style={{
             background: 'var(--color-primary)',
-            color: '#000',
+            color: '#0a0e17',
             border: 'none',
-            borderRadius: '100px',
-            padding: '8px 16px',
+            borderRadius: 'var(--radius-sm)',
+            padding: '7px 14px',
             fontSize: '0.8rem',
             fontWeight: 700,
             cursor: 'pointer',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px'
           }}
         >
-          {isIOS ? 'Install' : 'Install'}
+          <Download size={13} />
+          <span>Install</span>
         </button>
 
         <button
@@ -121,13 +125,14 @@ export default function PWAInstallBanner() {
             background: 'transparent',
             border: 'none',
             color: 'var(--color-text-muted)',
-            fontSize: '1.2rem',
             cursor: 'pointer',
-            padding: '4px 6px',
-            lineHeight: 1
+            padding: '4px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
-          ×
+          <X size={16} />
         </button>
       </div>
 
@@ -145,17 +150,18 @@ export default function PWAInstallBanner() {
           padding: '20px'
         }}>
           <div style={{
-            background: 'var(--color-bg-deep)',
-            border: '1px solid var(--color-primary)',
+            background: 'var(--color-bg-surface)',
+            border: '1px solid var(--border-hairline)',
+            borderTop: '2px solid var(--color-primary)',
             borderRadius: 'var(--radius-md)',
             padding: '24px',
             maxWidth: '360px',
             textAlign: 'center'
           }}>
             <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'center' }}>
-              <CustomEmoji name="phone" size={36} color="var(--color-primary)" />
+              <Smartphone size={32} color="var(--color-primary)" />
             </div>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '8px', color: '#fff' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '8px', color: '#fff' }}>
               Add to iPhone Home Screen
             </h3>
             <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', lineHeight: 1.5, marginBottom: '20px' }}>
@@ -167,15 +173,15 @@ export default function PWAInstallBanner() {
               onClick={() => setShowIOSGuide(false)}
               style={{
                 background: 'var(--color-primary)',
-                color: '#000',
+                color: '#0a0e17',
                 fontWeight: 700,
                 padding: '10px 24px',
-                borderRadius: '100px',
+                borderRadius: 'var(--radius-sm)',
                 border: 'none',
                 cursor: 'pointer'
               }}
             >
-              Got it!
+              Got it
             </button>
           </div>
         </div>

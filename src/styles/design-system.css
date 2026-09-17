@@ -53,6 +53,47 @@
   --transition-smooth: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* --- OUTDOOR HIGH-CONTRAST FIELD MODE (100,000 LUX TROPICAL SUNLIGHT) --- */
+[data-theme="field-contrast"] {
+  --color-bg-deep: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-card: #f1f5f9;
+  --color-bg-elevated: #e2e8f0;
+  --color-bg-glass: rgba(0, 0, 0, 0.03);
+  
+  --color-text-main: #090d16;
+  --color-text-body: #1e293b;
+  --color-text-muted: #475569;
+  --color-text-dim: #64748b;
+  
+  --border-hairline: rgba(15, 23, 42, 0.18);
+  --border-subtle: 1px solid rgba(15, 23, 42, 0.16);
+  --border-glass: 1px solid rgba(15, 23, 42, 0.16);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08);
+  
+  --color-primary: #b45309;
+  --color-primary-subtle: rgba(180, 83, 9, 0.1);
+  --color-primary-border: rgba(180, 83, 9, 0.3);
+  
+  --color-accent: #0284c7;
+  --color-accent-subtle: rgba(2, 132, 199, 0.1);
+  --color-accent-border: rgba(2, 132, 199, 0.3);
+  
+  --color-success: #059669;
+  --color-success-subtle: rgba(5, 150, 105, 0.1);
+}
+
+[data-theme="field-contrast"] .text-gradient {
+  background: linear-gradient(180deg, #090d16 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
 /* ================= UTILITIES ================= */
 
 .glass-panel {

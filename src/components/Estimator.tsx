@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { 
   Home, 
   Building2, 
@@ -23,7 +23,12 @@ import {
   Share2,
   BarChart3,
   Sliders,
-  Sun
+  Sun,
+  Moon,
+  User,
+  Wrench,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import AppResult from "./AppResult";
 import ApplianceSelector from "./ApplianceSelector";
@@ -56,6 +61,11 @@ export default function Estimator() {
   // Check if viewport is mobile or desktop/tablet (matching 768px CSS breakpoint)
   const isMobile = useMediaQuery('(max-width: 768px)');
 
+  // Dual-Persona State: 'client' (Executive Homeowner) vs 'engineer' (Full Technical Rack)
+  const [userMode, setUserMode] = useState<'client' | 'engineer'>('client');
+  const [fieldMode, setFieldMode] = useState<boolean>(false);
+  const [showAdvancedParams, setShowAdvancedParams] = useState<boolean>(false);
+
   // Stepper state for mobile wizard (1: Location & Site, 2: Energy Audit, 3: Blueprint)
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
 
@@ -66,6 +76,15 @@ export default function Estimator() {
   const [batteryType, setBatteryType] = useState<'lithium' | 'gel' | 'tubular'>('lithium');
   const [cableDistance, setCableDistance] = useState<number>(20);
   const [isProMode, setIsProMode] = useState<boolean>(false);
+
+  // Synchronize high-contrast direct-sunlight mode to root HTML element
+  useEffect(() => {
+    if (fieldMode) {
+      document.documentElement.setAttribute('data-theme', 'field-contrast');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+  }, [fieldMode]);
   
   // Custom hooks
   const { errors, validateEstimation, clearError } = useFormValidation();
@@ -362,129 +381,173 @@ export default function Estimator() {
           </div>
         </div>
 
-        {/* Param Box 3: Battery Storage Technology */}
-        <div className={styles.paramBox}>
-          <label className={styles.label} style={{ marginBottom: '10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <BatteryCharging size={15} color="var(--color-success)" />
-            <span>Storage Technology</span>
-          </label>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', height: '100%' }}>
+        {/* In Client Mode, wrap technical parameters in Progressive Disclosure Accordion */}
+        {userMode === 'client' && !showAdvancedParams ? (
+          <div style={{ gridColumn: '1 / -1', marginTop: '4px' }}>
             <button
               type="button"
-              onClick={() => setBatteryType('lithium')}
-              style={{
-                padding: '12px 10px',
-                borderRadius: 'var(--radius-sm)',
-                border: batteryType === 'lithium' ? '1.5px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.08)',
-                background: batteryType === 'lithium' ? 'var(--color-primary-subtle)' : 'var(--color-bg-surface)',
-                textAlign: 'left',
-                cursor: 'pointer',
-                color: '#fff',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                transition: 'all 0.15s ease'
-              }}
+              onClick={() => setShowAdvancedParams(true)}
+              className={styles.accordionHeader}
             >
-              <div style={{ fontWeight: 600, fontSize: '0.85rem', color: batteryType === 'lithium' ? 'var(--color-primary)' : '#fff' }}>
-                Lithium LiFePO4
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Sliders size={15} color="var(--color-primary)" />
+                <span>Advanced Electrical Parameters (Lithium LiFePO4 & 20m PV Cable auto-selected)</span>
               </div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                85% DoD • 6,000+ Cycles
-              </div>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setBatteryType('tubular')}
-              style={{
-                padding: '12px 10px',
-                borderRadius: 'var(--radius-sm)',
-                border: batteryType === 'tubular' ? '1.5px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.08)',
-                background: batteryType === 'tubular' ? 'var(--color-primary-subtle)' : 'var(--color-bg-surface)',
-                textAlign: 'left',
-                cursor: 'pointer',
-                color: '#fff',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                transition: 'all 0.15s ease'
-              }}
-            >
-              <div style={{ fontWeight: 600, fontSize: '0.85rem', color: batteryType === 'tubular' ? 'var(--color-primary)' : '#fff' }}>
-                Deep Cycle Tubular
-              </div>
-              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
-                50% DoD • Economical
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--color-primary)', fontSize: '0.8rem', fontWeight: 700 }}>
+                <span>Configure</span>
+                <ChevronDown size={14} />
               </div>
             </button>
           </div>
-        </div>
+        ) : (
+          <>
+            {userMode === 'client' && (
+              <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', marginBottom: '-6px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAdvancedParams(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--color-text-muted)',
+                    fontSize: '0.78rem',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <ChevronUp size={13} />
+                  <span>Collapse Advanced Options</span>
+                </button>
+              </div>
+            )}
 
-        {/* Param Box 4: Roof-to-Inverter Cable Distance */}
-        <div className={styles.paramBox}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <label className={styles.label} style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-              <Cable size={15} color="var(--color-accent)" />
-              <span>Roof to Inverter Distance</span>
-            </label>
-            <span className={styles.rangeValue}>{cableDistance} Meters</span>
-          </div>
+            {/* Param Box 3: Battery Storage Technology */}
+            <div className={styles.paramBox}>
+              <label className={styles.label} style={{ marginBottom: '10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <BatteryCharging size={15} color="var(--color-success)" />
+                <span>Storage Chemistry</span>
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', height: '100%' }}>
+                <button
+                  type="button"
+                  onClick={() => setBatteryType('lithium')}
+                  style={{
+                    padding: '12px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: batteryType === 'lithium' ? '1.5px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.08)',
+                    background: batteryType === 'lithium' ? 'var(--color-primary-subtle)' : 'var(--color-bg-surface)',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    color: '#fff',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div style={{ fontWeight: 600, fontSize: '0.85rem', color: batteryType === 'lithium' ? 'var(--color-primary)' : '#fff' }}>
+                    Lithium LiFePO4
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                    85% DoD • 6,000+ Cycles
+                  </div>
+                </button>
 
-          <p style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', marginBottom: '10px', lineHeight: 1.3 }}>
-            Tap your building height to calculate precise DC cable gauge and prevent power loss:
-          </p>
+                <button
+                  type="button"
+                  onClick={() => setBatteryType('tubular')}
+                  style={{
+                    padding: '12px 10px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: batteryType === 'tubular' ? '1.5px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.08)',
+                    background: batteryType === 'tubular' ? 'var(--color-primary-subtle)' : 'var(--color-bg-surface)',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    color: '#fff',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <div style={{ fontWeight: 600, fontSize: '0.85rem', color: batteryType === 'tubular' ? 'var(--color-primary)' : '#fff' }}>
+                    Deep Cycle Tubular
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: 'var(--color-text-muted)', marginTop: '4px' }}>
+                    50% DoD • Economical
+                  </div>
+                </button>
+              </div>
+            </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '10px' }}>
-            {[
-              { label: 'Bungalow', sub: '1-Story (~15m)', val: 15 },
-              { label: 'Duplex', sub: '2-Story (~25m)', val: 25 },
-              { label: 'Detached', sub: '3-Story (~40m)', val: 40 },
-            ].map((preset) => (
-              <button
-                key={preset.val}
-                type="button"
-                onClick={() => setCableDistance(preset.val)}
-                style={{
-                  padding: '8px 6px',
-                  borderRadius: 'var(--radius-sm)',
-                  border: cableDistance === preset.val ? '1.5px solid var(--color-accent)' : '1px solid rgba(255,255,255,0.08)',
-                  background: cableDistance === preset.val ? 'var(--color-accent-subtle)' : 'var(--color-bg-surface)',
-                  color: '#fff',
-                  cursor: 'pointer',
-                  textAlign: 'center',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                <span style={{ fontWeight: 600, fontSize: '0.78rem', color: cableDistance === preset.val ? 'var(--color-accent)' : '#fff' }}>
-                  {preset.label}
+            {/* Param Box 4: Roof-to-Inverter Cable Distance */}
+            <div className={styles.paramBox}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label className={styles.label} style={{ margin: 0, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <Cable size={15} color="var(--color-accent)" />
+                  <span>Roof to Inverter Distance</span>
+                </label>
+                <span className={styles.rangeValue}>{cableDistance} Meters</span>
+              </div>
+
+              <p style={{ fontSize: '0.74rem', color: 'var(--color-text-muted)', marginBottom: '10px', lineHeight: 1.3 }}>
+                Tap your building height to calculate precise DC cable gauge and prevent power loss:
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '10px' }}>
+                {[
+                  { label: 'Bungalow', sub: '1-Story (~15m)', val: 15 },
+                  { label: 'Duplex', sub: '2-Story (~25m)', val: 25 },
+                  { label: 'Detached', sub: '3-Story (~40m)', val: 40 },
+                ].map((preset) => (
+                  <button
+                    key={preset.val}
+                    type="button"
+                    onClick={() => setCableDistance(preset.val)}
+                    style={{
+                      padding: '8px 6px',
+                      borderRadius: 'var(--radius-sm)',
+                      border: cableDistance === preset.val ? '1.5px solid var(--color-accent)' : '1px solid rgba(255,255,255,0.08)',
+                      background: cableDistance === preset.val ? 'var(--color-accent-subtle)' : 'var(--color-bg-surface)',
+                      color: '#fff',
+                      cursor: 'pointer',
+                      textAlign: 'center',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '4px',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <span style={{ fontWeight: 600, fontSize: '0.78rem', color: cableDistance === preset.val ? 'var(--color-accent)' : '#fff' }}>
+                      {preset.label}
+                    </span>
+                    <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>
+                      {preset.sub}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <input
+                  type="range"
+                  min="5"
+                  max="70"
+                  step="5"
+                  value={cableDistance}
+                  onChange={(e) => setCableDistance(Number(e.target.value))}
+                  className={styles.rangeSlider}
+                />
+                <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
+                  Custom
                 </span>
-                <span style={{ fontSize: '0.65rem', color: 'var(--color-text-muted)' }}>
-                  {preset.sub}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <input
-              type="range"
-              min="5"
-              max="70"
-              step="5"
-              value={cableDistance}
-              onChange={(e) => setCableDistance(Number(e.target.value))}
-              className={styles.rangeSlider}
-            />
-            <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
-              Custom
-            </span>
-          </div>
-        </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -605,6 +668,47 @@ export default function Estimator() {
     <div className={styles.container} ref={topContainerRef}>
       <div className={styles.glassPanel}>
 
+        {/* Dual-Persona Bar: Homeowner vs. Field Engineer & Sunlight Mode */}
+        <div className={styles.personaBar}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Mode:
+            </span>
+            <div className={styles.personaSegmented}>
+              <button
+                type="button"
+                onClick={() => setUserMode('client')}
+                className={`${styles.personaBtn} ${userMode === 'client' ? styles.personaBtnActive : ''}`}
+              >
+                <User size={13} />
+                <span>Homeowner View</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMode('engineer');
+                  setShowAdvancedParams(true);
+                }}
+                className={`${styles.personaBtn} ${userMode === 'engineer' ? styles.personaBtnActive : ''}`}
+              >
+                <Wrench size={13} />
+                <span>Field Engineer View</span>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setFieldMode(!fieldMode)}
+            className={`${styles.fieldModeToggle} ${fieldMode ? styles.fieldModeToggleActive : ''}`}
+            title="Toggle high-contrast white theme for outdoor direct sunlight readability on roofs"
+          >
+            {fieldMode ? <Moon size={13} /> : <Sun size={13} />}
+            <span>{fieldMode ? 'Dark Studio' : 'Outdoor Sunlight Mode'}</span>
+          </button>
+        </div>
+
         {/* ========================================================================= */}
         {/* DESKTOP / TABLET VIEW: Expansive High-End Dashboard Flow                  */}
         {/* ========================================================================= */}
@@ -677,7 +781,7 @@ export default function Estimator() {
                   </div>
                 )}
                 {!loading && result && (
-                  <AppResult data={result} />
+                  <AppResult data={result} userMode={userMode} />
                 )}
               </div>
             )}
@@ -881,7 +985,7 @@ export default function Estimator() {
                 )}
 
                 {!loading && result && (
-                  <AppResult data={result} />
+                  <AppResult data={result} userMode={userMode} />
                 )}
               </div>
             )}

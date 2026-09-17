@@ -20,9 +20,10 @@ import { calculateEnvironmentalImpact } from '../utils/helpers';
 
 type ResultProps = {
   data: EstimationResult;
+  userMode?: 'client' | 'engineer';
 };
 
-export default function AppResult({ data }: ResultProps) {
+export default function AppResult({ data, userMode = 'client' }: ResultProps) {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
@@ -160,13 +161,15 @@ export default function AppResult({ data }: ResultProps) {
           marginBottom: '12px'
         }}>
           <ShieldCheck size={14} />
-          <span>Technical Sizing Specification</span>
+          <span>{userMode === 'client' ? 'Guaranteed Turnkey Solar System' : 'Technical Sizing Specification & Telemetry'}</span>
         </div>
         <h2 style={{ fontSize: 'clamp(1.6rem, 5vw, 2.4rem)', fontWeight: 800, marginBottom: '8px', letterSpacing: '-0.02em' }}>
-          Your Solar Blueprint
+          {userMode === 'client' ? 'Your Solar Power Blueprint' : 'Engineered System Rack & Telemetry'}
         </h2>
         <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', maxWidth: '580px', margin: '0 auto 20px', lineHeight: 1.5 }}>
-          Engineered to match your consumption profile with local solar irradiation and optimal DC safety tolerances.
+          {userMode === 'client'
+            ? `Calibrated for ${data.location?.address || 'Nigeria'} to power your home seamlessly and eliminate generator fueling costs.`
+            : `Engineered DC bus architecture matching peak surge kW, MPPT charge ampacity, and thermal safety tolerances.`}
         </p>
 
         {/* Quick Action Buttons */}
@@ -249,14 +252,16 @@ export default function AppResult({ data }: ResultProps) {
               gap: '6px'
             }}>
               <Zap size={14} />
-              <span>Inverter Capacity</span>
+              <span>{userMode === 'client' ? 'Inverter Capacity' : 'Inverter Continuous Rating'}</span>
             </div>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
               {((data.recommendedInverterW || 0) / 1000).toFixed(1)} kVA
             </h3>
           </div>
           <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '8px', lineHeight: 1.4 }}>
-            {data.systemVoltage}V Pure Sine Wave &bull; Surge: {(data.maxSurgeWatts || 0).toLocaleString()}W
+            {userMode === 'client'
+              ? `Pure Sine Wave &bull; Effortlessly starts ACs, fridge compressors & domestic surges without flickering.`
+              : `${data.systemVoltage}V Pure Sine Wave &bull; Surge: ${(data.maxSurgeWatts || 0).toLocaleString()}W &bull; PF: 0.85`}
           </p>
         </div>
 
@@ -284,14 +289,18 @@ export default function AppResult({ data }: ResultProps) {
               gap: '6px'
             }}>
               <BatteryCharging size={14} />
-              <span>Battery Storage</span>
+              <span>{userMode === 'client' ? 'Energy Storage Bank' : 'DC Battery Bank'}</span>
             </div>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
-              {((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh
+              {userMode === 'client' 
+                ? `${((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh`
+                : `${data.batteryAh} Ah @ ${data.systemVoltage}V`}
             </h3>
           </div>
           <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '8px', lineHeight: 1.4 }}>
-            {data.batteryAh} Ah @ {data.systemVoltage}V &bull; {data.batteryType === 'lithium' ? 'Lithium LiFePO4' : 'Deep Cycle Tubular'}
+            {userMode === 'client'
+              ? `${data.batteryType === 'lithium' ? '10+ Year LiFePO4 Lithium (Zero Maintenance)' : 'Deep Cycle Tubular Bank'} &bull; Sustains full night loads.`
+              : `${((data.batteryCapacityWh || 0) / 1000).toFixed(1)} kWh Reserve &bull; DoD: ${data.batteryType === 'lithium' ? '80%' : '50%'} &bull; ${data.batteryType === 'lithium' ? 'LiFePO4' : 'Lead-Acid'}`}
           </p>
         </div>
 
@@ -319,14 +328,16 @@ export default function AppResult({ data }: ResultProps) {
               gap: '6px'
             }}>
               <Sun size={14} />
-              <span>Solar PV Array</span>
+              <span>{userMode === 'client' ? 'Solar Array Generation' : 'PV Generator Array'}</span>
             </div>
             <h3 className="result-card-title" style={{ fontSize: 'clamp(1.5rem, 4.5vw, 2rem)', fontWeight: 800, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
               {data.panelQuantity} Panels
             </h3>
           </div>
           <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginTop: '8px', lineHeight: 1.4 }}>
-            {((data.panelQuantity * (data.panelWattage || 450)) / 1000).toFixed(2)} kW Array &bull; {data.chargeControllerAmps}A MPPT
+            {userMode === 'client'
+              ? `${((data.panelQuantity * (data.panelWattage || 450)) / 1000).toFixed(2)} kW High-Yield Monocrystalline &bull; Powers heavy appliances in direct sun.`
+              : `${((data.panelQuantity * (data.panelWattage || 450)) / 1000).toFixed(2)} kWp (${data.panelQuantity}x${data.panelWattage || 450}W) &bull; ${data.chargeControllerAmps}A MPPT`}
           </p>
         </div>
       </div>
@@ -340,11 +351,11 @@ export default function AppResult({ data }: ResultProps) {
           border: '1px solid rgba(255,255,255,0.06)'
         }}>
           <h4 style={{ color: 'var(--color-primary)', fontSize: '0.85rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '16px', letterSpacing: '0.1em' }}>
-            Technical Engineering Specifications
+            {userMode === 'client' ? 'System Performance & Capacity Summary' : 'Technical Engineering Specifications'}
           </h4>
           <div className="grid-responsive-narrow" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Peak Surge Load</span>
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>{userMode === 'client' ? 'Simultaneous Peak Load' : 'Peak Surge Load'}</span>
               <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{(data.maxSurgeWatts || 0).toLocaleString()} W</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
@@ -352,11 +363,11 @@ export default function AppResult({ data }: ResultProps) {
               <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{((data.dailyEnergyWh || 0) / 1000).toFixed(1)} kWh</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Solar Irradiance (Local)</span>
-              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{data.location?.psh ? `${data.location.psh.toFixed(2)} PSH` : '4.80 PSH'}</span>
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>{userMode === 'client' ? 'Local Sunlight Hours' : 'Peak Sun Hours (PSH)'}</span>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{data.location?.psh ? `${data.location.psh.toFixed(2)} hrs/day` : '4.80 hrs/day'}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '8px' }}>
-              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>Architecture</span>
+              <span style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>System Architecture</span>
               <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{data.systemVoltage}V DC Pure Sine</span>
             </div>
           </div>
@@ -377,7 +388,7 @@ export default function AppResult({ data }: ResultProps) {
             <Sparkles size={18} />
           </div>
           <p style={{ margin: 0, fontSize: '0.82rem', color: 'var(--color-text-muted)', lineHeight: 1.5 }}>
-            <strong style={{ color: '#fff' }}>Smart Energy Optimization Applied:</strong> Sizing automatically factors in cooling thermostat cycles (for ACs and refrigerators) and nighttime lighting hours, ensuring you get guaranteed 24/7 power without overpaying for unnecessary hardware.
+            <strong style={{ color: '#fff' }}>24/7 Power Assurance:</strong> Sizing automatically factors in compressor duty cycles (for air conditioners and refrigerators) and nighttime battery autonomy, ensuring your home or facility stays uninterrupted without overpaying for oversized hardware.
           </p>
         </div>
 
@@ -394,7 +405,7 @@ export default function AppResult({ data }: ResultProps) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Cable size={18} color="var(--color-accent)" />
               <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 700, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                DC Cable Sizing & Thermal Safety
+                {userMode === 'client' ? 'Safety, Fire Protection & Certified Wiring' : 'DC Cable Sizing & Thermal Safety'}
               </h4>
             </div>
 
@@ -411,14 +422,16 @@ export default function AppResult({ data }: ResultProps) {
               gap: '5px'
             }}>
               {data.pvArchitecture === 'high-voltage' ? <ShieldCheck size={13} /> : <AlertCircle size={13} />}
-              <span>{data.pvArchitecture === 'high-voltage' ? 'High Voltage Array (Optimal)' : 'Low Voltage Array'}</span>
+              <span>{data.pvArchitecture === 'high-voltage' ? 'High Voltage Array (Optimal Efficiency)' : 'Low Voltage Array'}</span>
             </span>
           </div>
 
           <p style={{ fontSize: '0.84rem', color: 'var(--color-text-muted)', lineHeight: 1.5, marginBottom: '16px' }}>
-            {data.pvArchitecture === 'high-voltage'
-              ? `High-voltage series configuration keeps current low, preventing cables from heating up over your ${data.cableDistanceMeters || 20}m run and reducing electrical resistance.`
-              : `Low-voltage parallel arrays generate heavy current. Heavy-duty copper cables are specified below to prevent thermal cable warming.`}
+            {userMode === 'client'
+              ? `Your system includes fire-retardant DC cabling, lightning surge arrestors (SPD), and high-efficiency circuit breakers to safeguard your appliances and roof installation.`
+              : data.pvArchitecture === 'high-voltage'
+                ? `High-voltage series configuration keeps current low, preventing cables from heating up over your ${data.cableDistanceMeters || 20}m run and reducing electrical resistance.`
+                : `Low-voltage parallel arrays generate heavy current. Heavy-duty copper cables are specified below to prevent thermal cable warming.`}
           </p>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px', marginBottom: '16px' }}>

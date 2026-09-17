@@ -11,7 +11,11 @@ import {
   Zap,
   Clock,
   Plug,
-  Info
+  Info,
+  Home,
+  Building2,
+  Stethoscope,
+  ShoppingBag
 } from 'lucide-react';
 import { APPLIANCE_DATABASE, CATEGORIES, searchAppliances, type ApplianceSpec } from '../data/applianceDatabase';
 import type { Appliance } from '../types';
@@ -118,6 +122,52 @@ export default function ApplianceSelector({ onAdd }: ApplianceSelectorProps) {
 
           <div className="scroll-touch-x" style={{ gap: '8px' }}>
             {[
+              {
+                label: '2-Bed Standard Home',
+                IconComponent: Home,
+                items: [
+                  { name: 'Small Refrigerator (Inverter)', watt: 120, quantity: 1, hours: 24, category: 'kitchen' },
+                  { name: 'Standing Fan 16"', watt: 55, quantity: 2, hours: 8, category: 'cooling' },
+                  { name: 'LED TV (43")', watt: 65, quantity: 1, hours: 6, category: 'entertainment' },
+                  { name: 'LED Bulb (9W)', watt: 9, quantity: 12, hours: 6, category: 'lighting' },
+                  { name: 'WiFi Router', watt: 15, quantity: 1, hours: 24, category: 'computing' },
+                  { name: 'Phone / Tablet Charger', watt: 18, quantity: 2, hours: 4, category: 'computing' },
+                ]
+              },
+              {
+                label: 'Executive Home (1 AC)',
+                IconComponent: Building2,
+                items: [
+                  { name: 'AC 1HP Inverter', watt: 746, quantity: 1, hours: 6, category: 'cooling' },
+                  { name: 'Small Refrigerator (Inverter)', watt: 120, quantity: 1, hours: 24, category: 'kitchen' },
+                  { name: 'Chest Freezer (Medium)', watt: 150, quantity: 1, hours: 24, category: 'kitchen' },
+                  { name: 'Standing Fan 16"', watt: 55, quantity: 3, hours: 8, category: 'cooling' },
+                  { name: 'LED TV (55")', watt: 100, quantity: 1, hours: 6, category: 'entertainment' },
+                  { name: 'LED Bulb (9W)', watt: 9, quantity: 18, hours: 6, category: 'lighting' },
+                  { name: 'WiFi Router', watt: 15, quantity: 1, hours: 24, category: 'computing' },
+                ]
+              },
+              {
+                label: 'Clinic / Health Post',
+                IconComponent: Stethoscope,
+                items: [
+                  { name: 'Small Refrigerator (Inverter)', watt: 120, quantity: 1, hours: 24, category: 'kitchen' },
+                  { name: 'LED Bulb (9W)', watt: 9, quantity: 16, hours: 10, category: 'lighting' },
+                  { name: 'Standing Fan 16"', watt: 55, quantity: 2, hours: 10, category: 'cooling' },
+                  { name: 'Laptop Computer', watt: 65, quantity: 1, hours: 10, category: 'computing' },
+                  { name: 'WiFi Router', watt: 15, quantity: 1, hours: 24, category: 'computing' },
+                ]
+              },
+              {
+                label: 'Commercial Shop / Office',
+                IconComponent: ShoppingBag,
+                items: [
+                  { name: 'AC 1.5HP Inverter', watt: 1100, quantity: 1, hours: 8, category: 'cooling' },
+                  { name: 'Desktop Computer + Monitor', watt: 150, quantity: 1, hours: 8, category: 'computing' },
+                  { name: 'LED Bulb (9W)', watt: 9, quantity: 12, hours: 10, category: 'lighting' },
+                  { name: 'Water Dispenser', watt: 500, quantity: 1, hours: 4, category: 'kitchen' },
+                ]
+              },
               {
                 label: 'Living Room Suite',
                 IconComponent: Tv,
